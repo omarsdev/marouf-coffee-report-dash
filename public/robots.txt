@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: http://admin.darsijo.com/
+
+# Sitemaps
+Sitemap: http://admin.darsijo.com/sitemap.xml

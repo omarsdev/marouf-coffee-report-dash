@@ -1,0 +1,13 @@
+{
+  "title": "Darsi CMS",
+  "titleTemplate": "%s",
+  "description": "",
+  "favicon": "/favicon.ico",
+  "openGraph": {
+    "type": "website",
+    "site_name": "Darsi CRM",
+    "profile": {
+      "firstName": "Admin Panel"
+    }
+  }
+}

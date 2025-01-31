@@ -1,0 +1,60 @@
+import {GridAddIcon} from '@mui/x-data-grid'
+import CustomButton from 'components/CustomButton'
+import CustomLabel from 'components/CustomLabel'
+import PanelSegmentation from 'components/PanelSegmentation'
+import {useStore} from 'lib/store/store'
+import router, {useRouter} from 'next/router'
+import React from 'react'
+import Layout from '../../Layout'
+import {redirectGuest} from '../_app'
+import ModelList from './ModelList'
+
+export default function Booking(props) {
+  // const { query: { venue: query } } = useRouter()
+  const {user} = useStore()
+  React.useEffect(() => {
+    console.log('user', user)
+  }, [])
+  return (
+    <Layout
+      meta={{
+        title: 'Bookings',
+      }}
+    >
+      <PanelSegmentation
+        panels={[
+          {
+            title: 'Bookings',
+            description: 'The appointments for darsi',
+            component: (
+              <ModelList
+                // query={query}
+                setLoading={props.setLoading}
+              />
+            ),
+            button: null,
+          },
+          // {
+          //     title: "Branch Users",
+          //     description: "Add employees to each branch and pair their phone",
+          //     component: <div>3</div>,
+          //     button: <CustomButton
+          //         onClick={() => { () => { } }}
+          //         startIcon={<GridAddIcon />}
+          //         width='13rem'
+          //         title='Add Branch User' />
+          // },
+          // {
+          //     title: "Map",
+          //     description: "Branch location projection (similar to application)",
+          //     component: <div>4</div>,
+          // },
+        ]}
+      />
+    </Layout>
+  )
+}
+
+export async function getServerSideProps(ctx) {
+  return await redirectGuest(ctx)
+}
