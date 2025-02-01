@@ -1,8 +1,0 @@
-{
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/_document": "pages/_document.js",
-  "/schedules": "pages/schedules.js",
-  "/schedules/form/[model_id]": "pages/schedules/form/[model_id].js",
-  "/tickets": "pages/tickets.js"
-}
