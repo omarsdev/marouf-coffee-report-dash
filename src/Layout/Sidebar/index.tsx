@@ -23,8 +23,14 @@ import {
   RiUserHeartFill,
   RiUserStarFill,
 } from 'react-icons/ri'
-import {RiAppsFill, RiBillFill} from 'react-icons/ri'
-import {FaUserClock, FaChalkboardTeacher, FaUserGraduate} from 'react-icons/fa'
+import {FaCodeBranch} from 'react-icons/fa'
+import {IoTicketOutline} from 'react-icons/io5'
+import {FaQuestion} from 'react-icons/fa'
+import {MdChecklist} from 'react-icons/md'
+
+import {TbCalendarStats} from 'react-icons/tb'
+
+import {IoPerson} from 'react-icons/io5'
 import {MdStorefront} from 'react-icons/md'
 import router, {useRouter} from 'next/router'
 import {useStore} from 'lib/store/store'
@@ -53,65 +59,101 @@ export default function SideBar() {
     //     icon: <RiDashboardFill size='1.7rem' />
     // },
     {
+      title: 'Employees',
+      tooltip: 'Employees',
+      href: '/employees',
+      icon: <IoPerson size="1.7rem" />,
+    },
+    {
       title: 'Branches',
       tooltip: 'Branches',
       href: '/branches',
       icon: <MdStorefront size="1.7rem" />,
     },
     {
-      title: 'Teachers',
-      tooltip: 'Teachers',
-      href: '/staff/64736133d682e100148c0222',
-      icon: <FaChalkboardTeacher size="1.7rem" />,
+      title: 'Departments',
+      tooltip: 'Departments',
+      href: '/departments',
+      icon: <FaCodeBranch size="1.7rem" />,
     },
     {
-      title: 'Pending Teachers',
-      tooltip: 'Pending Teachers',
-      href: '/pending-staff/64736133d682e100148c0222',
-      icon: <FaUserClock size="1.7rem" />,
+      title: 'Tickets',
+      tooltip: 'Tickets',
+      href: '/tickets',
+      icon: <IoTicketOutline size="1.7rem" />,
     },
     {
-      title: 'Special Needs Teachers',
-      tooltip: 'Special Needs Teachers',
-      href: '/specialneedsStaff/64736133d682e100148c0222',
-      icon: <RiUserStarFill size="1.7rem" />,
+      title: 'Checklist',
+      tooltip: 'Checklist',
+      href: '/checklist',
+      icon: <MdChecklist size="1.7rem" />,
     },
     {
-      title: 'Students',
-      tooltip: 'Students',
-      href: '/students',
-      icon: <FaUserGraduate size="1.7rem" />,
+      title: 'Questions',
+      tooltip: 'Questions',
+      href: '/questions',
+      icon: <FaQuestion size="1.7rem" />,
     },
     {
-      title: 'Advertisements',
-      tooltip: 'Advertisements',
-      href: '/advertisements',
-      icon: <RiBillFill size="1.7rem" />,
+      title: 'Schedules',
+      tooltip: 'Schedules',
+      href: '/schedules',
+      icon: <TbCalendarStats size="1.7rem" />,
     },
-    {
-      title: 'Special Needs',
-      tooltip: 'Special Needs',
-      href: '/special-needs',
-      icon: <RiUserHeartFill size="1.7rem" />,
-    },
-    {
-      title: 'Booking Finder',
-      tooltip: 'Booking Finder',
-      href: '/booking_finder',
-      icon: <RiBook2Fill size="1.7rem" />,
-    },
-    {
-      title: 'Bookings',
-      tooltip: 'Bookings',
-      href: '/booking',
-      icon: <RiBookmarkFill size="1.7rem" />,
-    },
-    {
-      title: 'Notifications',
-      tooltip: 'Notifications',
-      href: '/notifications',
-      icon: <RiNotification2Fill size="1.7rem" />,
-    },
+    // {
+    //   title: 'Teachers',
+    //   tooltip: 'Teachers',
+    //   href: '/staff/64736133d682e100148c0222',
+    //   icon: <FaChalkboardTeacher size="1.7rem" />,
+    // },
+    // {
+    //   title: 'Pending Teachers',
+    //   tooltip: 'Pending Teachers',
+    //   href: '/pending-staff/64736133d682e100148c0222',
+    //   icon: <FaUserClock size="1.7rem" />,
+    // },
+    // {
+    //   title: 'Special Needs Teachers',
+    //   tooltip: 'Special Needs Teachers',
+    //   href: '/specialneedsStaff/64736133d682e100148c0222',
+    //   icon: <RiUserStarFill size="1.7rem" />,
+    // },
+    // {
+    //   title: 'Students',
+    //   tooltip: 'Students',
+    //   href: '/students',
+    //   icon: <FaUserGraduate size="1.7rem" />,
+    // },
+    // {
+    //   title: 'Advertisements',
+    //   tooltip: 'Advertisements',
+    //   href: '/advertisements',
+    //   icon: <RiBillFill size="1.7rem" />,
+    // },
+    // {
+    //   title: 'Special Needs',
+    //   tooltip: 'Special Needs',
+    //   href: '/special-needs',
+    //   icon: <RiUserHeartFill size="1.7rem" />,
+    // },
+    // {
+    //   title: 'Booking Finder',
+    //   tooltip: 'Booking Finder',
+    //   href: '/booking_finder',
+    //   icon: <RiBook2Fill size="1.7rem" />,
+    // },
+    // {
+    //   title: 'Bookings',
+    //   tooltip: 'Bookings',
+    //   href: '/booking',
+    //   icon: <RiBookmarkFill size="1.7rem" />,
+    // },
+    // {
+    //   title: 'Notifications',
+    //   tooltip: 'Notifications',
+    //   href: '/notifications',
+    //   icon: <RiNotification2Fill size="1.7rem" />,
+    // },
 
     // {
     //     title: "Vouchers",

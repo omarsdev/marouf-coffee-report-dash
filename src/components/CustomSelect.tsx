@@ -31,6 +31,7 @@ interface Props {
   options?: Array<Option>
   hasEmpty?: boolean
   value?: any
+  multiple?: boolean
 }
 
 export default function CustomSelect({
@@ -47,6 +48,7 @@ export default function CustomSelect({
   error,
   options,
   hasEmpty,
+  multiple,
 }: Props) {
   const BootstrapInput = styled(InputBase)(({theme}) => ({
     '& .MuiInputBase-input': {
@@ -87,6 +89,7 @@ export default function CustomSelect({
         value={value}
         displayEmpty={!!hasEmpty}
         onChange={onChange}
+        multiple={multiple}
       >
         {!!hasEmpty && (
           <MenuItem value={''}>

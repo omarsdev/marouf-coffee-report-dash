@@ -1,0 +1,243 @@
+import {Box, TextField, useTheme} from '@mui/material'
+import {GridColDef} from '@mui/x-data-grid'
+import DeleteDialog from 'components/DeleteDialog'
+import Table from 'components/Table'
+import TableActionCell from 'components/TableActionCell'
+
+import router from 'next/router'
+
+import React, {useRef} from 'react'
+import {branchApi} from 'lib/api/branch'
+import {useQuery} from '@tanstack/react-query'
+import {ticketsApi} from 'lib/api/tickets'
+import {format} from 'date-fns'
+import CustomButton from 'components/CustomButton'
+import {DesktopDatePicker} from '@mui/x-date-pickers'
+import CustomSelect from 'components/CustomSelect'
+import {departmentsApi} from 'lib/api/departments'
+import TextInput from 'components/TextInput'
+import {CiSearch} from 'react-icons/ci'
+import {toSearchQuery} from 'lib/utils'
+
+export default function ModelList() {
+  const theme = useTheme()
+  const isSearchingRef = useRef(false)
+  const filterOptionsRef = useRef({})
+
+  const [localLoading, setLocalLoading] = React.useState(false)
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
+  const [filter, setFilter] = React.useState({
+    from: null,
+    to: null,
+    department: '',
+    branch: '',
+    ticket_title: '',
+  })
+
+  const {data, isLoading, isError, refetch} = useQuery({
+    queryFn: () => {
+      return ticketsApi.get(
+        isSearchingRef.current ? toSearchQuery(filterOptionsRef.current) : '',
+      )
+    },
+    queryKey: ['tickets'],
+    select: (data) => {
+      isSearchingRef.current = false
+      filterOptionsRef.current = {}
+      return data
+    },
+  })
+
+  const {data: branches, isLoading: isLoadingBranch} = useQuery({
+    queryFn: () => branchApi.get(),
+    queryKey: ['branches'],
+  })
+
+  const {data: departments, isLoading: isLoadingDepartments} = useQuery({
+    queryFn: () => departmentsApi.get(),
+    queryKey: ['departments'],
+  })
+
+  const defaultRowConfig = {
+    flex: 1,
+    headerAlign: 'left',
+    align: 'left',
+  } as GridColDef
+
+  const columns: GridColDef[] = [
+    {
+      ...defaultRowConfig,
+      field: 'ticket_title',
+      headerName: 'Ticket Title',
+      renderCell: ({row}) => `${row.ticket_title}`,
+    },
+    {
+      ...defaultRowConfig,
+      field: 'branch.name.en',
+      headerName: 'Branch',
+      renderCell: ({row}) => `${row.branch.name.en}`,
+    },
+    {
+      ...defaultRowConfig,
+      field: 'department.department_name.en',
+      headerName: 'Department',
+      renderCell: ({row}) => `${row.department.department_name.en}`,
+    },
+    {
+      ...defaultRowConfig,
+      field: 'status',
+      headerName: 'Status',
+      renderCell: ({row}) => `${row.status}`,
+    },
+    {
+      ...defaultRowConfig,
+      field: 'created_at',
+      headerName: 'Date',
+      renderCell: ({row}) =>
+        `${format(new Date(row.created_at), 'dd/MM/yyyy')}`,
+    },
+    // {
+    //   ...defaultRowConfig,
+    //   field: 'id',
+    //   headerName: '',
+    //   description: '',
+    //   sortable: false,
+    //   hideSortIcons: true,
+    //   hideable: false,
+    //   filterable: false,
+    //   renderCell: ({row}) => (
+    //     <TableActionCell
+    //       onEdit={() => {
+    //         router.push({
+    //           pathname: '/tickets/form/[model_id]',
+    //           query: {model_id: row.id},
+    //         })
+    //       }}
+    //       onDelete={() => {
+    //         setDeleteDialogOpen(row.id)
+    //       }}
+    //     />
+    //   ),
+    // },
+  ]
+
+  return (
+    <div>
+      <DeleteDialog
+        isOpen={!!deleteDialogOpen}
+        handleClose={() => setDeleteDialogOpen(null)}
+        deleteCallback={async () => {
+          try {
+            setLocalLoading(true)
+            let id = deleteDialogOpen
+            setDeleteDialogOpen(null)
+            await ticketsApi.delete(id)
+            await refetch()
+          } catch (e) {
+            console.log(e)
+          } finally {
+            setLocalLoading(false)
+          }
+        }}
+      />
+      <Table
+        rows={
+          (data?.tickets &&
+            data?.tickets?.map((model) => ({...model, id: model._id}))) ||
+          []
+        }
+        columns={columns}
+        loading={
+          localLoading || isLoading || isLoadingBranch || isLoadingDepartments
+        }
+        tableSize="tabbed"
+        headerComponent={
+          <Box
+            flexDirection="row"
+            display="flex"
+            justifyContent="flex-end"
+            gap="20px"
+            alignItems="center"
+          >
+            <DesktopDatePicker
+              label="To"
+              value={filter.to}
+              onChange={(value) => setFilter({...filter, to: value})}
+              slotProps={{textField: {fullWidth: true}}} // ✅ Correct way to use TextField
+              renderInput={(props) => <TextField {...props} />}
+            />
+            <DesktopDatePicker
+              label="From"
+              value={filter.from}
+              onChange={(value) => setFilter({...filter, from: value})}
+              slotProps={{textField: {fullWidth: true}}} // ✅ Correct way to use TextField
+              renderInput={(props) => <TextField {...props} />}
+            />
+            <CustomSelect
+              id="bootstrap"
+              options={departments?.departments?.map((department) => ({
+                label: department?.department_name?.en,
+                value: department._id,
+              }))}
+              hasEmpty
+              label="Department"
+              placeholder="Department"
+              className="w-full"
+              value={filter.department}
+              onChange={({target: {name, value}}) =>
+                setFilter({...filter, department: value})
+              }
+              padding={2}
+            />
+            <CustomSelect
+              id="bootstrap"
+              options={branches?.branches?.map((branch) => ({
+                label: branch?.name?.en,
+                value: branch._id,
+              }))}
+              inputProps={{
+                default: '1',
+              }}
+              hasEmpty
+              label="Brach"
+              placeholder="Branch"
+              className="w-full"
+              value={filter.branch}
+              onChange={({target: {name, value}}) =>
+                setFilter({...filter, branch: value})
+              }
+              padding={2}
+            />
+            <TextInput
+              label="Search by Name"
+              className="w-full"
+              value={filter.ticket_title}
+              onChange={(value) => setFilter({...filter, ticket_title: value})}
+              padding={2}
+              query={true}
+            />
+            <CustomButton
+              onClick={async () => {
+                try {
+                  setLocalLoading(true)
+                  console.log({filter})
+                  isSearchingRef.current = true
+                  filterOptionsRef.current = filter
+                  await refetch()
+                } catch (e) {
+                  console.log(e)
+                } finally {
+                  setLocalLoading(false)
+                }
+              }}
+              startIcon={<CiSearch />}
+              width="10rem"
+              title="Search"
+            />
+          </Box>
+        }
+      />
+    </div>
+  )
+}

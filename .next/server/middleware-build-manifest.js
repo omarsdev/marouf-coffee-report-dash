@@ -20,10 +20,15 @@ self.__BUILD_MANIFEST = {
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/categories": [
+    "/schedules": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/categories.js"
+      "static/chunks/pages/schedules.js"
+    ],
+    "/schedules/form/[model_id]": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/schedules/form/[model_id].js"
     ]
   },
   "ampFirstPages": []

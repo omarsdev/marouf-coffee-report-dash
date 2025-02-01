@@ -44,6 +44,7 @@ export default function Table({
   rows,
   tableSize = 'regular',
   loading,
+  headerComponent,
 }: Props) {
   return (
     <div>
@@ -101,6 +102,7 @@ export default function Table({
         className="w-full"
         radius="medium"
       >
+        {headerComponent && headerComponent}
         <div
           className="w-full"
           style={{height: tableSizes[tableSize].tableHeight}}

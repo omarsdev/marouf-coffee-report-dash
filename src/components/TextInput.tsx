@@ -21,6 +21,7 @@ interface Props {
   value?: any
   helperText?: string
   error?: string
+  type?: string
   multiline?
   secureEntry?: Boolean
   sx?: any
@@ -58,6 +59,7 @@ export default function TextInput({
   helperText,
   error,
   secureEntry,
+  type,
   query,
   pb,
 }: Props) {
@@ -115,7 +117,7 @@ export default function TextInput({
         value={value}
         //@ts-ignore
         onChange={!query ? _onChange : _onQueryChange}
-        type={secureEntry ? 'password' : 'default'}
+        type={secureEntry ? 'password' : type ? type : 'default'}
       />
 
       {(error || helperText) && (

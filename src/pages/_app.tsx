@@ -13,6 +13,9 @@ import {CookiesProvider} from 'react-cookie'
 import _ from 'lodash'
 import request from 'lib/api'
 import {useStore} from 'lib/store/store'
+import ReactQueryProvider from 'components/ReactQueryProvider'
+import {LocalizationProvider} from '@mui/x-date-pickers'
+import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns'
 
 export const ColorModeContext = React.createContext({toggleColorMode: () => {}})
 
@@ -170,15 +173,19 @@ function MyApp({Component, pageProps, _props}: any) {
   return (
     <>
       <DefaultSeo {...SEO} />
-      <CookiesProvider>
-        <ColorModeContext.Provider value={colorMode}>
-          <MUIThemeProvider theme={theme}>
-            <Backdrop isVisible={loading} />
-            <Component {...pageProps} setLoading={setLoading} />
-            {/* <FormWidget /> */}
-          </MUIThemeProvider>
-        </ColorModeContext.Provider>
-      </CookiesProvider>
+      <ReactQueryProvider>
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <CookiesProvider>
+            <ColorModeContext.Provider value={colorMode}>
+              <MUIThemeProvider theme={theme}>
+                <Backdrop isVisible={loading} />
+                <Component {...pageProps} setLoading={setLoading} />
+                {/* <FormWidget /> */}
+              </MUIThemeProvider>
+            </ColorModeContext.Provider>
+          </CookiesProvider>
+        </LocalizationProvider>
+      </ReactQueryProvider>
     </>
   )
 }
