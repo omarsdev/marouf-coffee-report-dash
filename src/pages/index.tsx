@@ -19,6 +19,7 @@ export default function Entry() {
   const [_, setCookies] = useCookies([])
   const handleLogin = async () => {
     clearErrors()
+    setBackendError('')
     try {
       await request.removeSession()
       await request.setCompany(values.email_a.toLowerCase())
@@ -26,12 +27,17 @@ export default function Entry() {
         email: values.email_a.toLowerCase(),
         password: values.password_2,
       })) as any
-      console.log(token, 'kjghksdgkh')
-      setCookies('token', token)
-      setCookies('company', values.email_a.toLowerCase())
-      request.setSession(token)
-      router.push('/categories')
-      console.log('token', token)
+      const data = await userApi.rehydrate(token)
+      if (data?.role !== 0) {
+        setBackendError('You are not authorized to access this page')
+      } else {
+        setCookies('token', token)
+        request.setSession(token)
+        console.log(token, 'kjghksdgkh')
+        setCookies('company', values.email_a.toLowerCase())
+        router.push('/categories')
+        console.log('token', token)
+      }
     } catch (e) {
       console.log(e)
       await request.removeCompany()

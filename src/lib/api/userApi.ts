@@ -34,7 +34,17 @@ export const userApi = {
   update: (data: any, id) => request.put('/users/' + id, data),
   signup: (data: any) => request.post('/users', data),
   login: (data) => request.post('/auth', data),
-  rehydrate: () => request.get('/users/me'),
+  rehydrate: (token) =>
+    request.get(
+      '/users/me',
+      token
+        ? {
+            headers: {
+              'x-auth-token': token,
+            },
+          }
+        : {},
+    ),
   changePassword: ({old_password, new_password}) =>
     request.post('/users/change_password', {old_password, new_password}),
   deleteAccount: ({password}) =>
