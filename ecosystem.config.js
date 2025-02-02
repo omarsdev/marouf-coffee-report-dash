@@ -8,7 +8,6 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
       },
-      interpreter: '/home/Mattia/.nvm/versions/node/v18.18.0/bin/node',
     },
   ],
 }
