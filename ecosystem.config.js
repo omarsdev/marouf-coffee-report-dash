@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'ORKABIT',
+      name: 'Vudedale-MaroufDashboard',
       script: 'npm',
       args: 'start',
       watch: true,
