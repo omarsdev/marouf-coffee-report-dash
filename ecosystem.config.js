@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'Vudedale-MaroufDashboard',
       script: 'npm',
-      args: 'run start:prod',
+      args: 'run start',
       watch: true,
       env: {
         NODE_ENV: 'production',
