@@ -35,7 +35,7 @@ export default function Entry() {
         request.setSession(token)
         console.log(token, 'kjghksdgkh')
         setCookies('company', values.email_a.toLowerCase())
-        router.push('/categories')
+        router.push('/employees')
         console.log('token', token)
       }
     } catch (e) {
