@@ -16,6 +16,7 @@ interface Props {
   rows
   tableSize?: 'regular' | 'tabbed'
   loading?
+  headerComponent?
 }
 
 const tableSizes = {

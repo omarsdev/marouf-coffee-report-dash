@@ -4,7 +4,7 @@ export const toSearchQuery = (params) => {
     .filter(([_, value]) => value !== null && value !== '') // Remove null & empty values
     .map(
       ([key, value]) =>
-        `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
+        `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`,
     )
     .join('&')
 

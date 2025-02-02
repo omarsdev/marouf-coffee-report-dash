@@ -27,7 +27,7 @@ export default function Entry() {
         email: values.email_a.toLowerCase(),
         password: values.password_2,
       })) as any
-      const data = await userApi.rehydrate(token)
+      const data = (await userApi.rehydrate(token)) as any
       if (data?.role !== 0) {
         setBackendError('You are not authorized to access this page')
       } else {

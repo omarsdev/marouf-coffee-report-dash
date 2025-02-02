@@ -30,7 +30,7 @@ export default function VenueForm({setLoading}) {
 
   const [backendError, setBackendError] = React.useState<string>('')
 
-  const {data, isLoading} = useQuery({
+  const {data, isLoading} = useQuery<any>({
     queryFn: () => userApi.getId(model_id.toString()),
     enabled: isEditting,
     queryKey: ['users' + model_id.toString()],

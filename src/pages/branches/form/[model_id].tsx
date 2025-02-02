@@ -30,12 +30,12 @@ export default function VenueForm({setLoading}) {
 
   const [backendError, setBackendError] = React.useState<string>('')
 
-  const {data, isLoading, isError} = useQuery({
+  const {data, isLoading, isError} = useQuery<any>({
     queryFn: () => userApi.getAllAreaManagers(),
     queryKey: ['area_managers'],
   })
 
-  const {data: branch, isLoading: isLoadingBranch} = useQuery({
+  const {data: branch, isLoading: isLoadingBranch} = useQuery<any>({
     queryFn: () => branchApi.getId(model_id.toString()),
     enabled: isEditting,
     queryKey: ['branch' + model_id.toString()],

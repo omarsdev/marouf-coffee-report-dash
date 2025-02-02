@@ -35,7 +35,7 @@ export default function ModelList() {
     ticket_title: '',
   })
 
-  const {data, isLoading, isError, refetch} = useQuery({
+  const {data, isLoading, isError, refetch} = useQuery<any>({
     queryFn: () => {
       return ticketsApi.get(
         isSearchingRef.current ? toSearchQuery(filterOptionsRef.current) : '',
@@ -49,12 +49,12 @@ export default function ModelList() {
     },
   })
 
-  const {data: branches, isLoading: isLoadingBranch} = useQuery({
+  const {data: branches, isLoading: isLoadingBranch} = useQuery<any>({
     queryFn: () => branchApi.get(),
     queryKey: ['branches'],
   })
 
-  const {data: departments, isLoading: isLoadingDepartments} = useQuery({
+  const {data: departments, isLoading: isLoadingDepartments} = useQuery<any>({
     queryFn: () => departmentsApi.get(),
     queryKey: ['departments'],
   })
@@ -164,14 +164,12 @@ export default function ModelList() {
               label="To"
               value={filter.to}
               onChange={(value) => setFilter({...filter, to: value})}
-              slotProps={{textField: {fullWidth: true}}} // ✅ Correct way to use TextField
               renderInput={(props) => <TextField {...props} />}
             />
             <DesktopDatePicker
               label="From"
               value={filter.from}
               onChange={(value) => setFilter({...filter, from: value})}
-              slotProps={{textField: {fullWidth: true}}} // ✅ Correct way to use TextField
               renderInput={(props) => <TextField {...props} />}
             />
             <CustomSelect

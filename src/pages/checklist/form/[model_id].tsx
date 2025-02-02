@@ -35,12 +35,12 @@ export default function VenueForm({setLoading}) {
     data: questions,
     isLoading,
     isError,
-  } = useQuery({
+  } = useQuery<any>({
     queryFn: () => questionsApi.get(),
     queryKey: ['questions'],
   })
 
-  const {data: branch, isLoading: isLoadingChecklist} = useQuery({
+  const {data: branch, isLoading: isLoadingChecklist} = useQuery<any>({
     queryFn: () => checklistApi.getId(model_id.toString()),
     enabled: isEditting,
     queryKey: ['checklist' + model_id.toString()],

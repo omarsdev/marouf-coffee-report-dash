@@ -34,7 +34,7 @@ export const userApi = {
   update: (data: any, id) => request.put('/users/' + id, data),
   signup: (data: any) => request.post('/users', data),
   login: (data) => request.post('/auth', data),
-  rehydrate: (token) =>
+  rehydrate: (token?) =>
     request.get(
       '/users/me',
       token

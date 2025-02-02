@@ -33,22 +33,22 @@ export default function VenueForm({setLoading}) {
 
   const [backendError, setBackendError] = React.useState<string>('')
 
-  const {data: reports, isLoading: isLoadingReports} = useQuery({
+  const {data: reports, isLoading: isLoadingReports} = useQuery<any>({
     queryFn: () => checklistApi.get(),
     queryKey: ['checklist'],
   })
 
-  const {data: users, isLoading: isLoadingUser} = useQuery({
+  const {data: users, isLoading: isLoadingUser} = useQuery<any>({
     queryFn: () => userApi.get(),
     queryKey: ['users'],
   })
 
-  const {data: branches, isLoading: isLoadingBranch} = useQuery({
+  const {data: branches, isLoading: isLoadingBranch} = useQuery<any>({
     queryFn: () => branchApi.get(),
     queryKey: ['branches'],
   })
 
-  const {data: schedule, isLoading: isLoadingChecklist} = useQuery({
+  const {data: schedule, isLoading: isLoadingChecklist} = useQuery<any>({
     queryFn: () => schedulesApi.getId(model_id.toString()),
     enabled: isEditting,
     queryKey: ['schedule' + model_id.toString()],
@@ -197,7 +197,6 @@ export default function VenueForm({setLoading}) {
           label="Assigned At"
           value={values.assignedAt}
           onChange={(value) => handleChange('assignedAt', value)}
-          slotProps={{textField: {fullWidth: true}}} // ✅ Correct way to use TextField
           renderInput={(props) => <TextField {...props} />}
         />
 
@@ -205,7 +204,6 @@ export default function VenueForm({setLoading}) {
           label="Due Date"
           value={values.dueDate}
           onChange={(value) => handleChange('dueDate', value)}
-          slotProps={{textField: {fullWidth: true}}} // ✅ Correct way to use TextField
           renderInput={(props) => <TextField {...props} />}
         />
 

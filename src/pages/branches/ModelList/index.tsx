@@ -21,7 +21,7 @@ export default function ModelList() {
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
 
-  const {data, isLoading, isError, refetch} = useQuery({
+  const {data, isLoading, isError, refetch} = useQuery<any>({
     queryFn: () => branchApi.get(),
     queryKey: ['branches'],
   })
