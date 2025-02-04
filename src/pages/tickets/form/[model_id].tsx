@@ -76,15 +76,15 @@ export default function TicketsForm({setLoading}) {
   return (
     <Layout
       meta={{
-        title: isEditting ? 'Edit Employee' : 'Add Employee',
+        title: isEditting ? 'Edit Ticket' : 'Add Ticket',
       }}
     >
       <CustomLabel size="bigTitle">
-        {isEditting ? 'Edit Employee' : 'Add Employee'}
+        {isEditting ? 'Edit Ticket' : 'Add Ticket'}
       </CustomLabel>
 
       <CustomLabel type="secondary" padding={3} size="normal">
-        {isEditting ? 'Edit an existing Employee' : 'Create a new Employee'}
+        {isEditting ? 'Edit an existing Ticket' : 'Create a new Ticket'}
       </CustomLabel>
 
       <CustomContainer
