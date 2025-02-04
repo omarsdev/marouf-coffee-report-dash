@@ -48,6 +48,11 @@ export default function EmployeesForm({setLoading}) {
     },
   })
 
+  const {data: branches, isLoading: isLoadingBranch} = useQuery<any>({
+    queryFn: () => branchApi.get(),
+    queryKey: ['branches'],
+  })
+
   const submitCreate = async () => {
     try {
       setLoading(true)
@@ -186,6 +191,24 @@ export default function EmployeesForm({setLoading}) {
           padding={2}
         />
 
+        {values.role === '3' && (
+          <CustomSelect
+            id="bootstrap"
+            options={branches?.branches?.map((branch) => ({
+              label: branch?.name?.en,
+              value: branch?._id,
+            }))}
+            value={values.branch_access}
+            label="Branch"
+            helperText="Choose branch"
+            className="w-full"
+            // onChange={({target: {name, value}}) => handleChange('userId', value)}
+            onChange={({target: {name, value}}) =>
+              handleChange('branch_access', value)
+            }
+            padding={2}
+          />
+        )}
         <Error backendError={backendError} />
 
         <FormBottomWidget
