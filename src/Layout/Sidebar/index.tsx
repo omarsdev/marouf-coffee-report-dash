@@ -32,6 +32,19 @@ const ColoredIconButton = styled(IconButton)<IconButtonProps>(({theme}) => ({
 export default function SideBar() {
   const MenuItems = [
     {
+      title: 'Schedules',
+      tooltip: 'Schedules',
+      href: '/schedules',
+      icon: <TbCalendarStats size="1.7rem" />,
+    },
+
+    {
+      title: 'Tickets',
+      tooltip: 'Tickets',
+      href: '/tickets',
+      icon: <IoTicketOutline size="1.7rem" />,
+    },
+    {
       title: 'Employees',
       tooltip: 'Employees',
       href: '/employees',
@@ -50,12 +63,6 @@ export default function SideBar() {
       icon: <FaCodeBranch size="1.7rem" />,
     },
     {
-      title: 'Tickets',
-      tooltip: 'Tickets',
-      href: '/tickets',
-      icon: <IoTicketOutline size="1.7rem" />,
-    },
-    {
       title: 'Checklist',
       tooltip: 'Checklist',
       href: '/checklist',
@@ -66,12 +73,6 @@ export default function SideBar() {
       tooltip: 'Questions',
       href: '/questions',
       icon: <FaQuestion size="1.7rem" />,
-    },
-    {
-      title: 'Schedules',
-      tooltip: 'Schedules',
-      href: '/schedules',
-      icon: <TbCalendarStats size="1.7rem" />,
     },
   ]
 
