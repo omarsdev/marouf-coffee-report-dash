@@ -75,14 +75,6 @@ export default function BranchesForm({setLoading}) {
     onSubmit: isEditting ? submitUpdateBranch : submitCreateBranch,
   })
 
-  useEffect(() => {
-    if (isEditting) {
-      setLoading(isLoading || isLoadingBranch)
-    } else {
-      setLoading(isLoading)
-    }
-  }, [isLoading, isLoadingBranch])
-
   return (
     <Layout
       meta={{
