@@ -5,7 +5,7 @@ import Table from 'components/Table'
 import TableActionCell from 'components/TableActionCell'
 import {categoriesApi} from 'lib/api/categories'
 import {venuesApi} from 'lib/api/venues'
-import {useStore} from 'lib/store/store'
+import useStore from 'lib/store/store'
 import {get} from 'lodash'
 import router from 'next/router'
 import {redirectGuest} from 'pages/_app'
@@ -64,14 +64,11 @@ export default function ModelList() {
       filterable: false,
       renderCell: ({row}) => (
         <TableActionCell
-          onEdit={() => {
+          onView={() => {
             router.push({
-              pathname: '/departments/form/[model_id]',
+              pathname: '/departments/info/[model_id]',
               query: {model_id: row.id},
             })
-          }}
-          onDelete={() => {
-            setDeleteDialogOpen(row.id)
           }}
         />
       ),
@@ -91,7 +88,7 @@ export default function ModelList() {
             await departmentsApi.delete(id)
             await refetch()
           } catch (e) {
-            console.log(e)
+            console.error(e)
           } finally {
             setLocalLoading(false)
           }

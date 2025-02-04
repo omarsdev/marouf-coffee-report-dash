@@ -1,7 +1,7 @@
-import React,{ useRef, useCallback} from 'react'
+import React, {useRef, useCallback} from 'react'
 const GOOGLEAPIKEY = 'AIzaSyD5OQ-RVhYfeYpBiD65zb7PdZkQpfOHWnA'
 import {compose, withProps} from 'recompose'
-import { GoogleMap, Marker, LoadScript} from '@react-google-maps/api'
+import {GoogleMap, Marker, LoadScript} from '@react-google-maps/api'
 //withScriptjs, withGoogleMap,
 // import {  useLoadScript } from '@react-google-maps/api';
 import {useTheme} from '@mui/material'
@@ -367,58 +367,33 @@ const MAPNIGHTSTYLE = [
 ]
 
 const MapWithAMarker = (props: any) => {
-    const theme = useTheme()
-    const [location, setLocation] = React.useState({
-      // lat: 31.972657,
-      // lng: 35.864801,
-      lat: props.initial?.lat ? props.initial.lat : 31.956305,
-      lng: props.initial?.lng ? props.initial.lng : 35.854405,
+  const theme = useTheme()
+  const [location, setLocation] = React.useState({
+    lat: props.initial?.lat ? props.initial.lat : 31.956305,
+    lng: props.initial?.lng ? props.initial.lng : 35.854405,
+  })
+  const mapRef = React.useRef<any>(null)
+
+  React.useEffect(() => {
+    setTimeout(() => {
+      if (get(props, 'initial.type', false) == 'Point') {
+        setLocation({
+          lat: get(props, 'initial.lat'),
+          lng: get(props, 'initial.lng'),
+        })
+      }
+    }, 250)
+  }, [props.initial])
+
+  React.useEffect(() => {
+    props.onChange(props.name, {
+      lat: location.lat,
+      lng: location.lng,
     })
-    const mapRef = React.useRef<any>(null)
+  }, [location])
 
-    React.useEffect(() => {
-      console.log(
-        'Form Trying to get initial',
-        // props,
-        location,
-        // get(props, 'initial.lat'),
-        // get(props, 'initial.type', false),
-      )
-      setTimeout(() => {
-        if (get(props, 'initial.type', false) == 'Point') {
-          setLocation({
-            lat: get(props, 'initial.lat'),
-            lng: get(props, 'initial.lng'),
-            // lat: get(props, 'initial.coordinates.0', 31.972657),
-            // lng: get(props, 'initial.coordinates.1', 35.864801),
-          })
-          // props.onChange(props.name, { coordinates: [location.lat, location.lng] })
-        }
-      }, 250)
-    }, [props.initial])
-
-    React.useEffect(() => {
-      props.onChange(props.name, {
-        lat: location.lat,
-        lng: location.lng,
-      })
-      // if (hello) {
-      //   setLocation({lat: location.lat, lng: location.lng})
-      // }
-      // props.onChange(props.name, {coordinates: [location.lat, location.lng]})
-    }, [location])
-
-    // React.useEffect(() => {
-    //   // console.log('here i want', props.current)
-    //   if (props.onChange) {
-    //     setLocation({lat: props.current?.lat, lng: props.current?.lng})
-    //   }
-    // }, [props.current])
-
-   
-
-    return (
-      <LoadScript googleMapsApiKey={`${GOOGLEAPIKEY}`}>
+  return (
+    <LoadScript googleMapsApiKey={`${GOOGLEAPIKEY}`}>
       <GoogleMap
         ref={mapRef}
         options={{
@@ -432,19 +407,17 @@ const MapWithAMarker = (props: any) => {
           // await mapRef.current.panTo(location)
           // props.onChange(props.name, { coordinates: [location.lat, location.lng] })
         }}
-        >
+      >
         <Marker
           icon={{
-            url:
-            'https://vuedalesmallapps.s3.us-east-2.amazonaws.com/map-pin-2-fill.png',
+            url: 'https://vuedalesmallapps.s3.us-east-2.amazonaws.com/map-pin-2-fill.png',
           }}
           position={props.current ? props.current : location}
-          />
+        />
       </GoogleMap>
-          </LoadScript>
-    )
-  };
-
+    </LoadScript>
+  )
+}
 
 export default function MapFormPicker(props: Props) {
   return (

@@ -54,7 +54,6 @@ export default function SchedulesForm({setLoading}) {
     queryKey: ['schedule' + model_id.toString()],
     select: (data) => {
       const chosenKeys = ['dueDate', 'assignedAt']
-      console.log('assignment', data?.assignment)
       handleChange('reportId', data?.assignment?.reportId?._id)
       handleChange('branches', [data?.assignment?.branch])
       handleChange('userId', data?.assignment?.userId?._id)
@@ -69,7 +68,7 @@ export default function SchedulesForm({setLoading}) {
       await schedulesApi.create({...values})
       router.back()
     } catch (e) {
-      console.log(e)
+      console.error(e)
       setBackendError(e?.message)
     } finally {
       setLoading(false)
@@ -81,7 +80,7 @@ export default function SchedulesForm({setLoading}) {
       await schedulesApi.update(model_id.toString(), {...values})
       router.back()
     } catch (e) {
-      console.log(e)
+      console.error(e)
       setBackendError(e?.message)
     } finally {
       setLoading(false)

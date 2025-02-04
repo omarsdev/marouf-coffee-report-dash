@@ -66,7 +66,6 @@ export default function TextInput({
   const _onChange = (
     event,
   ): ChangeEvent<HTMLInputElement | HTMLTextAreaElement> => {
-    console.log('target,value', name, event.target.value)
     if (!!onChange) {
       return onChange(name, event.target.value)
     }

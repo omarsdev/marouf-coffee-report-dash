@@ -5,7 +5,7 @@ import Table from 'components/Table'
 import TableActionCell from 'components/TableActionCell'
 import {categoriesApi} from 'lib/api/categories'
 import {venuesApi} from 'lib/api/venues'
-import {useStore} from 'lib/store/store'
+import useStore from 'lib/store/store'
 import {get} from 'lodash'
 import router from 'next/router'
 import {redirectGuest} from 'pages/_app'
@@ -78,7 +78,7 @@ export default function ModelList() {
             await checklistApi.delete(id)
             await refetch()
           } catch (e) {
-            console.log(e)
+            console.error(e)
           } finally {
             setLocalLoading(false)
           }

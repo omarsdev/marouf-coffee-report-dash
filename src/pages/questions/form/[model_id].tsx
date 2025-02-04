@@ -48,7 +48,7 @@ export default function QuestionsForm({setLoading}) {
       await questionsApi.create({...values})
       router.back()
     } catch (e) {
-      console.log(e)
+      console.error(e)
       setBackendError(e?.message)
     } finally {
       setLoading(false)
@@ -60,7 +60,7 @@ export default function QuestionsForm({setLoading}) {
       await questionsApi.update(model_id.toString(), {...values})
       router.back()
     } catch (e) {
-      console.log(e)
+      console.error(e)
       setBackendError(e?.message)
     } finally {
       setLoading(false)

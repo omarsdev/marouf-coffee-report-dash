@@ -6,8 +6,11 @@ import React from 'react'
 import Layout from '../../Layout'
 import {redirectGuest} from '../_app'
 import ModelList from './ModelList'
+import useStore from 'lib/store/store'
 
 export default function Departments(props) {
+  const {user} = useStore()
+
   return (
     <Layout
       meta={{
@@ -20,7 +23,7 @@ export default function Departments(props) {
             title: 'Departments',
             description: 'Get all the Departments here',
             component: <ModelList />,
-            button: (
+            button: user?.role === 0 && (
               <CustomButton
                 onClick={() => {
                   router.push('/departments/form/new')

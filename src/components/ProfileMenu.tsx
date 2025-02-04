@@ -10,7 +10,7 @@ import request from 'lib/api'
 import router from 'next/router'
 import {useCookies} from 'react-cookie'
 import shallow from 'zustand/shallow'
-import {useStore} from 'lib/store/store'
+import useStore from 'lib/store/store'
 import {get, truncate} from 'lodash'
 import {red} from '@mui/material/colors'
 

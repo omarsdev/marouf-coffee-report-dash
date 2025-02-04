@@ -61,7 +61,7 @@ export default function CheckListForm({setLoading}) {
       await checklistApi.create({...values})
       router.back()
     } catch (e) {
-      console.log(e)
+      console.error(e)
       setBackendError(e?.message)
     } finally {
       setLoading(false)
@@ -73,7 +73,7 @@ export default function CheckListForm({setLoading}) {
       await checklistApi.update(model_id.toString(), {...values})
       router.back()
     } catch (e) {
-      console.log(e)
+      console.error(e)
       setBackendError(e?.message)
     } finally {
       setLoading(false)

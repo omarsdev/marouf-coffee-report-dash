@@ -8,7 +8,6 @@ import Document, {
 } from 'next/document'
 import createEmotionServer from '@emotion/server/create-instance'
 import {cache} from '@emotion/css'
-import {createTheme} from '@mui/material'
 
 const {extractCritical} = createEmotionServer(cache)
 
@@ -51,7 +50,7 @@ export default class MyDocument extends Document {
           <link
             rel="preconnect"
             href="https://fonts.gstatic.com"
-            crossOrigin='anonymous'
+            crossOrigin="anonymous"
           />
           <link
             href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Mulish:wght@200;300;400;500;600;700;800;900&display=swap"

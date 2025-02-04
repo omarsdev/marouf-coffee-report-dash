@@ -59,7 +59,7 @@ export default function EmployeesForm({setLoading}) {
       await userApi.create({...values})
       router.back()
     } catch (e) {
-      console.log(e)
+      console.error(e)
       setBackendError(e?.message)
     } finally {
       setLoading(false)
@@ -71,7 +71,7 @@ export default function EmployeesForm({setLoading}) {
       await userApi.edit(model_id.toString(), {...values})
       router.back()
     } catch (e) {
-      console.log(e)
+      console.error(e)
       setBackendError(e?.message)
     } finally {
       setLoading(false)
