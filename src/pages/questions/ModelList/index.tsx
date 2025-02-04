@@ -54,12 +54,6 @@ export default function ModelList() {
     },
     {
       ...defaultRowConfig,
-      field: 'media_status',
-      headerName: 'Media Status',
-      renderCell: ({row}) => `${row.media_status}`,
-    },
-    {
-      ...defaultRowConfig,
       field: 'id',
       headerName: '',
       description: '',
