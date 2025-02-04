@@ -8,7 +8,6 @@ export default function UserUser() {
 
   const handleSignout = async () => {
     // await router.prefetch('/')
-    request.removeCompany()
     request.removeSession()
     setCookies('token', null)
     router.push('/')

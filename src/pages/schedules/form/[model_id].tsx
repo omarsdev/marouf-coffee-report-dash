@@ -25,7 +25,7 @@ import {checklistApi} from 'lib/api/checklist'
 import {branchApi} from 'lib/api/branch'
 import {schedulesApi} from 'lib/api/schedules'
 import {DesktopDatePicker} from '@mui/x-date-pickers'
-export default function VenueForm({setLoading}) {
+export default function SchedulesForm({setLoading}) {
   const {
     query: {model_id},
   } = useRouter()

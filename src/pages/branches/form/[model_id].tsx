@@ -1,17 +1,8 @@
-import {Divider} from '@mui/material'
-import CustomAutoComplete from 'components/CustomAutoComplete'
-import CustomButton from 'components/CustomButton'
 import CustomContainer from 'components/CustomContainer'
 import CustomLabel from 'components/CustomLabel'
 import CustomSelect from 'components/CustomSelect'
-import DropZone from 'components/DropZone'
 import FormBottomWidget from 'components/FormBottomWidget'
-import MapFormPicker from 'components/MapFormPicker'
-import MultiLineOptionSelector from 'components/MultiLineOptionSelector'
 import TextInput from 'components/TextInput'
-import {branchesApi} from 'lib/api/branches'
-import {categoriesApi} from 'lib/api/categories'
-import {venuesApi} from 'lib/api/venues'
 import useForm from 'lib/hooks/useForm'
 import router, {useRouter} from 'next/router'
 import {redirectGuest} from 'pages/_app'
@@ -22,7 +13,7 @@ import {useQuery} from '@tanstack/react-query'
 import {userApi} from 'lib/api/user'
 import {branchApi} from 'lib/api/branch'
 import {get, map} from 'lodash'
-export default function VenueForm({setLoading}) {
+export default function BranchesForm({setLoading}) {
   const {
     query: {model_id},
   } = useRouter()
@@ -30,12 +21,12 @@ export default function VenueForm({setLoading}) {
 
   const [backendError, setBackendError] = React.useState<string>('')
 
-  const {data, isLoading, isError} = useQuery<any>({
+  const {data, isLoading} = useQuery<any>({
     queryFn: () => userApi.getAllAreaManagers(),
     queryKey: ['area_managers'],
   })
 
-  const {data: branch, isLoading: isLoadingBranch} = useQuery<any>({
+  const {isLoading: isLoadingBranch} = useQuery<any>({
     queryFn: () => branchApi.getId(model_id.toString()),
     enabled: isEditting,
     queryKey: ['branch' + model_id.toString()],
@@ -78,7 +69,7 @@ export default function VenueForm({setLoading}) {
     }
   }
 
-  const {values, errors, handleChange, handleSubmit, clearErrors} = useForm({
+  const {values, handleChange, handleSubmit} = useForm({
     initial: {},
     // validationSchema:
     onSubmit: isEditting ? submitUpdateBranch : submitCreateBranch,
@@ -88,7 +79,7 @@ export default function VenueForm({setLoading}) {
     if (isEditting) {
       setLoading(isLoading || isLoadingBranch)
     } else {
-      setLoading(!isLoading)
+      setLoading(isLoading)
     }
   }, [isLoading, isLoadingBranch])
 

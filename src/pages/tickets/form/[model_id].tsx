@@ -1,17 +1,8 @@
-import {Divider} from '@mui/material'
-import CustomAutoComplete from 'components/CustomAutoComplete'
-import CustomButton from 'components/CustomButton'
 import CustomContainer from 'components/CustomContainer'
 import CustomLabel from 'components/CustomLabel'
 import CustomSelect from 'components/CustomSelect'
-import DropZone from 'components/DropZone'
 import FormBottomWidget from 'components/FormBottomWidget'
-import MapFormPicker from 'components/MapFormPicker'
-import MultiLineOptionSelector from 'components/MultiLineOptionSelector'
 import TextInput from 'components/TextInput'
-import {branchesApi} from 'lib/api/branches'
-import {categoriesApi} from 'lib/api/categories'
-import {venuesApi} from 'lib/api/venues'
 import useForm from 'lib/hooks/useForm'
 import router, {useRouter} from 'next/router'
 import {redirectGuest} from 'pages/_app'
@@ -20,9 +11,8 @@ import Layout from '../../../Layout'
 import Error from 'components/Error'
 import {useQuery} from '@tanstack/react-query'
 import {userApi} from 'lib/api/user'
-import {branchApi} from 'lib/api/branch'
-import {get, map} from 'lodash'
-export default function VenueForm({setLoading}) {
+import {get} from 'lodash'
+export default function TicketsForm({setLoading}) {
   const {
     query: {model_id},
   } = useRouter()
@@ -86,15 +76,15 @@ export default function VenueForm({setLoading}) {
   return (
     <Layout
       meta={{
-        title: isEditting ? 'Edit Employee' : 'Add Employee',
+        title: isEditting ? 'Edit Ticket' : 'Add Ticket',
       }}
     >
       <CustomLabel size="bigTitle">
-        {isEditting ? 'Edit Employee' : 'Add Employee'}
+        {isEditting ? 'Edit Ticket' : 'Add Ticket'}
       </CustomLabel>
 
       <CustomLabel type="secondary" padding={3} size="normal">
-        {isEditting ? 'Edit an existing Employee' : 'Create a new Employee'}
+        {isEditting ? 'Edit an existing Ticket' : 'Create a new Ticket'}
       </CustomLabel>
 
       <CustomContainer

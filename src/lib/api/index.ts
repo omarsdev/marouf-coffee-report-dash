@@ -14,8 +14,6 @@ const request = Axios as AxiosStatic & {
   removeSession: any
   setUser: any
   setEnv: any
-  setCompany: any
-  removeCompany: any
   getSession: any
 }
 
@@ -93,14 +91,6 @@ request['setSession'] = function ({token}) {
 
 request['getSession'] = function ({token}) {
   return request.defaults.headers[AUTH_HEADER]
-}
-
-request['setCompany'] = function (COMPID) {
-  request.defaults.headers['COMPID'] = COMPID
-}
-
-request['removeCompany'] = function () {
-  delete request.defaults.headers['COMPID']
 }
 
 request['setEnv'] = function () {

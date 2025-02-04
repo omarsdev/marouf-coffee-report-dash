@@ -23,7 +23,7 @@ import {userApi} from 'lib/api/user'
 import {get, map} from 'lodash'
 import {checklistApi} from 'lib/api/checklist'
 import {questionsApi} from 'lib/api/questions'
-export default function VenueForm({setLoading}) {
+export default function QuestionsForm({setLoading}) {
   const {
     query: {model_id},
   } = useRouter()

@@ -1,28 +1,10 @@
 //@ts-ignore
-import {
-  Avatar,
-  Button,
-  ButtonProps,
-  IconButton,
-  IconButtonProps,
-  MenuItem,
-  Tooltip,
-} from '@mui/material'
+import {Avatar, IconButton, IconButtonProps, Tooltip} from '@mui/material'
 import {Box, styled, useTheme} from '@mui/system'
-import CustomContainer from 'components/CustomContainer'
 //@ts-ignore
 import {AnimatePresence, motion} from 'framer-motion'
-import {truncate} from 'fs/promises'
 import React, {useState} from 'react'
-import {
-  RiArrowLeftRightLine,
-  RiBook2Fill,
-  RiBookmarkFill,
-  RiNotification2Fill,
-  RiTruckFill,
-  RiUserHeartFill,
-  RiUserStarFill,
-} from 'react-icons/ri'
+import {RiArrowLeftRightLine} from 'react-icons/ri'
 import {FaCodeBranch} from 'react-icons/fa'
 import {IoTicketOutline} from 'react-icons/io5'
 import {FaQuestion} from 'react-icons/fa'
@@ -36,10 +18,7 @@ import router, {useRouter} from 'next/router'
 import {useStore} from 'lib/store/store'
 import shallow from 'zustand/shallow'
 
-import Image from 'next/image'
 import {get} from 'lodash'
-// import darkLogo from "../../assets/mainLogoDark.png";
-// import Logo from "../../assets/mainLogo.png";
 
 const ColoredIconButton = styled(IconButton)<IconButtonProps>(({theme}) => ({
   '&:disabled': {
@@ -52,12 +31,6 @@ const ColoredIconButton = styled(IconButton)<IconButtonProps>(({theme}) => ({
 
 export default function SideBar() {
   const MenuItems = [
-    // {
-    //     title: "Dashboard",
-    //     tooltip: "Dashboard",
-    //     href: '/dashboard',
-    //     icon: <RiDashboardFill size='1.7rem' />
-    // },
     {
       title: 'Employees',
       tooltip: 'Employees',
@@ -100,84 +73,6 @@ export default function SideBar() {
       href: '/schedules',
       icon: <TbCalendarStats size="1.7rem" />,
     },
-    // {
-    //   title: 'Teachers',
-    //   tooltip: 'Teachers',
-    //   href: '/staff/64736133d682e100148c0222',
-    //   icon: <FaChalkboardTeacher size="1.7rem" />,
-    // },
-    // {
-    //   title: 'Pending Teachers',
-    //   tooltip: 'Pending Teachers',
-    //   href: '/pending-staff/64736133d682e100148c0222',
-    //   icon: <FaUserClock size="1.7rem" />,
-    // },
-    // {
-    //   title: 'Special Needs Teachers',
-    //   tooltip: 'Special Needs Teachers',
-    //   href: '/specialneedsStaff/64736133d682e100148c0222',
-    //   icon: <RiUserStarFill size="1.7rem" />,
-    // },
-    // {
-    //   title: 'Students',
-    //   tooltip: 'Students',
-    //   href: '/students',
-    //   icon: <FaUserGraduate size="1.7rem" />,
-    // },
-    // {
-    //   title: 'Advertisements',
-    //   tooltip: 'Advertisements',
-    //   href: '/advertisements',
-    //   icon: <RiBillFill size="1.7rem" />,
-    // },
-    // {
-    //   title: 'Special Needs',
-    //   tooltip: 'Special Needs',
-    //   href: '/special-needs',
-    //   icon: <RiUserHeartFill size="1.7rem" />,
-    // },
-    // {
-    //   title: 'Booking Finder',
-    //   tooltip: 'Booking Finder',
-    //   href: '/booking_finder',
-    //   icon: <RiBook2Fill size="1.7rem" />,
-    // },
-    // {
-    //   title: 'Bookings',
-    //   tooltip: 'Bookings',
-    //   href: '/booking',
-    //   icon: <RiBookmarkFill size="1.7rem" />,
-    // },
-    // {
-    //   title: 'Notifications',
-    //   tooltip: 'Notifications',
-    //   href: '/notifications',
-    //   icon: <RiNotification2Fill size="1.7rem" />,
-    // },
-
-    // {
-    //     title: "Vouchers",
-    //     tooltip: "Vouchers",
-    //     href: '/vouchers',
-    //     icon: <RiCoupon2Fill size='1.7rem' />
-    // },
-    // {
-    //     title: "Product Variations",
-    //     tooltip: "",
-    //     icon: <RiFilePaper2Fill size='1.7rem'/>
-    // },
-    // {
-    //     title: "Delivery",
-    //     tooltip: "Delivery",
-    //     href: '/delivery',
-    //     icon: <RiTruckFill size='1.7rem' />
-    // },
-    // {
-    //     title: "Settings",
-    //     tooltip: "Settings",
-    //     href: '/settings',
-    //     icon: <RiSettingsFill size='1.7rem' />
-    // },
   ]
 
   const [open, setOpen] = useState(false)
@@ -185,9 +80,7 @@ export default function SideBar() {
 
   const {pathname} = useRouter()
   const {settings} = useStore(({settings}) => ({settings}), shallow)
-  React.useEffect(() => {
-    console.log('logo', settings, pathname)
-  }, [settings])
+
   return (
     <motion.div
       style={{

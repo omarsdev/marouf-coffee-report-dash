@@ -23,7 +23,7 @@ import {userApi} from 'lib/api/user'
 import {get, map} from 'lodash'
 import {checklistApi} from 'lib/api/checklist'
 import {questionsApi} from 'lib/api/questions'
-export default function VenueForm({setLoading}) {
+export default function CheckListForm({setLoading}) {
   const {
     query: {model_id},
   } = useRouter()
@@ -89,12 +89,11 @@ export default function VenueForm({setLoading}) {
   })
 
   useEffect(() => {
-    if (isEditting) {
-      console.log({loading: isLoading || isLoadingChecklist})
-      setLoading(isLoading || isLoadingChecklist)
-    } else {
-      setLoading(!isLoading)
-    }
+    setLoading(isLoading || isLoadingChecklist)
+    // if (isEditting) {
+    // } else {
+    //   setLoading(!isLoading)
+    // }
   }, [isLoading, isLoadingChecklist])
 
   return (

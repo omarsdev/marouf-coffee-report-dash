@@ -1,11 +1,11 @@
 {
-  "title": "Darsi CMS",
+  "title": "Area Manager System",
   "titleTemplate": "%s",
   "description": "",
   "favicon": "/favicon.ico",
   "openGraph": {
     "type": "website",
-    "site_name": "Darsi CRM",
+    "site_name": "Area Manager System",
     "profile": {
       "firstName": "Admin Panel"
     }

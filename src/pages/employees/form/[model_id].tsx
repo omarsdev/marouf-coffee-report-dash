@@ -22,7 +22,7 @@ import {useQuery} from '@tanstack/react-query'
 import {userApi} from 'lib/api/user'
 import {branchApi} from 'lib/api/branch'
 import {get, map} from 'lodash'
-export default function VenueForm({setLoading}) {
+export default function EmployeesForm({setLoading}) {
   const {
     query: {model_id},
   } = useRouter()
@@ -46,6 +46,11 @@ export default function VenueForm({setLoading}) {
       chosenKeys.map((key) => handleChange(key, get(data?.user, key)))
       return data
     },
+  })
+
+  const {data: branches, isLoading: isLoadingBranch} = useQuery<any>({
+    queryFn: () => branchApi.get(),
+    queryKey: ['branches'],
   })
 
   const submitCreate = async () => {
@@ -186,6 +191,24 @@ export default function VenueForm({setLoading}) {
           padding={2}
         />
 
+        {values.role === '3' && (
+          <CustomSelect
+            id="bootstrap"
+            options={branches?.branches?.map((branch) => ({
+              label: branch?.name?.en,
+              value: branch?._id,
+            }))}
+            value={values.branch_access}
+            label="Branch"
+            helperText="Choose branch"
+            className="w-full"
+            // onChange={({target: {name, value}}) => handleChange('userId', value)}
+            onChange={({target: {name, value}}) =>
+              handleChange('branch_access', value)
+            }
+            padding={2}
+          />
+        )}
         <Error backendError={backendError} />
 
         <FormBottomWidget
