@@ -91,7 +91,7 @@ export default function ModelList() {
           []
         }
         columns={columns}
-        loading={localLoading}
+        loading={localLoading || isLoading}
         tableSize="tabbed"
       />
     </div>

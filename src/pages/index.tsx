@@ -22,7 +22,6 @@ export default function Entry() {
     setBackendError('')
     try {
       await request.removeSession()
-      await request.setCompany(values.email_a.toLowerCase())
       let {token} = (await userApi.login({
         email: values.email_a.toLowerCase(),
         password: values.password_2,
@@ -33,14 +32,11 @@ export default function Entry() {
       } else {
         setCookies('token', token)
         request.setSession(token)
-        console.log(token, 'kjghksdgkh')
-        setCookies('company', values.email_a.toLowerCase())
         router.push('/employees')
         console.log('token', token)
       }
     } catch (e) {
       console.log(e)
-      await request.removeCompany()
       setBackendError(e?.message)
     }
   }

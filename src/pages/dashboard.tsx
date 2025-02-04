@@ -5,11 +5,6 @@ import CustomLabel from 'components/CustomLabel'
 import {redirectGuest} from './_app'
 import {useStore} from 'lib/store/store'
 export default function Dashboard() {
-  const {user, rehydrateUser} = useStore()
-  React.useEffect(() => {
-    console.log('user', user)
-  }, [])
-
   return (
     <Layout meta={{}}>
       <div className="dark:bg-gray-800 h-full w-full flex justify-center items-center">

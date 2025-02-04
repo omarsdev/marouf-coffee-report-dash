@@ -22,7 +22,7 @@ import {useQuery} from '@tanstack/react-query'
 import {userApi} from 'lib/api/user'
 import {branchApi} from 'lib/api/branch'
 import {get, map} from 'lodash'
-export default function VenueForm({setLoading}) {
+export default function EmployeesForm({setLoading}) {
   const {
     query: {model_id},
   } = useRouter()

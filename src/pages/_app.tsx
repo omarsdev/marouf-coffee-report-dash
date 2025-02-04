@@ -25,7 +25,6 @@ export const isLoggedIn = (cookies) =>
 export const initializeRequest = (cookies) => {
   console.log('XXINIT FUN', cookies)
   request.setSession({token: cookies['token']})
-  request.setCompany(cookies['company'])
 }
 
 export const parseServerSideCookies = (ctx) => {
@@ -130,14 +129,9 @@ function MyApp({Component, pageProps, _props}: any) {
     }
   }, [])
 
-  const {rehydrateUser, rehydrate} = useStore(({rehydrateUser, rehydrate}) => ({
-    rehydrateUser,
-    rehydrate,
-  })) as any
   const initalize = async () => {
     initializeRequest({
       token: pageProps.cookies?.token,
-      company: pageProps.cookies?.company,
     })
     // if (!!SSR_DATA) {
     //   rehydrate(SSR_DATA)

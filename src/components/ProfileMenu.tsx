@@ -1,30 +1,10 @@
 import * as React from 'react'
-import Box from '@mui/material/Box'
-import Avatar from '@mui/material/Avatar'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
-import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
-import Notification from '@mui/icons-material/NotificationsActive'
-import Typography from '@mui/material/Typography'
 import Tooltip from '@mui/material/Tooltip'
-import PersonAdd from '@mui/icons-material/PersonAdd'
-import Settings from '@mui/icons-material/Settings'
-import Logout from '@mui/icons-material/Logout'
-import {
-  RiAliensFill,
-  RiUser3Line,
-  RiUser4Fill,
-  RiUser4Line,
-  RiNotification2Fill,
-  RiSettingsFill,
-  RiLogoutBoxFill,
-  RiLogoutCircleFill,
-  RiLogoutCircleRLine,
-  RiLogoutBoxRFill,
-  RiLogoutCircleLine,
-} from 'react-icons/ri'
+import {RiAliensFill, RiLogoutCircleLine} from 'react-icons/ri'
 import UserUser from 'lib/hooks/useUser'
 import request from 'lib/api'
 import router from 'next/router'
@@ -44,14 +24,7 @@ export default function ProfileMenu() {
     setAnchorEl(null)
   }
 
-  const {logout} = UserUser()
-
   const [_, setCookies] = useCookies([])
-
-  const {user, settings} = useStore(
-    ({user, settings}) => ({user, settings}),
-    shallow,
-  )
 
   return (
     <React.Fragment>
@@ -148,10 +121,8 @@ export default function ProfileMenu() {
           //   pb: 1.5
           // }}
           onClick={() => {
-            request.removeCompany()
             request.removeSession()
             setCookies('token', null)
-            setCookies('company', null)
             // router.push('/', "/", { shallow: false })
             window.location.replace('/')
           }}
