@@ -162,14 +162,6 @@ export default function EmployeesForm({setLoading}) {
           id="bootstrap"
           options={[
             {
-              label: 'Super Admin',
-              value: '0',
-            },
-            {
-              label: 'Department',
-              value: '1',
-            },
-            {
               label: 'Area Manager',
               value: '2',
             },
