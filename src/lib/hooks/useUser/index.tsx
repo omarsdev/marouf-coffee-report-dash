@@ -3,7 +3,6 @@ import router from 'next/router'
 import React from 'react'
 import cookie from "cookie-cutter"
 export default function UserUser() {
-  const [_, setCookies] = useCookies()
 
   const handleSignout = async () => {
     // await router.prefetch('/')
