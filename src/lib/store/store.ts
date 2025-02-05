@@ -16,7 +16,7 @@ const initNetworkRouter = async () => {
 }
 
 // Zustand Store
-const useStore = create((set, get) => ({
+const useStore = create<any>((set, get) => ({
   user: null,
   token: getCookie('token') || null, // Persist token from cookies
   settings: null,
@@ -31,7 +31,7 @@ const useStore = create((set, get) => ({
         maxAge: 7 * 24 * 60 * 60, // Expires in 7 days
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Strict',
+        sameSite: 'strict',
       })
     }
   },
