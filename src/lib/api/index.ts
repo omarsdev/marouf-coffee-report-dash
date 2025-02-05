@@ -1,6 +1,7 @@
 import Axios, {AxiosResponse, AxiosError, AxiosStatic} from 'axios'
 import useStore from 'lib/store/store'
 import _ from 'lodash'
+import cookie from "cookie-cutter"
 
 //https://lit-plains-02666.herokuapp.com/api/
 export const PRODUCTION_API = 'https://darsivuedale.herokuapp.com/api/'
@@ -75,6 +76,25 @@ request.interceptors.response.use(onSuccess, onError)
 request.defaults.headers['accept-language'] = 'en'
 request.defaults.headers['x-lang'] = 0
 request.defaults.headers['access-control-allow-origin'] = '*'
+
+request.interceptors.request.use(
+  (config) => {
+    // Get token from cookie
+    if(!cookie.get) {
+      return config;
+    }
+    const token = cookie.get("token");
+    // If token exists, attach it to the Authorization header
+    if (token && !_.isUndefined(token) && !_.isNull(token)) {
+      config.headers[AUTH_HEADER] = `${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // request.defaults.headers[AUTH_HEADER] = useStore.getState().token
 
 // request.defaults.baseURL = PRODUCTION_API

@@ -20,7 +20,7 @@ import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns'
 export const ColorModeContext = React.createContext({toggleColorMode: () => {}})
 
 export const isLoggedIn = (cookies) =>
-  !!cookies['token'] && cookies['token'] !== 'null'
+  !!cookies?.['token'] && cookies?.['token'] !== 'null'
 
 export const initializeRequest = (cookies) => {
   request.setSession({token: cookies['token']})
@@ -95,7 +95,7 @@ function MyApp({Component, pageProps, _props}: any) {
   const [mode, setMode] = React.useState<PaletteMode>(
     pageProps?.cookies?.mode || 'dark',
   )
-  const [loading, setLoading] = React.useState(true)
+  const [loading, setLoading] = React.useState(false)
   // const [_cookies, _] = React.useState(cookies)
   const colorMode = React.useMemo(
     () => ({
@@ -163,21 +163,7 @@ function MyApp({Component, pageProps, _props}: any) {
     [mode],
   )
 
-  useEffect(() => {
-    if (user) {
-      return
-    }
-    if (token) {
-      const getUserInfo = async () => {
-        const user = await rehydrateUser()
-        setLoading(false)
-        router.push(user?.role === 1 ? '/tickets' : '/schedules')
-      }
-      getUserInfo()
-    } else {
-      setLoading(false)
-    }
-  }, [user])
+
 
   return (
     <>
