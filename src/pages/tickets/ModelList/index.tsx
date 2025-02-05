@@ -6,7 +6,7 @@ import TableActionCell from 'components/TableActionCell'
 
 import router from 'next/router'
 
-import React, {useRef} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {branchApi} from 'lib/api/branch'
 import {useQuery} from '@tanstack/react-query'
 import {ticketsApi} from 'lib/api/tickets'
@@ -18,9 +18,11 @@ import {departmentsApi} from 'lib/api/departments'
 import TextInput from 'components/TextInput'
 import {CiSearch} from 'react-icons/ci'
 import {toSearchQuery} from 'lib/utils'
+import useStore from 'lib/store/store'
 
 export default function ModelList() {
   const theme = useTheme()
+  const {user} = useStore()
   const isSearchingRef = useRef(false)
   const filterOptionsRef = useRef({})
 
@@ -35,20 +37,6 @@ export default function ModelList() {
     ticket_title: '',
   })
 
-  const {data, isLoading, isError, refetch} = useQuery<any>({
-    queryFn: () => {
-      return ticketsApi.get(
-        isSearchingRef.current ? toSearchQuery(filterOptionsRef.current) : '',
-      )
-    },
-    queryKey: ['tickets'],
-    select: (data) => {
-      isSearchingRef.current = false
-      filterOptionsRef.current = {}
-      return data
-    },
-  })
-
   const {data: branches, isLoading: isLoadingBranch} = useQuery<any>({
     queryFn: () => branchApi.get(),
     queryKey: ['branches'],
@@ -57,6 +45,33 @@ export default function ModelList() {
   const {data: departments, isLoading: isLoadingDepartments} = useQuery<any>({
     queryFn: () => departmentsApi.get(),
     queryKey: ['departments'],
+    select: (data) => {
+      if (data && user?.role === 1) {
+        const departmentsId = data?.departments?.find(
+          (e) => e?.user?._id === user?._id,
+        )?._id
+        isSearchingRef.current = true
+        filterOptionsRef.current = {
+          department: departmentsId,
+        }
+      }
+      return data
+    },
+  })
+
+  const {data, isLoading, isError, refetch} = useQuery<any>({
+    queryFn: () => {
+      return ticketsApi.get(
+        isSearchingRef.current ? toSearchQuery(filterOptionsRef.current) : '',
+      )
+    },
+    queryKey: ['tickets'],
+    select: (data) => {
+      // isSearchingRef.current = false
+      // filterOptionsRef.current = {}
+      return data
+    },
+    enabled: !isLoadingBranch && !isLoadingDepartments,
   })
 
   const defaultRowConfig = {
@@ -135,7 +150,7 @@ export default function ModelList() {
             await ticketsApi.delete(id)
             await refetch()
           } catch (e) {
-            console.log(e)
+            console.error(e)
           } finally {
             setLocalLoading(false)
           }
@@ -172,41 +187,45 @@ export default function ModelList() {
               onChange={(value) => setFilter({...filter, from: value})}
               renderInput={(props) => <TextField {...props} />}
             />
-            <CustomSelect
-              id="bootstrap"
-              options={departments?.departments?.map((department) => ({
-                label: department?.department_name?.en,
-                value: department._id,
-              }))}
-              hasEmpty
-              label="Department"
-              placeholder="Department"
-              className="w-full"
-              value={filter.department}
-              onChange={({target: {name, value}}) =>
-                setFilter({...filter, department: value})
-              }
-              padding={2}
-            />
-            <CustomSelect
-              id="bootstrap"
-              options={branches?.branches?.map((branch) => ({
-                label: branch?.name?.en,
-                value: branch._id,
-              }))}
-              inputProps={{
-                default: '1',
-              }}
-              hasEmpty
-              label="Brach"
-              placeholder="Branch"
-              className="w-full"
-              value={filter.branch}
-              onChange={({target: {name, value}}) =>
-                setFilter({...filter, branch: value})
-              }
-              padding={2}
-            />
+            {user?.role === 0 && (
+              <CustomSelect
+                id="bootstrap"
+                options={departments?.departments?.map((department) => ({
+                  label: department?.department_name?.en,
+                  value: department._id,
+                }))}
+                hasEmpty
+                label="Department"
+                placeholder="Department"
+                className="w-full"
+                value={filter.department}
+                onChange={({target: {name, value}}) =>
+                  setFilter({...filter, department: value})
+                }
+                padding={2}
+              />
+            )}
+            {user?.role === 0 && (
+              <CustomSelect
+                id="bootstrap"
+                options={branches?.branches?.map((branch) => ({
+                  label: branch?.name?.en,
+                  value: branch._id,
+                }))}
+                inputProps={{
+                  default: '1',
+                }}
+                hasEmpty
+                label="Brach"
+                placeholder="Branch"
+                className="w-full"
+                value={filter.branch}
+                onChange={({target: {name, value}}) =>
+                  setFilter({...filter, branch: value})
+                }
+                padding={2}
+              />
+            )}
             <TextInput
               label="Search by Name"
               className="w-full"
@@ -219,12 +238,14 @@ export default function ModelList() {
               onClick={async () => {
                 try {
                   setLocalLoading(true)
-                  console.log({filter})
                   isSearchingRef.current = true
-                  filterOptionsRef.current = filter
+                  filterOptionsRef.current = {
+                    ...filter,
+                    ...filterOptionsRef.current,
+                  }
                   await refetch()
                 } catch (e) {
-                  console.log(e)
+                  console.error(e)
                 } finally {
                   setLocalLoading(false)
                 }

@@ -44,7 +44,7 @@ export default function TicketsForm({setLoading}) {
       await userApi.create({...values})
       router.back()
     } catch (e) {
-      console.log(e)
+      console.error(e)
       setBackendError(e?.message)
     } finally {
       setLoading(false)
@@ -56,7 +56,7 @@ export default function TicketsForm({setLoading}) {
       await userApi.edit(model_id.toString(), {...values})
       router.back()
     } catch (e) {
-      console.log(e)
+      console.error(e)
       setBackendError(e?.message)
     } finally {
       setLoading(false)
@@ -146,14 +146,6 @@ export default function TicketsForm({setLoading}) {
         <CustomSelect
           id="bootstrap"
           options={[
-            {
-              label: 'Super Admin',
-              value: '0',
-            },
-            {
-              label: 'Department',
-              value: '1',
-            },
             {
               label: 'Area Manager',
               value: '2',

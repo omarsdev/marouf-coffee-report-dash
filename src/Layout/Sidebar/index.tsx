@@ -15,7 +15,7 @@ import {TbCalendarStats} from 'react-icons/tb'
 import {IoPerson} from 'react-icons/io5'
 import {MdStorefront} from 'react-icons/md'
 import router, {useRouter} from 'next/router'
-import {useStore} from 'lib/store/store'
+import useStore from 'lib/store/store'
 import shallow from 'zustand/shallow'
 
 import {get} from 'lodash'
@@ -30,7 +30,26 @@ const ColoredIconButton = styled(IconButton)<IconButtonProps>(({theme}) => ({
 }))
 
 export default function SideBar() {
+  const {settings} = useStore(({settings}) => ({settings}), shallow)
+  const {user} = useStore()
+
+  const isDepartmentManager = user?.role === 1
+  console.log(user?.role)
+
   const MenuItems = [
+    {
+      title: 'Schedules',
+      tooltip: 'Schedules',
+      href: '/schedules',
+      icon: <TbCalendarStats size="1.7rem" />,
+    },
+
+    {
+      title: 'Tickets',
+      tooltip: 'Tickets',
+      href: '/tickets',
+      icon: <IoTicketOutline size="1.7rem" />,
+    },
     {
       title: 'Employees',
       tooltip: 'Employees',
@@ -50,12 +69,6 @@ export default function SideBar() {
       icon: <FaCodeBranch size="1.7rem" />,
     },
     {
-      title: 'Tickets',
-      tooltip: 'Tickets',
-      href: '/tickets',
-      icon: <IoTicketOutline size="1.7rem" />,
-    },
-    {
       title: 'Checklist',
       tooltip: 'Checklist',
       href: '/checklist',
@@ -67,19 +80,12 @@ export default function SideBar() {
       href: '/questions',
       icon: <FaQuestion size="1.7rem" />,
     },
-    {
-      title: 'Schedules',
-      tooltip: 'Schedules',
-      href: '/schedules',
-      icon: <TbCalendarStats size="1.7rem" />,
-    },
   ]
 
   const [open, setOpen] = useState(false)
   const theme = useTheme()
 
   const {pathname} = useRouter()
-  const {settings} = useStore(({settings}) => ({settings}), shallow)
 
   return (
     <motion.div
@@ -141,7 +147,10 @@ export default function SideBar() {
         )}
 
         <div className="flex flex-col justify-center w-full items-center h-full">
-          {MenuItems.map((item: any) => {
+          {(isDepartmentManager
+            ? MenuItems.filter((e) => e.href === '/tickets')
+            : MenuItems
+          ).map((item: any) => {
             return (
               <div
                 className={`flex mb-4 py-1 w-full relative justify-center items-center cursor-pointer rounded-sm ${

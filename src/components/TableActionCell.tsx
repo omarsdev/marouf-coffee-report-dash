@@ -6,26 +6,39 @@ export default function TableActionCell({
   onDelete,
   onEdit,
   onReset,
+  onView,
 }: {
-  onDelete
-  onEdit
+  onDelete?
+  onEdit?
   onReset?
+  onView?
 }) {
   return (
     <div className="flex">
-      <Tooltip title="Edit">
-        <IconButton onClick={onEdit}>
-          <RiEdit2Fill />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Delete">
-        <IconButton onClick={onDelete} sx={{ml: 2}}>
-          <RiDeleteBin2Fill />
-        </IconButton>
-      </Tooltip>
+      {onEdit && (
+        <Tooltip title="Edit">
+          <IconButton onClick={onEdit}>
+            <RiEdit2Fill />
+          </IconButton>
+        </Tooltip>
+      )}
+      {onDelete && (
+        <Tooltip title="Delete">
+          <IconButton onClick={onDelete} sx={{ml: 2}}>
+            <RiDeleteBin2Fill />
+          </IconButton>
+        </Tooltip>
+      )}
       {onReset && (
         <Tooltip title="Reset Password">
           <IconButton onClick={onReset} sx={{ml: 2}}>
+            <RiLockPasswordFill />
+          </IconButton>
+        </Tooltip>
+      )}
+      {onView && (
+        <Tooltip title="Reset Password">
+          <IconButton onClick={onView} sx={{ml: 2}}>
             <RiLockPasswordFill />
           </IconButton>
         </Tooltip>

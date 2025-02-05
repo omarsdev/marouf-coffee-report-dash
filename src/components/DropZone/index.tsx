@@ -27,14 +27,13 @@ export default function DropZone(props: Props) {
   const onDrop = useCallback(async (acceptedFiles) => {
     try {
       setLoading(true)
-      console.log('acceptedFiles', acceptedFiles)
       const {imageUrl} = (await filesApi.upload({
         file: acceptedFiles[0],
       })) as any
       props.onChange(props.name, imageUrl)
       setLoading(false)
     } catch (e) {
-      console.log(e)
+      console.error(e)
     }
   }, [])
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})

@@ -49,43 +49,11 @@ const buildGeocodingURLAR = (location: Location) => {
 
 const autoComplete = (query: String, location: Location = null) => {
   let url = buildAutoCompleteUrl(query, location)
-  // return fetch(url, {
-  //   // headers: {
-  //   // ...corsHeaders,
-  //   // },
-  //   headers: {
-  //     // mode: 'no-cors',
-  //     'Access-Control-Allow-Origin': '*',
-  //     'Access-Control-Allow-Credentials': 'true',
-  //     'Access-Control-Allow-Methods': 'GET,HEAD,OPTIONS,POST,PUT',
-  //     'Access-Control-Allow-Headers':
-  //       'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers',
-  //     'x-lang': undefined,
-  //     'x-auth-token': undefined,
-  //     COMPID: undefined,
-  //   },
-  // })
-  //   .then((response: any) => {
-  //     console.log(response, 'response is hereeee')
-  //     JSON.parse(response.body)
-  //     return response.json().predictions
-  //   })
-  //   .catch((err) => {
-  //     console.log(err, 'err is hereeee')
-  //   })
   return axios
     .get('', {
       baseURL: url,
       headers: {
         mode: 'no-cors',
-        // 'Access-Control-Allow-Origin': '*',
-        // 'Access-Control-Allow-Credentials': 'true',
-        // 'Access-Control-Allow-Methods': 'GET,HEAD,OPTIONS,POST,PUT',
-        // 'Access-Control-Allow-Headers':
-        //   'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers',
-        // 'x-lang': undefined,
-        // 'x-auth-token': undefined,
-        // COMPID: undefined,
       },
     })
     .then((response: any) => {
@@ -109,22 +77,6 @@ const getPlace = async (placeId) => {
     .then((response: any) => {
       return response.result
     })
-
-  // return fetch(baseURL, {
-  //   // headers: {
-  //   //   'Access-Control-Allow-Origin': '*',
-  //   //   'Access-Control-Allow-Credentials': 'true',
-  //   //   'Access-Control-Allow-Methods': 'GET,HEAD,OPTIONS,POST,PUT',
-  //   //   'Access-Control-Allow-Headers':
-  //   //     'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers',
-  //   //   'x-lang': undefined,
-  //   //   'x-auth-token': undefined,
-  //   //   COMPID: undefined,
-  //   // },
-  // }).then((response: any) => {
-  //   JSON.parse(response.body)
-  //   return response.json().result
-  // })
 }
 
 const getPlaceFromLatLng = async (location: Location) => {

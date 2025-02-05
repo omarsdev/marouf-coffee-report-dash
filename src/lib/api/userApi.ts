@@ -4,26 +4,6 @@ import {timeApi} from './time'
 export const userApi = {
   sendOTP: (phone) => {
     return new Promise(async (resolve, reject) => {
-      //     resolve(null)
-      //     try {
-      //         let { minute } = await timeApi.getSeed() as any;
-      //         let seed = minute + "NOTHINGISFOREVER21" + minute
-      //         console.log("TIMESEED", seed, "Min", minute)
-      //         let hash = await sha1(seed).then(hash => {
-      //             return hash
-      //             console.log('HASH', hash);
-      //         }).catch(e => {
-      //             throw e;
-      //         })
-      //         await request.post('/otp/otp', {
-      //             phone,
-      //             hash
-      //         })
-      //         resolve(null)
-      //     } catch (e) {
-      //         console.error(e)
-      //         reject(e)
-      //     }
       resolve(0)
     })
   },

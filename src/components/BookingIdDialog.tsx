@@ -65,7 +65,7 @@ export default function BookingIdDialog({
                 confirmCallBack(booking)
                 handleClose()
               } catch (e) {
-                console.log(e)
+                console.error(e)
               }
             }}
           >

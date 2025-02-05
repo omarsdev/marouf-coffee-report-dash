@@ -12,7 +12,7 @@ import Backdrop from 'components/Backdrop'
 import {CookiesProvider} from 'react-cookie'
 import _ from 'lodash'
 import request from 'lib/api'
-import {useStore} from 'lib/store/store'
+import useStore from 'lib/store/store'
 import ReactQueryProvider from 'components/ReactQueryProvider'
 import {LocalizationProvider} from '@mui/x-date-pickers'
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns'
@@ -23,7 +23,6 @@ export const isLoggedIn = (cookies) =>
   !!cookies['token'] && cookies['token'] !== 'null'
 
 export const initializeRequest = (cookies) => {
-  console.log('XXINIT FUN', cookies)
   request.setSession({token: cookies['token']})
 }
 
@@ -86,7 +85,9 @@ export const redirectGuest = async (context, SSF = null) => {
 }
 
 function MyApp({Component, pageProps, _props}: any) {
-  console.log(pageProps, _props)
+  const {token, user, rehydrateUser} = useStore()
+  console.log('TOKEN: ', {token, user})
+
   useEffect(() => {
     initalize()
   }, [])
@@ -94,7 +95,7 @@ function MyApp({Component, pageProps, _props}: any) {
   const [mode, setMode] = React.useState<PaletteMode>(
     pageProps?.cookies?.mode || 'dark',
   )
-  const [loading, setLoading] = React.useState(false)
+  const [loading, setLoading] = React.useState(true)
   // const [_cookies, _] = React.useState(cookies)
   const colorMode = React.useMemo(
     () => ({
@@ -104,8 +105,6 @@ function MyApp({Component, pageProps, _props}: any) {
     }),
     [],
   )
-
-  // const store = useHydrate(ClientStoreInstance)
 
   useEffect(() => {
     const handleRouteChangeComplete = (url, {shallow}): any => {
@@ -164,6 +163,22 @@ function MyApp({Component, pageProps, _props}: any) {
     [mode],
   )
 
+  useEffect(() => {
+    if (user) {
+      return
+    }
+    if (token) {
+      const getUserInfo = async () => {
+        const user = await rehydrateUser()
+        setLoading(false)
+        router.push(user?.role === 1 ? '/tickets' : '/schedules')
+      }
+      getUserInfo()
+    } else {
+      setLoading(false)
+    }
+  }, [user])
+
   return (
     <>
       <DefaultSeo {...SEO} />
@@ -201,7 +216,7 @@ export default MyApp
 //   //     }
 //   //   }
 //   // } catch (e) {
-//   //   console.log(e);
+//   //   console.error(e);
 //   // }
 
 //   return {

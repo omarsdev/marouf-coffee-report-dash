@@ -1,47 +1,55 @@
-import {branchesApi} from 'lib/api/branches'
-import {settingsApi} from 'lib/api/settingsApi'
 import {userApi} from 'lib/api/userApi'
 import create from 'zustand'
-import cookiecutter from 'cookie-cutter'
+import {getCookie, setCookie} from 'cookies-next'
 import {initializeRequest} from 'pages/_app'
-import {venuesApi} from 'lib/api/venues'
-import {categoriesApi} from 'lib/api/categories'
-import {bannersApi} from 'lib/api/banners'
-import {advertisesApi} from 'lib/api/advertises'
-import {specialneedsApi} from 'lib/api/specialneeds'
 
-export const initialState = {
-  user: null,
-  settings: null,
-}
-
+// Initialize API Request with Token from Cookies
 const initNetworkRouter = async () => {
-  let company = cookiecutter.get('company')
-  let token = cookiecutter.get('token')
-  await initializeRequest({company, token})
+  try {
+    const token = getCookie('token') // Retrieve token from cookies
+    if (token) {
+      await initializeRequest({token})
+    }
+  } catch (error) {
+    console.error('Error initializing network router:', error)
+  }
 }
 
-const store = (set, get) => ({
-  ...initialState,
-  rehydrate: (HydrationObject) => {
-    set({
-      ...HydrationObject,
-    })
-  },
-  rehydrateUser: () => {
-    return new Promise(async (resolve, reject) => {
-      initNetworkRouter()
-      try {
-        let {user} = (await userApi.rehydrate()) as any
-        set({
-          user: user,
-        })
-        resolve(user)
-      } catch (e) {
-        reject(e)
-      }
-    })
-  },
-})
+// Zustand Store
+const useStore = create((set, get) => ({
+  user: null,
+  token: getCookie('token') || null, // Persist token from cookies
+  settings: null,
 
-export const useStore = create(store)
+  // Rehydrate store from saved state
+  rehydrate: (HydrationObject) => {
+    set({...HydrationObject})
+
+    // Store token in cookies for persistence
+    if (HydrationObject.token) {
+      setCookie('token', HydrationObject.token, {
+        maxAge: 7 * 24 * 60 * 60, // Expires in 7 days
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict',
+      })
+    }
+  },
+
+  // Fetch and set user data
+  rehydrateUser: async () => {
+    await initNetworkRouter() // Ensure API requests are properly initialized
+    try {
+      const data = (await userApi.rehydrate()) as any
+
+      set({user: data})
+
+      return data
+    } catch (error) {
+      console.error('Error rehydrating user:', error)
+      throw error
+    }
+  },
+}))
+
+export default useStore
