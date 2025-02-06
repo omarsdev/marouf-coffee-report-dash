@@ -39,19 +39,19 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'department_name.en',
       headerName: 'English Name',
-      renderCell: ({row}) => `${row.department_name.en}`,
+      renderCell: ({row}) => `${row.department_name?.en}`,
     },
     {
       ...defaultRowConfig,
       field: 'department_name.ar',
       headerName: 'Arabic Name',
-      renderCell: ({row}) => `${row.department_name.ar}`,
+      renderCell: ({row}) => `${row.department_name?.ar}`,
     },
     {
       ...defaultRowConfig,
       field: 'user.name.en',
       headerName: 'User Name',
-      renderCell: ({row}) => `${row.user.name.en}`,
+      renderCell: ({row}) => `${row.user?.name?.en}`,
     },
     {
       ...defaultRowConfig,
