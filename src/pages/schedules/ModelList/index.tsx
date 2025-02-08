@@ -75,10 +75,9 @@ export default function ModelList() {
     },
     {
       ...defaultRowConfig,
-      field: 'assignedAt',
-      headerName: 'Time Started',
-      renderCell: ({row}) =>
-        `${format(new Date(row.assignedAt), 'dd/MM/yyyy')}`,
+      field: 'reportId.title',
+      headerName: 'Report',
+      renderCell: ({row}) => `${row.reportId?.title}`,
     },
     {
       ...defaultRowConfig,
