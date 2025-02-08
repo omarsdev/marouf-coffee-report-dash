@@ -64,7 +64,7 @@ export default function ModelList() {
       filterable: false,
       renderCell: ({row}) => (
         <TableActionCell
-          onView={() => {
+          onEdit={() => {
             router.push({
               pathname: '/departments/info/[model_id]',
               query: {model_id: row.id},
