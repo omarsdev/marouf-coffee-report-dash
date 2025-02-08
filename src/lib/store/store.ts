@@ -50,6 +50,14 @@ const useStore = create((set, get) => ({
       throw error
     }
   },
+
+  reset: () => {
+    set({
+      user: null,
+      token: null,
+      settings: null,
+    })
+  },
 }))
 
 export default useStore

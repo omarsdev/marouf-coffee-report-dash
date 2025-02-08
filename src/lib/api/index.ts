@@ -1,6 +1,7 @@
 import Axios, {AxiosResponse, AxiosError, AxiosStatic} from 'axios'
 import useStore from 'lib/store/store'
 import _ from 'lodash'
+import {Cookies} from 'react-cookie'
 
 //https://lit-plains-02666.herokuapp.com/api/
 export const PRODUCTION_API = 'https://darsivuedale.herokuapp.com/api/'
@@ -36,6 +37,13 @@ const onError = function (error) {
 
     switch (error.response.status) {
       case 401:
+        // TODO: revoke local session
+        break
+      case 411:
+        const cookie = new Cookies()
+        cookie.remove('token', null)
+        request.removeSession()
+        useStore.getState().reset()
         // TODO: revoke local session
         break
       case 422:
