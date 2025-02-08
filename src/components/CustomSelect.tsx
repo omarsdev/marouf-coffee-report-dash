@@ -90,6 +90,13 @@ export default function CustomSelect({
         displayEmpty={!!hasEmpty}
         onChange={onChange}
         multiple={multiple}
+        renderValue={(selected) => (
+          <div style={{whiteSpace: 'pre-wrap'}}>
+            {selected
+              .map((val) => options.find((opt) => opt.value === val)?.label)
+              .join('\n')}
+          </div>
+        )}
       >
         {!!hasEmpty && (
           <MenuItem value={''}>
