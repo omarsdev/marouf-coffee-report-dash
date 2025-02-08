@@ -91,13 +91,13 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'branch.name.en',
       headerName: 'Branch',
-      renderCell: ({row}) => `${row.branch.name.en}`,
+      renderCell: ({row}) => `${row.branch?.name?.en}`,
     },
     {
       ...defaultRowConfig,
       field: 'department.department_name.en',
       headerName: 'Department',
-      renderCell: ({row}) => `${row.department.department_name.en}`,
+      renderCell: ({row}) => `${row.department?.department_name?.en}`,
     },
     {
       ...defaultRowConfig,
