@@ -216,7 +216,7 @@ export default function ModelList() {
                   default: '1',
                 }}
                 hasEmpty
-                label="Brach"
+                label="Branch"
                 placeholder="Branch"
                 className="w-full"
                 value={filter.branch}

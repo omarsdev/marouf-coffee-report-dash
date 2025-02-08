@@ -1,4 +1,4 @@
-import {IconButton, useTheme} from '@mui/material'
+import {Box, IconButton, TextField, useTheme} from '@mui/material'
 import {GridColDef} from '@mui/x-data-grid'
 import DeleteDialog from 'components/DeleteDialog'
 import Table from 'components/Table'
@@ -9,23 +9,42 @@ import useStore from 'lib/store/store'
 import {get} from 'lodash'
 import router from 'next/router'
 import {redirectGuest} from 'pages/_app'
-import React from 'react'
+import React, {useRef} from 'react'
 import shallow from 'zustand/shallow'
 import {branchesApi} from '../../../lib/api/branches'
 import {branchApi} from 'lib/api/branch'
 import {useQuery} from '@tanstack/react-query'
 import {schedulesApi} from 'lib/api/schedules'
 import {format} from 'date-fns'
+import {DesktopDatePicker} from '@mui/x-date-pickers'
+import CustomButton from 'components/CustomButton'
+import {CiSearch} from 'react-icons/ci'
+import {toSearchQuery} from 'lib/utils'
+import CustomSelect from 'components/CustomSelect'
 
 export default function ModelList() {
   const theme = useTheme()
-  const [localLoading, setLocalLoading] = React.useState(false)
+  const isSearchingRef = useRef(false)
+  const filterOptionsRef = useRef({})
 
+  const [localLoading, setLocalLoading] = React.useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
+  const [filter, setFilter] = React.useState({
+    date: null,
+    branch: '',
+  })
 
   const {data, isLoading, isError, refetch} = useQuery<any>({
-    queryFn: () => schedulesApi.get(),
+    queryFn: () =>
+      schedulesApi.get(
+        isSearchingRef.current ? toSearchQuery(filterOptionsRef.current) : '',
+      ),
     queryKey: ['schedules'],
+  })
+
+  const {data: branches, isLoading: isLoadingBranch} = useQuery<any>({
+    queryFn: () => branchApi.get(),
+    queryKey: ['branches'],
   })
 
   const defaultRowConfig = {
@@ -65,7 +84,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'completed',
       headerName: 'Status',
-      renderCell: ({row}) => `${row.completed ? 'Active' : 'Inactive'}`,
+      renderCell: ({row}) => `${row.completed ? 'Completed' : 'In Progress'}`,
     },
     {
       ...defaultRowConfig,
@@ -118,8 +137,70 @@ export default function ModelList() {
           []
         }
         columns={columns}
-        loading={localLoading}
+        loading={localLoading || isLoading || isLoadingBranch}
         tableSize="tabbed"
+        headerComponent={
+          <Box
+            flexDirection="row"
+            display="flex"
+            justifyContent="flex-end"
+            gap="20px"
+            alignItems="center"
+          >
+            <DesktopDatePicker
+              label="Date"
+              value={filter.date}
+              onChange={(value) => {
+                console.log(format(value, 'yyyy/MM/dd'))
+                setFilter({
+                  ...filter,
+                  date: format(value, 'yyyy/MM/dd'),
+                })
+              }}
+              renderInput={(props) => <TextField {...props} />}
+            />
+            <CustomSelect
+              id="bootstrap"
+              options={branches?.branches?.map((branch) => ({
+                label: branch?.name?.en,
+                value: branch._id,
+              }))}
+              inputProps={{
+                default: '1',
+              }}
+              hasEmpty
+              label="Branch"
+              placeholder="Branch"
+              className="w-full"
+              value={filter.branch}
+              onChange={({target: {name, value}}) =>
+                setFilter({...filter, branch: value})
+              }
+              padding={2}
+            />
+            <CustomButton
+              onClick={async () => {
+                try {
+                  setLocalLoading(true)
+                  console.log(filter)
+                  isSearchingRef.current = true
+                  filterOptionsRef.current = {
+                    ...filter,
+                    ...filterOptionsRef.current,
+                  }
+                  await refetch()
+                } catch (e) {
+                  console.error(e)
+                } finally {
+                  setLocalLoading(false)
+                }
+              }}
+              startIcon={<CiSearch />}
+              width="10rem"
+              title="Search"
+            />
+          </Box>
+        }
       />
     </div>
   )
