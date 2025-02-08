@@ -62,7 +62,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'active',
       headerName: 'Active',
-      renderCell: ({row}) => `${row.active}`,
+      renderCell: ({row}) => `${row.active ? 'Active' : 'InActive'}`,
     },
     {
       ...defaultRowConfig,
