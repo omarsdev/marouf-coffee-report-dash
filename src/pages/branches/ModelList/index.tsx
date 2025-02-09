@@ -40,6 +40,11 @@ export default function ModelList() {
     },
     {
       ...defaultRowConfig,
+      headerName: 'Location',
+      renderCell: ({row}) => `${row.lng},${row.lat}`,
+    },
+    {
+      ...defaultRowConfig,
       field: 'miles',
       flex: 0.25,
       headerName: 'Miles',
@@ -95,7 +100,7 @@ export default function ModelList() {
           []
         }
         columns={columns}
-        loading={localLoading}
+        loading={localLoading || isLoading}
         tableSize="tabbed"
       />
     </div>
