@@ -70,6 +70,9 @@ export default function ModelList() {
               query: {model_id: row.id},
             })
           }}
+          onDelete={() => {
+            setDeleteDialogOpen(row.id)
+          }}
         />
       ),
     },
