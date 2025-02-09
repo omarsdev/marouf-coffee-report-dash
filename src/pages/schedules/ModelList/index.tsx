@@ -57,7 +57,7 @@ export default function ModelList() {
     {
       ...defaultRowConfig,
       field: 'branch.area_manager.name.en',
-      headerName: 'Area Manager',
+      headerName: 'Username',
       renderCell: ({row}) => `${row.branch?.area_manager?.name?.en}`,
     },
     {
