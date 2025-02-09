@@ -241,8 +241,8 @@ export default function ModelList() {
                   setLocalLoading(true)
                   isSearchingRef.current = true
                   filterOptionsRef.current = {
+                    ...(filterOptionsRef.current && filterOptionsRef.current),
                     ...filter,
-                    ...filterOptionsRef.current,
                   }
                   await refetch()
                 } catch (e) {
