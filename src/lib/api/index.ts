@@ -87,6 +87,7 @@ request.defaults.headers['access-control-allow-origin'] = '*'
 request.interceptors.request.use(
   (config) => {
     // Get token from cookie
+    const cookie = new Cookies();
     if(!cookie.get) {
       return config;
     }
