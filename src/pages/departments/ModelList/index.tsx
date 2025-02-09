@@ -1,20 +1,11 @@
-import {IconButton, useTheme} from '@mui/material'
+import {useTheme} from '@mui/material'
 import {GridColDef} from '@mui/x-data-grid'
 import DeleteDialog from 'components/DeleteDialog'
 import Table from 'components/Table'
 import TableActionCell from 'components/TableActionCell'
-import {categoriesApi} from 'lib/api/categories'
-import {venuesApi} from 'lib/api/venues'
-import useStore from 'lib/store/store'
-import {get} from 'lodash'
 import router from 'next/router'
-import {redirectGuest} from 'pages/_app'
 import React from 'react'
-import shallow from 'zustand/shallow'
-import {branchesApi} from '../../../lib/api/branches'
-import {branchApi} from 'lib/api/branch'
 import {useQuery} from '@tanstack/react-query'
-import {userApi} from 'lib/api/user'
 import {departmentsApi} from 'lib/api/departments'
 
 export default function ModelList() {
@@ -39,19 +30,25 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'department_name.en',
       headerName: 'English Name',
-      renderCell: ({row}) => `${row?.department_name?.en}`,
+      renderCell: ({row}) => `${row.department_name?.en}`,
     },
     {
       ...defaultRowConfig,
       field: 'department_name.ar',
       headerName: 'Arabic Name',
-      renderCell: ({row}) => `${row?.department_name?.ar}`,
+      renderCell: ({row}) => `${row.department_name?.ar}`,
     },
     {
       ...defaultRowConfig,
       field: 'user.name.en',
       headerName: 'User Name',
-      renderCell: ({row}) => `${row?.user?.name?.en}`,
+      renderCell: ({row}) => `${row.user?.name?.en}`,
+    },
+    {
+      ...defaultRowConfig,
+      field: 'ticketCount',
+      headerName: 'On Going Tickets',
+      renderCell: ({row}) => `${row.ticketCount}`,
     },
     {
       ...defaultRowConfig,
@@ -64,11 +61,14 @@ export default function ModelList() {
       filterable: false,
       renderCell: ({row}) => (
         <TableActionCell
-          onView={() => {
+          onEdit={() => {
             router.push({
               pathname: '/departments/info/[model_id]',
               query: {model_id: row?.id},
             })
+          }}
+          onDelete={() => {
+            setDeleteDialogOpen(row.id)
           }}
         />
       ),

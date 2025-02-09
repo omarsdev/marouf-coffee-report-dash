@@ -3,10 +3,18 @@ import create from 'zustand'
 import {getCookie, setCookie} from 'cookies-next'
 import {initializeRequest} from 'pages/_app'
 
-// Initialize API Request with Token from Cookies
-const initNetworkRouter = async () => {
+interface StoreState {
+  user: any | null
+  token: string | null
+  settings: Record<string, any> | null
+  rehydrate: (hydrationObject: Partial<StoreState>) => void
+  rehydrateUser: () => Promise<any | null>
+  reset: () => void
+}
+
+const initNetworkRouter = async (): Promise<void> => {
   try {
-    const token = getCookie('token') // Retrieve token from cookies
+    const token = getCookie('token') as string | null
     if (token) {
       await initializeRequest({token})
     }
@@ -15,19 +23,15 @@ const initNetworkRouter = async () => {
   }
 }
 
-// Zustand Store
-const useStore = create<any>((set, get) => ({
+const useStore = create<StoreState>((set) => ({
   user: null,
-  token: getCookie('token') || null, // Persist token from cookies
+  token: (getCookie('token') as string | null) || null,
   settings: null,
 
-  // Rehydrate store from saved state
-  rehydrate: (HydrationObject) => {
-    set({...HydrationObject})
-
-    // Store token in cookies for persistence
-    if (HydrationObject.token) {
-      setCookie('token', HydrationObject.token, {
+  rehydrate: (hydrationObject: any) => {
+    set({...hydrationObject})
+    if (hydrationObject.token) {
+      setCookie('token', hydrationObject.token, {
         maxAge: 7 * 24 * 60 * 60, // Expires in 7 days
         path: '/',
         secure: process.env.NODE_ENV === 'production',
@@ -36,20 +40,19 @@ const useStore = create<any>((set, get) => ({
     }
   },
 
-  // Fetch and set user data
   rehydrateUser: async () => {
-    await initNetworkRouter() // Ensure API requests are properly initialized
+    await initNetworkRouter()
     try {
       const data = (await userApi.rehydrate()) as any
-
       set({user: data})
-
       return data
     } catch (error) {
       console.error('Error rehydrating user:', error)
-      throw error
+      return null
     }
   },
+
+  reset: () => set({user: null, token: null, settings: null}),
 }))
 
 export default useStore

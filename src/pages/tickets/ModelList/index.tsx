@@ -91,19 +91,20 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'branch.name.en',
       headerName: 'Branch',
-      renderCell: ({row}) => `${row.branch.name.en}`,
+      renderCell: ({row}) => `${row.branch?.name?.en}`,
     },
     {
       ...defaultRowConfig,
       field: 'department.department_name.en',
       headerName: 'Department',
-      renderCell: ({row}) => `${row.department.department_name.en}`,
+      renderCell: ({row}) => `${row.department?.department_name?.en}`,
     },
     {
       ...defaultRowConfig,
       field: 'status',
       headerName: 'Status',
-      renderCell: ({row}) => `${row.status}`,
+      renderCell: ({row}) =>
+        `${row.status === 0 ? 'In Progress' : 'Completed'}`,
     },
     {
       ...defaultRowConfig,
@@ -112,29 +113,29 @@ export default function ModelList() {
       renderCell: ({row}) =>
         `${format(new Date(row.created_at), 'dd/MM/yyyy')}`,
     },
-    // {
-    //   ...defaultRowConfig,
-    //   field: 'id',
-    //   headerName: '',
-    //   description: '',
-    //   sortable: false,
-    //   hideSortIcons: true,
-    //   hideable: false,
-    //   filterable: false,
-    //   renderCell: ({row}) => (
-    //     <TableActionCell
-    //       onEdit={() => {
-    //         router.push({
-    //           pathname: '/tickets/form/[model_id]',
-    //           query: {model_id: row.id},
-    //         })
-    //       }}
-    //       onDelete={() => {
-    //         setDeleteDialogOpen(row.id)
-    //       }}
-    //     />
-    //   ),
-    // },
+    {
+      ...defaultRowConfig,
+      field: 'id',
+      headerName: '',
+      description: '',
+      sortable: false,
+      hideSortIcons: true,
+      hideable: false,
+      filterable: false,
+      renderCell: ({row}) => (
+        <TableActionCell
+          // onEdit={() => {
+          //   router.push({
+          //     pathname: '/tickets/form/[model_id]',
+          //     query: {model_id: row.id},
+          //   })
+          // }}
+          onDelete={() => {
+            setDeleteDialogOpen(row.id)
+          }}
+        />
+      ),
+    },
   ]
 
   return (
@@ -216,7 +217,7 @@ export default function ModelList() {
                   default: '1',
                 }}
                 hasEmpty
-                label="Brach"
+                label="Branch"
                 placeholder="Branch"
                 className="w-full"
                 value={filter.branch}
@@ -240,8 +241,8 @@ export default function ModelList() {
                   setLocalLoading(true)
                   isSearchingRef.current = true
                   filterOptionsRef.current = {
+                    ...(filterOptionsRef.current && filterOptionsRef.current),
                     ...filter,
-                    ...filterOptionsRef.current,
                   }
                   await refetch()
                 } catch (e) {

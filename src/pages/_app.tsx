@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useMemo, useState, createContext} from 'react'
 import '../styles/globals.css'
 import {DefaultSeo} from 'next-seo'
 import SEO from '../../next-seo.json'
@@ -8,16 +8,16 @@ import {
   createTheme,
 } from '@mui/material/styles'
 import router from 'next/router'
-import Backdrop from 'components/Backdrop'
 import {CookiesProvider} from 'react-cookie'
-import _ from 'lodash'
 import request from 'lib/api'
 import useStore from 'lib/store/store'
+import Backdrop from 'components/Backdrop'
 import ReactQueryProvider from 'components/ReactQueryProvider'
 import {LocalizationProvider} from '@mui/x-date-pickers'
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns'
+import _ from 'lodash'
 
-export const ColorModeContext = React.createContext({toggleColorMode: () => {}})
+export const ColorModeContext = createContext({toggleColorMode: () => {}})
 
 export const isLoggedIn = (cookies) =>
   !!cookies?.['token'] && cookies?.['token'] !== 'null'
@@ -31,13 +31,10 @@ export const parseServerSideCookies = (ctx) => {
     try {
       let cookies = _.get(ctx, 'req.headers.cookie', null)
       let parsedCookies = {}
-      if (!!cookies) {
-        cookies = cookies.split(';')
-        cookies.map((cookie) => {
-          parsedCookies = {
-            ...parsedCookies,
-            [cookie.split('=')[0].trim()]: cookie.split('=')[1].trim(),
-          }
+      if (cookies) {
+        cookies.split(';').forEach((cookie) => {
+          const [key, value] = cookie.split('=').map((c) => c.trim())
+          parsedCookies[key] = value
         })
         resolve(parsedCookies)
       }
@@ -48,122 +45,107 @@ export const parseServerSideCookies = (ctx) => {
 }
 
 export const parseSession = (ctx) => {
-  let cookies = _.get(ctx, 'req.headers.cookie', null)
-  let parsedCookies = {}
-  if (!!cookies) {
-    cookies = cookies.split(';')
-    cookies.map((cookie) => {
-      parsedCookies = {
-        ...parsedCookies,
-        [cookie.split('=')[0].trim()]: cookie.split('=')[1].trim(),
-      }
-    })
-  }
+  const cookies = _.get(ctx, 'req.headers.cookie', null)
+  if (!cookies) return null
+
+  const parsedCookies = Object.fromEntries(
+    cookies.split(';').map((cookie) => cookie.split('=').map((c) => c.trim())),
+  )
   return parsedCookies['token']
 }
 
-export const redirectGuest = async (context, SSF = null) => {
+export const redirectGuest = async (context, fetchData = null) => {
   const cookies = await parseServerSideCookies(context)
-  if (!cookies['token'] || cookies['token'] == 'null') {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    }
-  } else {
-    let SSD = {}
-    if (SSF) {
-      SSD = await SSF()
-    }
-    return {
-      props: {
-        cookies,
-      },
-    }
+  if (!isLoggedIn(cookies)) {
+    return {redirect: {destination: '/', permanent: false}}
   }
+
+  const data = fetchData ? await fetchData() : {}
+  return {props: {cookies, ...data}}
 }
 
-function MyApp({Component, pageProps, _props}: any) {
+function MyApp({Component, pageProps}) {
   const {token, user, rehydrateUser} = useStore()
-  console.log('TOKEN: ', {token, user})
-
-  useEffect(() => {
-    initalize()
-  }, [])
-
-  const [mode, setMode] = React.useState<PaletteMode>(
+  const [mode, setMode] = useState<PaletteMode>(
     pageProps?.cookies?.mode || 'dark',
   )
-  const [loading, setLoading] = React.useState(false)
-  // const [_cookies, _] = React.useState(cookies)
-  const colorMode = React.useMemo(
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    initializeRequest({token: pageProps.cookies?.token})
+  }, [])
+
+  const colorMode = useMemo(
     () => ({
-      toggleColorMode: () => {
-        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'))
-      },
+      toggleColorMode: () =>
+        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light')),
     }),
     [],
   )
 
   useEffect(() => {
-    const handleRouteChangeComplete = (url, {shallow}): any => {
-      setLoading(false)
-    }
-    const handleRouteChangeStart = (url, {shallow}): any => {
-      setLoading(true)
-    }
-    const handleRouteChangeError = (err, url) => {
+    const handleRouteChangeStart = () => setLoading(true)
+    const handleRouteChangeComplete = () => setLoading(false)
+    const handleRouteChangeError = (err) => {
       console.error(err)
       setLoading(false)
     }
 
-    router.events.on('routeChangeError', handleRouteChangeError)
     router.events.on('routeChangeStart', handleRouteChangeStart)
     router.events.on('routeChangeComplete', handleRouteChangeComplete)
+    router.events.on('routeChangeError', handleRouteChangeError)
+
     return () => {
-      router.events.off('routeChangeError', handleRouteChangeError)
       router.events.off('routeChangeStart', handleRouteChangeStart)
       router.events.off('routeChangeComplete', handleRouteChangeComplete)
+      router.events.off('routeChangeError', handleRouteChangeError)
     }
   }, [])
 
-  const initalize = async () => {
-    initializeRequest({
-      token: pageProps.cookies?.token,
-    })
-    // if (!!SSR_DATA) {
-    //   rehydrate(SSR_DATA)
-    // }
-  }
+  useEffect(() => {
+    if (!token) {
+      setLoading(false)
+      router.replace('/')
+    }
+    if (user) {
+      setLoading(false)
+      return
+    }
 
-  const theme = React.useMemo(
+    const getUserInfo = async () => {
+      try {
+        const userData = await rehydrateUser()
+        router.push(userData?.role === 1 ? '/tickets' : '/schedules')
+      } catch (error) {
+        router.push('/')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    getUserInfo()
+  }, [user, token])
+
+  const theme = useMemo(
     () =>
       createTheme({
         palette: {
           mode,
-          primary: {
-            main: '#3DBEC9',
-          },
+          primary: {main: '#3DBEC9'},
           background: {
             default: mode === 'dark' ? '#121212' : '#F7F8FA',
             paper: mode === 'dark' ? '#1E1E1E' : '#FFF',
           },
           text: {
             primary: mode === 'dark' ? '#FFF' : '#2A3256',
-            secondary: mode === 'dark' ? '#B7BBC8' : '#B7BBC8',
+            secondary: '#B7BBC8',
           },
           divider: mode === 'dark' ? '#292929' : '#E9E9EB',
         },
-        typography: {
-          fontFamily: 'Mulish, sans-serif',
-        },
-        transitions: {},
+        typography: {fontFamily: 'Mulish, sans-serif'},
       }),
     [mode],
   )
-
-
 
   return (
     <>
@@ -175,7 +157,6 @@ function MyApp({Component, pageProps, _props}: any) {
               <MUIThemeProvider theme={theme}>
                 <Backdrop isVisible={loading} />
                 <Component {...pageProps} setLoading={setLoading} />
-                {/* <FormWidget /> */}
               </MUIThemeProvider>
             </ColorModeContext.Provider>
           </CookiesProvider>
@@ -186,27 +167,3 @@ function MyApp({Component, pageProps, _props}: any) {
 }
 
 export default MyApp
-
-// MyApp.getInitialProps = async ({ ctx }) => {
-//   // const isShallow = !ctx.req || (ctx.req.url && ctx.req.url.startsWith('/_next/data'));
-//   // const serverCookies = new Cookies(ctx.req, ctx.res)
-//   const parsedCookies = await parseServerSideCookies(ctx)
-//   // let SSR_DATA = null;
-//   // try {
-//   //   if (isLoggedIn(parsedCookies)) {
-//   //     initializeRequest(parsedCookies)
-//   //     if (!isShallow) {
-//   //       let { user } = await userApi.rehydrate() as any
-//   //       let { settings } = await settingsApi.get() as any;
-//   //       SSR_DATA = { user, settings: settings[0] }
-//   //     }
-//   //   }
-//   // } catch (e) {
-//   //   console.error(e);
-//   // }
-
-//   return {
-//     // SSR_DATA,
-//     cookies: parsedCookies
-//   }
-// }
