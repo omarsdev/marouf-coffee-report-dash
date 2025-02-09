@@ -113,29 +113,29 @@ export default function ModelList() {
       renderCell: ({row}) =>
         `${format(new Date(row.created_at), 'dd/MM/yyyy')}`,
     },
-    // {
-    //   ...defaultRowConfig,
-    //   field: 'id',
-    //   headerName: '',
-    //   description: '',
-    //   sortable: false,
-    //   hideSortIcons: true,
-    //   hideable: false,
-    //   filterable: false,
-    //   renderCell: ({row}) => (
-    //     <TableActionCell
-    //       onEdit={() => {
-    //         router.push({
-    //           pathname: '/tickets/form/[model_id]',
-    //           query: {model_id: row.id},
-    //         })
-    //       }}
-    //       onDelete={() => {
-    //         setDeleteDialogOpen(row.id)
-    //       }}
-    //     />
-    //   ),
-    // },
+    {
+      ...defaultRowConfig,
+      field: 'id',
+      headerName: '',
+      description: '',
+      sortable: false,
+      hideSortIcons: true,
+      hideable: false,
+      filterable: false,
+      renderCell: ({row}) => (
+        <TableActionCell
+          // onEdit={() => {
+          //   router.push({
+          //     pathname: '/tickets/form/[model_id]',
+          //     query: {model_id: row.id},
+          //   })
+          // }}
+          onDelete={() => {
+            setDeleteDialogOpen(row.id)
+          }}
+        />
+      ),
+    },
   ]
 
   return (
