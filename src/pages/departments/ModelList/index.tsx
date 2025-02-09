@@ -46,6 +46,12 @@ export default function ModelList() {
     },
     {
       ...defaultRowConfig,
+      field: 'ticketCount',
+      headerName: 'On Going Tickets',
+      renderCell: ({row}) => `${row.ticketCount}`,
+    },
+    {
+      ...defaultRowConfig,
       field: 'id',
       headerName: '',
       description: '',
