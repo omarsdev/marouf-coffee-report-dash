@@ -103,7 +103,8 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'status',
       headerName: 'Status',
-      renderCell: ({row}) => `${row.status}`,
+      renderCell: ({row}) =>
+        `${row.status === 0 ? 'In Progress' : 'Completed'}`,
     },
     {
       ...defaultRowConfig,
