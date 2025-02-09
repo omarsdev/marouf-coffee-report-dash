@@ -150,7 +150,6 @@ export default function ModelList() {
               label="Date"
               value={filter.date}
               onChange={(value) => {
-                console.log(format(value, 'yyyy/MM/dd'))
                 setFilter({
                   ...filter,
                   date: format(value, 'yyyy/MM/dd'),
@@ -181,7 +180,6 @@ export default function ModelList() {
               onClick={async () => {
                 try {
                   setLocalLoading(true)
-                  console.log(filter)
                   isSearchingRef.current = true
                   filterOptionsRef.current = {
                     ...(filterOptionsRef.current && filterOptionsRef.current),
