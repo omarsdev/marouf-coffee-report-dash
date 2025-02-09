@@ -92,9 +92,13 @@ export default function CustomSelect({
         multiple={multiple}
         renderValue={(selected) => (
           <div style={{whiteSpace: 'pre-wrap'}}>
-            {selected
-              .map((val) => options.find((opt) => opt.value === val)?.label)
-              .join('\n')}
+            {Array.isArray(selected)
+              ? selected
+                  ?.map(
+                    (val) => options?.find((opt) => opt?.value === val)?.label,
+                  )
+                  ?.join('\n')
+              : options?.find((opt) => opt?.value === selected)?.label}
           </div>
         )}
       >
