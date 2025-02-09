@@ -34,7 +34,6 @@ export default function SideBar() {
   const {user} = useStore()
 
   const isDepartmentManager = user?.role === 1
-  console.log(user?.role)
 
   const MenuItems = [
     {
