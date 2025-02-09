@@ -16,18 +16,35 @@ export default function Header() {
   const [filteredData, setFilteredDate] = useState<any>()
 
   const data = [
-    {name: 'Categories', href: '/categories'},
-    {name: 'Teachers', href: '/staff/64736133d682e100148c0222'},
     {
-      name: 'Specail Needs Teachers',
-      href: '/specialneedsStaff/64736133d682e100148c0222',
+      name: 'Schedules',
+      href: '/schedules',
     },
-    {name: 'Students', href: '/students'},
-    {name: 'Advertisements', href: '/advertisements'},
-    {name: 'Special Needs', href: '/special-needs'},
-    {name: 'Booking Finder', href: '/booking_finder'},
-    {name: 'Notifications', href: '/notifications'},
-    {name: 'Bookings', href: '/booking'},
+
+    {
+      name: 'Tickets',
+      href: '/tickets',
+    },
+    {
+      name: 'Employees',
+      href: '/employees',
+    },
+    {
+      name: 'Branches',
+      href: '/branches',
+    },
+    {
+      name: 'Departments',
+      href: '/departments',
+    },
+    {
+      name: 'Checklist',
+      href: '/checklist',
+    },
+    {
+      name: 'Questions',
+      href: '/questions',
+    },
   ]
 
   const search = (query) => {
