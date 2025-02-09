@@ -32,7 +32,7 @@ export default function Entry() {
         rehydrate({token, user: data})
         setCookies('token', token)
         request.setSession(token)
-        router.push('/employees')
+        router.push('/schedules')
       } else {
         setBackendError('You are not authorized to access this page')
       }
