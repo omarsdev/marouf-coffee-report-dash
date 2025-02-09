@@ -1,5 +1,4 @@
 import {Divider} from '@mui/material'
-import CustomAutoComplete from 'components/CustomAutoComplete'
 import CustomButton from 'components/CustomButton'
 import CustomContainer from 'components/CustomContainer'
 import CustomLabel from 'components/CustomLabel'
@@ -23,6 +22,7 @@ import {userApi} from 'lib/api/user'
 import {get, map} from 'lodash'
 import {checklistApi} from 'lib/api/checklist'
 import {questionsApi} from 'lib/api/questions'
+import CustomAutocomplete from 'components/CustomAutoComplete'
 export default function CheckListForm({setLoading}) {
   const {
     query: {model_id},
@@ -31,26 +31,20 @@ export default function CheckListForm({setLoading}) {
 
   const [backendError, setBackendError] = React.useState<string>('')
 
-  const {
-    data: questions,
-    isLoading,
-    isError,
-  } = useQuery<any>({
+  const {data: questions, isLoading} = useQuery<any>({
     queryFn: () => questionsApi.get(),
     queryKey: ['questions'],
   })
 
-  const {data: branch, isLoading: isLoadingChecklist} = useQuery<any>({
+  const {
+    data: checkListData,
+    isLoading: isLoadingChecklist,
+    refetch,
+  } = useQuery<any>({
     queryFn: () => checklistApi.getId(model_id.toString()),
     enabled: isEditting,
     queryKey: ['checklist' + model_id.toString()],
     select: (data) => {
-      const chosenKeys = ['title', 'description']
-      handleChange(
-        'questions',
-        data?.report.questions?.map((e) => e._id),
-      )
-      chosenKeys.map((key) => handleChange(key, get(data?.report, key)))
       return data
     },
   })
@@ -58,7 +52,10 @@ export default function CheckListForm({setLoading}) {
   const submitCreate = async () => {
     try {
       setLoading(true)
-      await checklistApi.create({...values})
+      const payload = values
+      payload.questions = payload?.questions?.map((e) => e?.value)
+      await checklistApi.create(payload)
+      await refetch()
       router.back()
     } catch (e) {
       console.error(e)
@@ -70,7 +67,10 @@ export default function CheckListForm({setLoading}) {
   const submitUpdate = async () => {
     try {
       setLoading(true)
-      await checklistApi.update(model_id.toString(), {...values})
+      const payload = values
+      payload.questions = payload?.questions?.map((e) => e?.value)
+      await checklistApi.update(model_id.toString(), payload)
+      await refetch()
       router.back()
     } catch (e) {
       console.error(e)
@@ -82,7 +82,7 @@ export default function CheckListForm({setLoading}) {
 
   const {values, errors, handleChange, handleSubmit, clearErrors} = useForm({
     initial: {
-      questions: [],
+      questions: isEditting ? undefined : [],
     },
     // validationSchema:
     onSubmit: isEditting ? submitUpdate : submitCreate,
@@ -90,11 +90,23 @@ export default function CheckListForm({setLoading}) {
 
   useEffect(() => {
     setLoading(isLoading || isLoadingChecklist)
-    // if (isEditting) {
-    // } else {
-    //   setLoading(!isLoading)
-    // }
   }, [isLoading, isLoadingChecklist])
+
+  useEffect(() => {
+    if (checkListData) {
+      const chosenKeys = ['title', 'description']
+      handleChange(
+        'questions',
+        checkListData?.report.questions?.map((e) => ({
+          label: e.text,
+          value: e._id,
+        })),
+      )
+      chosenKeys.map((key) =>
+        handleChange(key, get(checkListData?.report, key)),
+      )
+    }
+  }, [checkListData])
 
   return (
     <Layout
@@ -136,33 +148,35 @@ export default function CheckListForm({setLoading}) {
           padding={1}
         />
 
-        <CustomSelect
-          id="bootstrap"
-          options={questions?.questions?.map((question) => ({
-            label: question?.text,
-            value: question?._id,
-          }))}
-          inputProps={{
-            default: '1',
-          }}
-          // hasEmpty
-          // variant='outlined'
-          value={values.questions || []}
-          label="Questions"
-          helperText="Choose Questions"
-          className="w-full"
-          // onChange={({target: {name, value}}) =>
-          //   handleChange('questions', [...values.questions, value])
-          // }
-          onChange={({target: {value}}) => {
-            const newValue = Array.isArray(value)
-              ? value
-              : [...(value || []), value]
-            handleChange('questions', newValue)
-          }}
-          padding={2}
-          multiple={true}
-        />
+        {values.questions && (
+          <CustomAutocomplete
+            id="bootstrap"
+            options={questions?.questions?.map((question) => ({
+              label: question?.text,
+              value: question?._id,
+            }))}
+            inputProps={{
+              default: '1',
+            }}
+            // hasEmpty
+            // variant='outlined'
+            value={values.questions}
+            label="Questions"
+            helperText="Choose Questions"
+            className="w-full"
+            // onChange={({target: {name, value}}) =>
+            //   handleChange('questions', [...values.questions, value])
+            // }
+            onChange={({target: {value}}) => {
+              const newValue = Array.isArray(value)
+                ? value
+                : [...(value || []), value]
+              handleChange('questions', newValue)
+            }}
+            padding={2}
+            multiple={true}
+          />
+        )}
 
         <Error backendError={backendError} />
 
