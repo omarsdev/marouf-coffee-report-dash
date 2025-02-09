@@ -19,6 +19,7 @@ import CustomSelect from 'components/CustomSelect'
 import CustomButton from 'components/CustomButton'
 import {CiSearch} from 'react-icons/ci'
 import {toSearchQuery} from 'lib/utils'
+import {format} from 'date-fns'
 
 export default function ModelList() {
   const theme = useTheme()
@@ -69,6 +70,13 @@ export default function ModelList() {
       field: 'phone',
       headerName: 'Phone',
       renderCell: ({row}) => `${row.phone}`,
+    },
+    {
+      ...defaultRowConfig,
+      field: 'time_started',
+      headerName: 'Time Started',
+      renderCell: ({row}) =>
+        `${row.time_started ? format(new Date(row.time_started), 'p') : ''}`,
     },
     {
       ...defaultRowConfig,
