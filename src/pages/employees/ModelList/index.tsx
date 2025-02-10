@@ -13,7 +13,7 @@ import {CiSearch} from 'react-icons/ci'
 import {toSearchQuery} from 'lib/utils'
 import {format} from 'date-fns'
 import {branchApi} from 'lib/api/branch'
-
+import TextInput from 'components/TextInput'
 
 export default function ModelList() {
   const theme = useTheme()
@@ -22,6 +22,7 @@ export default function ModelList() {
 
   const [filter, setFilter] = React.useState({
     role: null,
+    name: null,
   })
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
@@ -33,17 +34,21 @@ export default function ModelList() {
       ),
     queryKey: ['users'],
   })
-  const { data: branchesData, isLoading: branchesLoading } = useQuery<any>({
+  const {data: branchesData, isLoading: branchesLoading} = useQuery<any>({
     queryFn: () => branchApi.get(),
     queryKey: ['branches'],
-  });
-  const branches = Array.isArray(branchesData?.branches) ? branchesData.branches : [];
+  })
+  const branches = Array.isArray(branchesData?.branches)
+    ? branchesData.branches
+    : []
 
-  const branchesMap = branches.reduce((acc: Record<string, string>, branch: any) => {
-    acc[branch._id] = branch.name?.en || 'Unknown'; // Ensure safe access to name.en
-    return acc;
-  }, {});
-  
+  const branchesMap = branches.reduce(
+    (acc: Record<string, string>, branch: any) => {
+      acc[branch._id] = branch.name?.en || 'Unknown' // Ensure safe access to name.en
+      return acc
+    },
+    {},
+  )
 
   const defaultRowConfig = {
     flex: 1,
@@ -88,7 +93,17 @@ export default function ModelList() {
       field: 'active',
       headerName: 'Active',
       renderCell: ({row}) => (
-        <span style={{background: row.active ? 'green' : 'red', paddingTop: "5px", paddingBottom: "5px", paddingLeft: "10px", paddingRight: "10px", borderRadius: "20px", color: "white"}}>
+        <span
+          style={{
+            background: row.active ? 'green' : 'red',
+            paddingTop: '5px',
+            paddingBottom: '5px',
+            paddingLeft: '10px',
+            paddingRight: '10px',
+            borderRadius: '20px',
+            color: 'white',
+          }}
+        >
           {row.active ? 'Active' : 'InActive'}
         </span>
       ),
@@ -97,7 +112,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'current_branch',
       headerName: 'Current Branch',
-      renderCell: ({ row }) => branchesMap[row.current_branch] || '--',
+      renderCell: ({row}) => branchesMap[row.current_branch] || '--',
     },
     {
       ...defaultRowConfig,
@@ -156,7 +171,7 @@ export default function ModelList() {
           []
         }
         columns={columns}
-        loading={localLoading || isLoading || branchesLoading }
+        loading={localLoading || isLoading || branchesLoading}
         tableSize="tabbed"
         headerComponent={
           <Box
@@ -187,9 +202,17 @@ export default function ModelList() {
               className="w-full"
               value={filter.role}
               onChange={({target: {name, value}}) =>
-                setFilter({...filter, role: value})
+                setFilter((old) => ({...old, role: value}))
               }
               padding={2}
+            />
+            <TextInput
+              label="Search by Name"
+              className="w-full"
+              value={filter.name}
+              onChange={(value) => setFilter((old) => ({...old, name: value}))}
+              padding={2}
+              query={true}
             />
             <CustomButton
               onClick={async () => {
