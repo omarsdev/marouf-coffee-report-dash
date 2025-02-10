@@ -106,6 +106,7 @@ function MyApp({Component, pageProps}) {
     if (!token) {
       setLoading(false)
       router.replace('/')
+      return
     }
     if (user) {
       setLoading(false)
