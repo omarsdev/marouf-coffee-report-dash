@@ -49,9 +49,9 @@ export default function ModelList() {
   const columns: GridColDef[] = [
     {
       ...defaultRowConfig,
-      field: 'branch.area_manager.name.en',
+      field: 'userId.name.en',
       headerName: 'Username',
-      renderCell: ({row}) => `${row.branch?.area_manager?.name?.en}`,
+      renderCell: ({row}) => `${row.userId?.name?.en}`,
     },
     {
       ...defaultRowConfig,
