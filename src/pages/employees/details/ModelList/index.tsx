@@ -70,7 +70,7 @@ export default function ModelList() {
     {
       ...defaultRowConfig,
       field: 'row.submittedAt',
-      headerName: 'Schedule Date',
+      headerName: 'Submitted Date',
       renderCell: ({row}) => format(new Date(row?.submittedAt), 'yyyy/MM/dd'),
     },
     {
