@@ -12,6 +12,9 @@ import Error from 'components/Error'
 import {useQuery} from '@tanstack/react-query'
 import {userApi} from 'lib/api/user'
 import {get} from 'lodash'
+import {branchApi} from 'lib/api/branch'
+import {departmentsApi} from 'lib/api/departments'
+import {ticketsApi} from 'lib/api/tickets'
 export default function TicketsForm({setLoading}) {
   const {
     query: {model_id},
@@ -21,27 +24,43 @@ export default function TicketsForm({setLoading}) {
   const [backendError, setBackendError] = React.useState<string>('')
 
   const {data, isLoading} = useQuery<any>({
-    queryFn: () => userApi.getId(model_id.toString()),
+    queryFn: () => ticketsApi.getId(model_id.toString()),
     enabled: isEditting,
-    queryKey: ['users' + model_id.toString()],
+    queryKey: ['ticket' + model_id.toString()],
     select: (data) => {
       const chosenKeys = [
-        'name.en',
-        'name.ar',
-        'email',
-        'phone',
-        'password',
-        'role',
+        'status',
+        'priority',
+        'branch',
+        'user',
+        'ticket_title',
+        'ticket_description',
+        'department',
       ]
-      chosenKeys.map((key) => handleChange(key, get(data?.user, key)))
+      chosenKeys.map((key) => handleChange(key, String(get(data.ticket, key))))
       return data
     },
+  })
+
+  const {data: branches, isLoading: isLoadingBranch} = useQuery<any>({
+    queryFn: () => branchApi.get(),
+    queryKey: ['branches'],
+  })
+
+  const {
+    data: departments,
+    isLoading: isLoadingDepartments,
+    isError,
+    refetch,
+  } = useQuery<any>({
+    queryFn: () => departmentsApi.get(),
+    queryKey: ['departments'],
   })
 
   const submitCreate = async () => {
     try {
       setLoading(true)
-      await userApi.create({...values})
+      await ticketsApi.create({...values})
       router.back()
     } catch (e) {
       console.error(e)
@@ -53,7 +72,7 @@ export default function TicketsForm({setLoading}) {
   const submitUpdate = async () => {
     try {
       setLoading(true)
-      await userApi.edit(model_id.toString(), {...values})
+      await ticketsApi.edit(model_id.toString(), {...values})
       router.back()
     } catch (e) {
       console.error(e)
@@ -70,8 +89,8 @@ export default function TicketsForm({setLoading}) {
   })
 
   useEffect(() => {
-    setLoading(isLoading)
-  }, [isLoading])
+    setLoading(isLoading || isLoadingBranch || isLoadingDepartments)
+  }, [isLoading, isLoadingBranch, isLoadingDepartments])
 
   return (
     <Layout
@@ -97,74 +116,112 @@ export default function TicketsForm({setLoading}) {
         padding={3}
       >
         <TextInput
-          label="Employee Name (English)"
+          label="Tittle"
           className="w-full"
-          name="name.en"
-          value={values.name?.en}
+          name="ticket_title"
+          value={values.ticket_title}
           onChange={handleChange}
           padding={1}
         />
         <TextInput
-          label="Employee Name (Arabic)"
+          label="Description"
           className="w-full"
-          value={values.name?.ar}
-          name="name.ar"
+          value={values.ticket_description}
+          name="ticket_description"
           onChange={handleChange}
           padding={1}
-        />
-
-        <TextInput
-          label="Email"
-          className="w-full"
-          value={values.email}
-          name="email"
-          onChange={handleChange}
-          padding={2}
-          multiline
-        />
-
-        <TextInput
-          label="Phone"
-          className="w-full"
-          value={values.phone}
-          name="phone"
-          onChange={handleChange}
-          padding={2}
-          multiline
-        />
-
-        <TextInput
-          label="Password"
-          className="w-full"
-          value={values.password}
-          name="password"
-          onChange={handleChange}
-          padding={2}
-          secureEntry={true}
         />
 
         <CustomSelect
           id="bootstrap"
           options={[
             {
-              label: 'Area Manager',
-              value: '2',
+              label: 'Low',
+              value: '0',
             },
             {
-              label: 'Branch User',
+              label: 'Medium',
+              value: '1',
+            },
+            {
+              label: 'Hight',
               value: '3',
             },
           ]}
           inputProps={{
             default: '1',
           }}
-          // hasEmpty
-          // variant='outlined'
-          value={values.role}
-          label="Role"
-          helperText="Choose Employee Role"
+          value={values.priority}
+          label="Priority"
+          helperText="Choose Ticket Priority"
           className="w-full"
-          onChange={({target: {name, value}}) => handleChange('role', value)}
+          onChange={({target: {name, value}}) =>
+            handleChange('priority', value)
+          }
+          padding={2}
+        />
+
+        <CustomSelect
+          id="bootstrap"
+          options={[
+            {
+              label: 'In Progress',
+              value: '0',
+            },
+            {
+              label: 'Completed',
+              value: '1',
+            },
+          ]}
+          inputProps={{
+            default: '1',
+          }}
+          value={values.status}
+          label="Status"
+          helperText="Choose Ticket Status"
+          className="w-full"
+          onChange={({target: {name, value}}) => handleChange('status', value)}
+          padding={2}
+        />
+
+        <CustomSelect
+          id="bootstrap"
+          options={
+            branches?.branches?.map((branch) => ({
+              label: branch?.name?.en,
+              value: branch?._id,
+            })) || []
+          }
+          inputProps={{
+            default: '1',
+          }}
+          value={values.branch}
+          label="Branch"
+          helperText="Choose branch"
+          className="w-full"
+          // onChange={({target: {name, value}}) => handleChange('userId', value)}
+          onChange={({target: {name, value}}) => handleChange('branch', value)}
+          padding={2}
+        />
+
+        <CustomSelect
+          id="bootstrap"
+          options={
+            departments?.departments?.map((department) => ({
+              label: department?.department_name?.en,
+              value: department?._id,
+            })) || []
+          }
+          inputProps={{
+            default: '1',
+          }}
+          value={values.department || []}
+          label="Departments"
+          helperText="Choose department"
+          className="w-full"
+          onChange={({target: {name, value}}) =>
+            handleChange('department', value)
+          }
           padding={2}
         />
 
