@@ -15,83 +15,88 @@ import {get} from 'lodash'
 import {questionsApi} from 'lib/api/questions'
 export default function QuestionsForm({setLoading}) {
   const {
-    query: {model_id},
-  } = useRouter()
-  const isEditting = model_id.toString() !== 'new'
+    query: { model_id },
+  } = useRouter();
+  const isEditting = model_id.toString() !== "new";
 
-  const [backendError, setBackendError] = React.useState<string>('')
+  const [backendError, setBackendError] = React.useState<string>("");
 
-  const {data: branch, isLoading: isLoadingChecklist} = useQuery<any>({
+  const { data: branch, isLoading: isLoadingChecklist } = useQuery<any>({
     queryFn: () => questionsApi.getId(model_id.toString()),
     enabled: isEditting,
-    queryKey: ['questions' + model_id.toString()],
+    queryKey: ["questions" + model_id.toString()],
     select: (data) => {
-      const chosenKeys = ['text', 'type', 'media_status', 'required', 'options']
-      chosenKeys.map((key) => handleChange(key, get(data?.report, key)))
-      return data
+      const chosenKeys = ["text"];
+      chosenKeys.map((key) => handleChange(key, get(data?.report, key)));
+      return data;
     },
-  })
+  });
 
   const submitCreate = async () => {
     try {
-      setLoading(true)
-      await questionsApi.create({...values})
-      router.back()
+      setLoading(true);
+      await questionsApi.create({ ...values });
+      router.back();
     } catch (e) {
-      console.error(e)
-      setBackendError(e?.message)
+      console.error(e);
+      setBackendError(e?.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+
   const submitUpdate = async () => {
     try {
-      setLoading(true)
-      await questionsApi.update(model_id.toString(), {...values})
-      router.back()
+      setLoading(true);
+      await questionsApi.update(model_id.toString(), { ...values });
+      router.back();
     } catch (e) {
-      console.error(e)
-      setBackendError(e?.message)
+      console.error(e);
+      setBackendError(e?.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const {values, errors, handleChange, handleSubmit, clearErrors} = useForm({
+  const { values, errors, handleChange, handleSubmit, clearErrors } = useForm({
     initial: {
-      required: false,
+      text: "",
+      type: "MultipleChoice",
+      media_status: "no_media",
+      options: ["Yes", "No"],
+      required: true,
     },
-    // validationSchema:
     onSubmit: isEditting ? submitUpdate : submitCreate,
-  })
+  });
 
   useEffect(() => {
-    setLoading(isLoadingChecklist)
-  }, [isLoadingChecklist])
+    setLoading(isLoadingChecklist);
+  }, [isLoadingChecklist]);
 
   return (
     <Layout
       meta={{
-        title: isEditting ? 'Edit Question' : 'Add Question',
+        title: isEditting ? "Edit Question" : "Add Question",
       }}
     >
       <CustomLabel size="bigTitle">
-        {isEditting ? 'Edit Question' : 'Add Question'}
+        {isEditting ? "Edit Question" : "Add Question"}
       </CustomLabel>
 
       <CustomLabel type="secondary" padding={3} size="normal">
-        {isEditting ? 'Edit an existing Question' : 'Create a new Question'}
+        {isEditting ? "Edit an existing Question" : "Create a new Question"}
       </CustomLabel>
 
       <CustomContainer
         style={{
-          overflow: 'hidden',
+          overflow: "hidden",
         }}
         className="overflow-hidden mb-14"
         radius="medium"
         type="secondary"
         padding={3}
       >
+        {/* Text Input (Only visible input field) */}
         <TextInput
           label="Text"
           className="w-full"
@@ -101,104 +106,25 @@ export default function QuestionsForm({setLoading}) {
           padding={1}
         />
 
-        <CustomSelect
-          id="bootstrap"
-          options={[
-            {
-              label: 'Multiple Choice',
-              value: 'MultipleChoice',
-            },
-          ]}
-          inputProps={{
-            default: '1',
-          }}
-          // hasEmpty
-          // variant='outlined'
-          value={values.type}
-          label="Type"
-          helperText="Choose Type"
-          className="w-full"
-          onChange={({target: {name, value}}) => handleChange('type', value)}
-          padding={2}
-        />
-
-        <CustomSelect
-          id="bootstrap"
-          options={[
-            {
-              label: 'No Media',
-              value: 'no_media',
-            },
-          ]}
-          inputProps={{
-            default: '1',
-          }}
-          // hasEmpty
-          // variant='outlined'
-          value={values.media_status}
-          label="Media Status"
-          helperText="Choose Media Status"
-          className="w-full"
-          onChange={({target: {name, value}}) =>
-            handleChange('media_status', value)
-          }
-          padding={2}
-        />
-
-        <CustomSelect
-          id="bootstrap"
-          options={[
-            {
-              label: 'Yes',
-              value: 'Yes',
-            },
-            {
-              label: 'No',
-              value: 'No',
-            },
-          ]}
-          inputProps={{
-            default: '1',
-          }}
-          // hasEmpty
-          // variant='outlined'
-          value={values.options || []}
-          label="Options"
-          helperText="Choose Options"
-          className="w-full"
-          onChange={({target: {value}}) => {
-            const newValue = Array.isArray(value)
-              ? value
-              : [...(value || []), value]
-            handleChange('options', newValue)
-          }}
-          padding={2}
-          multiple={true}
-        />
-
-        <InputLabel shrink>Required</InputLabel>
-        <Checkbox
-          checked={values.required}
-          value={values.required}
-          inputProps={{'aria-label': 'primary checkbox'}}
-          onChange={({target: {name, checked}}) =>
-            handleChange('required', checked)
-          }
-        />
+        {/* Hidden Inputs for default values */}
+        <input type="hidden" name="type" value={values.type} />
+        <input type="hidden" name="media_status" value={values.media_status} />
+        <input type="hidden" name="options" value={values.options.join(",")} />
+        <input type="hidden" name="required" value={values.required} />
 
         <Error backendError={backendError} />
 
         <FormBottomWidget
           isEdit={isEditting}
           onSubmit={() => {
-            handleSubmit()
+            handleSubmit();
           }}
         />
       </CustomContainer>
     </Layout>
-  )
+  );
 }
 
 export async function getServerSideProps(ctx) {
-  return await redirectGuest(ctx)
+  return await redirectGuest(ctx);
 }

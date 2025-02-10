@@ -103,9 +103,23 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'status',
       headerName: 'Status',
-      renderCell: ({row}) =>
-        `${row.status === 0 ? 'In Progress' : 'Completed'}`,
+      renderCell: ({ row }) => (
+        <span
+          style={{
+            backgroundColor: row.status === 0 ? '#5F6EB9' : '#00BF29',
+            paddingTop: "5px",
+            paddingBottom: "5px",
+            paddingLeft: "10px",
+            paddingRight: "10px",
+            borderRadius: "20px",
+            color: "white",
+          }}
+        >
+          {row.status === 0 ? 'In Progress' : 'Completed'}
+        </span>
+      ),
     },
+    
     {
       ...defaultRowConfig,
       field: 'created_at',

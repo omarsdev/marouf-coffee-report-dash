@@ -55,6 +55,7 @@ export default function SchedulesForm({setLoading}) {
 
   const submitCreate = async () => {
     try {
+      // console.log("Creating schedule:", values);
       setLoading(true)
       await schedulesApi.create({...values})
       router.back()
