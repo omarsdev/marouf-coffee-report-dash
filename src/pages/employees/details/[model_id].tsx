@@ -32,8 +32,8 @@ export default function Employees({setLoading}) {
       <PanelSegmentation
         panels={[
           {
-            title: data?.user?.name?.en,
-            description: `Get ${data?.user?.name?.en} info here`,
+            title: `${data?.user?.name?.en} Submissions`,
+            description: `Get Submissions here info of ${data?.user?.name?.en} here`,
             component: <ModelList />,
             button: (
               <CustomButton

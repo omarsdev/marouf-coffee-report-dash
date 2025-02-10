@@ -63,6 +63,12 @@ export default function ModelList() {
   const columns: GridColDef[] = [
     {
       ...defaultRowConfig,
+      field: 'row.reportCopy.title',
+      headerName: 'Title',
+      renderCell: ({row}) => row?.reportCopy?.title,
+    },
+    {
+      ...defaultRowConfig,
       field: 'row.submittedAt',
       headerName: 'Schedule Date',
       renderCell: ({row}) => format(new Date(row?.submittedAt), 'yyyy/MM/dd'),
@@ -117,8 +123,8 @@ export default function ModelList() {
     },
     {
       ...defaultRowConfig,
-      field: 'Checklist',
-      headerName: 'Checklist',
+      field: 'answers',
+      headerName: 'Answers',
       renderCell: ({row}) => (
         <div
           style={{cursor: 'pointer'}}
@@ -129,11 +135,13 @@ export default function ModelList() {
             })
           }
         >
-          Details
+          See Answers
         </div>
       ),
     },
   ]
+
+  console.log(data?.submissions)
 
   return (
     <div>
