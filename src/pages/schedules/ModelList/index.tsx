@@ -14,6 +14,7 @@ import CustomButton from 'components/CustomButton'
 import {CiSearch} from 'react-icons/ci'
 import {toSearchQuery} from 'lib/utils'
 import CustomSelect from 'components/CustomSelect'
+import {userApi} from 'lib/api/user'
 
 export default function ModelList() {
   const theme = useTheme()
@@ -24,6 +25,7 @@ export default function ModelList() {
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
   const [filter, setFilter] = React.useState({
     date: null,
+    userId: null,
     branch: '',
   })
 
@@ -38,6 +40,11 @@ export default function ModelList() {
   const {data: branches, isLoading: isLoadingBranch} = useQuery<any>({
     queryFn: () => branchApi.get(),
     queryKey: ['branches'],
+  })
+
+  const {data: users, isLoading: isLoadingUser} = useQuery<any>({
+    queryFn: () => userApi.get(),
+    queryKey: ['users'],
   })
 
   const defaultRowConfig = {
@@ -149,7 +156,7 @@ export default function ModelList() {
           []
         }
         columns={columns}
-        loading={localLoading || isLoading || isLoadingBranch}
+        loading={localLoading || isLoading || isLoadingBranch || isLoadingUser}
         tableSize="tabbed"
         headerComponent={
           <Box
@@ -163,10 +170,10 @@ export default function ModelList() {
               label="Date"
               value={filter.date}
               onChange={(value) => {
-                setFilter({
-                  ...filter,
+                setFilter((old) => ({
+                  ...old,
                   date: format(value, 'yyyy/MM/dd'),
-                })
+                }))
               }}
               renderInput={(props) => <TextField {...props} />}
             />
@@ -185,7 +192,24 @@ export default function ModelList() {
               className="w-full"
               value={filter.branch}
               onChange={({target: {name, value}}) =>
-                setFilter({...filter, branch: value})
+                setFilter((old) => ({...old, branch: value}))
+              }
+              padding={2}
+            />
+            <CustomSelect
+              id="bootstrap"
+              options={users?.users?.map((question) => ({
+                label: question?.name?.en,
+                value: question?._id,
+              }))}
+              inputProps={{
+                default: '1',
+              }}
+              value={filter.userId}
+              label="User"
+              className="w-full"
+              onChange={({target: {name, value}}) =>
+                setFilter((old) => ({...old, userId: value}))
               }
               padding={2}
             />
