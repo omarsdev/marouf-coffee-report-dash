@@ -9,6 +9,7 @@ import {useQuery} from '@tanstack/react-query'
 import {checklistApi} from 'lib/api/checklist'
 import {submissionsApi} from 'lib/api/submissions'
 import Image from 'next/image'
+import CustomLabel from 'components/CustomLabel'
 
 export default function ModelList() {
   const {
@@ -103,6 +104,61 @@ export default function ModelList() {
 
   return (
     <div>
+      <div className="-mt-10 mb-6 flex-col gap-y-2">
+        <CustomLabel type="primary" size="normal">
+          My Report report ID
+        </CustomLabel>
+        <CustomLabel
+          type="primary"
+          size="normal"
+          className="flex flex-row gap-2"
+        >
+          <CustomLabel type="primary" size="normal">
+            Employee:
+          </CustomLabel>{' '}
+          report ID
+        </CustomLabel>
+        <CustomLabel
+          type="primary"
+          size="normal"
+          className="flex flex-row gap-2"
+        >
+          <CustomLabel type="primary" size="normal">
+            Submission Time:
+          </CustomLabel>
+          report ID
+        </CustomLabel>
+        <CustomLabel
+          type="primary"
+          size="normal"
+          className="flex flex-row gap-2"
+        >
+          <CustomLabel type="primary" size="normal">
+            Location/Branch:
+          </CustomLabel>
+          Madeina
+        </CustomLabel>
+        <CustomLabel
+          type="primary"
+          size="normal"
+          className="flex flex-row gap-2"
+        >
+          <CustomLabel type="primary" size="normal">
+            Inside/Outside Branch:
+          </CustomLabel>
+          True
+        </CustomLabel>
+        <CustomLabel
+          type="primary"
+          size="normal"
+          className="flex flex-row gap-2"
+        >
+          <CustomLabel type="primary" size="normal">
+            CheckIn/Checkout:
+          </CustomLabel>
+          123/13
+        </CustomLabel>
+      </div>
       <Table
         rows={
           (data?.submission?.answers &&
