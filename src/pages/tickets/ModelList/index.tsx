@@ -19,10 +19,11 @@ import TextInput from 'components/TextInput'
 import {CiSearch} from 'react-icons/ci'
 import {toSearchQuery} from 'lib/utils'
 import useStore from 'lib/store/store'
+import {userApi} from 'lib/api/user'
 
 export default function ModelList() {
   const {
-    query: {departmentId},
+    query: {departmentId, userId},
   } = useRouter()
 
   const theme = useTheme()
@@ -30,6 +31,7 @@ export default function ModelList() {
   const isSearchingRef = useRef(false)
   const filterOptionsRef = useRef({
     department: departmentId || '',
+    user: userId || '',
   })
 
   const [localLoading, setLocalLoading] = React.useState(false)
@@ -39,8 +41,14 @@ export default function ModelList() {
     from: null,
     to: null,
     department: departmentId || '',
+    user: userId || '',
     branch: '',
     ticket_title: '',
+  })
+
+  const {data: usersData, isLoading: isLoadingUser} = useQuery<any>({
+    queryFn: () => userApi.get(),
+    queryKey: ['users'],
   })
 
   const {data: branches, isLoading: isLoadingBranch} = useQuery<any>({
@@ -212,6 +220,22 @@ export default function ModelList() {
               value={filter.from}
               onChange={(value) => setFilter({...filter, from: value})}
               renderInput={(props) => <TextField {...props} />}
+            />
+            <CustomSelect
+              id="bootstrap"
+              options={usersData?.users?.map((user) => ({
+                label: user?.name?.en,
+                value: user._id,
+              }))}
+              hasEmpty
+              label="User"
+              placeholder="User Name"
+              className="w-full"
+              value={filter.user}
+              onChange={({target: {name, value}}) =>
+                setFilter({...filter, user: value})
+              }
+              padding={2}
             />
             {user?.role === 0 && (
               <CustomSelect

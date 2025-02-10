@@ -101,7 +101,19 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'TicketsSent',
       headerName: 'Tickets Sent',
-      renderCell: ({row}) => <div style={{cursor: 'pointer'}}>See Details</div>,
+      renderCell: ({row}) => (
+        <div
+          style={{cursor: 'pointer'}}
+          onClick={() => {
+            router.push({
+              pathname: '/tickets',
+              query: {userId: row.userId._id},
+            })
+          }}
+        >
+          See Details
+        </div>
+      ),
     },
     {
       ...defaultRowConfig,
