@@ -79,7 +79,7 @@ export default function ModelList() {
       renderCell: ({row}) => (
         <span
           style={{
-            backgroundColor: row.completed === 0 ? '#5F6EB9' : '#00BF29',
+            backgroundColor: row.completed ? '#5F6EB9' : '#00BF29',
             paddingTop: '5px',
             paddingBottom: '5px',
             paddingLeft: '10px',
