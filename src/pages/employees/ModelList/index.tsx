@@ -86,7 +86,9 @@ export default function ModelList() {
       field: 'time_started',
       headerName: 'Time Started',
       renderCell: ({row}) =>
-        `${row.time_started ? format(new Date(row.time_started), 'p') : ''}`,
+        row.active
+          ? `${row.time_started ? format(new Date(row.time_started), 'p') : ''}`
+          : '-',
     },
     {
       ...defaultRowConfig,
@@ -112,7 +114,8 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'current_branch',
       headerName: 'Current Branch',
-      renderCell: ({row}) => branchesMap[row.current_branch] || '--',
+      renderCell: ({row}) =>
+        row.active ? branchesMap[row.current_branch] || '--' : '-',
     },
     {
       ...defaultRowConfig,
