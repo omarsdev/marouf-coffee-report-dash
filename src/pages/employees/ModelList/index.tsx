@@ -106,7 +106,7 @@ export default function ModelList() {
             color: 'white',
           }}
         >
-          {row.active ? 'Active' : 'InActive'}
+          {row.active ? 'online' : 'offline'}
         </span>
       ),
     },
@@ -116,6 +116,26 @@ export default function ModelList() {
       headerName: 'Current Branch',
       renderCell: ({row}) =>
         row.active ? branchesMap[row.current_branch] || '--' : '-',
+    },
+    {
+      ...defaultRowConfig,
+      field: 'deleted',
+      headerName: 'Status',
+      renderCell: ({row}) => (
+        <span
+          style={{
+            background: !row.deleted ? 'green' : 'red',
+            paddingTop: '5px',
+            paddingBottom: '5px',
+            paddingLeft: '10px',
+            paddingRight: '10px',
+            borderRadius: '20px',
+            color: 'white',
+          }}
+        >
+          {row.deleted ? 'deactivate' : 'activate'}
+        </span>
+      ),
     },
     {
       ...defaultRowConfig,
