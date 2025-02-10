@@ -5,4 +5,6 @@ export const submissionsApi = {
   getById: async (id: string) => request.get('/submissions/' + id),
   getByAssignmentId: async (id: string) =>
     request.get('/submissions/assignment/' + id),
+  getAssignmentSubmission: async (options: string) =>
+    request.get('/submissions/assignment_submission/' + options),
 }
