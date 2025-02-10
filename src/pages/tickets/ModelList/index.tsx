@@ -97,29 +97,34 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'department.department_name.en',
       headerName: 'Department',
-      renderCell: ({row}) => `${row.department?.department_name?.en}`,
+      renderCell: ({row}) =>
+        `${
+          row.area_manager?.name?.en
+            ? row.area_manager?.name?.en
+            : row.department?.department_name?.en
+        }`,
     },
     {
       ...defaultRowConfig,
       field: 'status',
       headerName: 'Status',
-      renderCell: ({ row }) => (
+      renderCell: ({row}) => (
         <span
           style={{
             backgroundColor: row.status === 0 ? '#5F6EB9' : '#00BF29',
-            paddingTop: "5px",
-            paddingBottom: "5px",
-            paddingLeft: "10px",
-            paddingRight: "10px",
-            borderRadius: "20px",
-            color: "white",
+            paddingTop: '5px',
+            paddingBottom: '5px',
+            paddingLeft: '10px',
+            paddingRight: '10px',
+            borderRadius: '20px',
+            color: 'white',
           }}
         >
           {row.status === 0 ? 'In Progress' : 'Completed'}
         </span>
       ),
     },
-    
+
     {
       ...defaultRowConfig,
       field: 'created_at',
@@ -138,12 +143,12 @@ export default function ModelList() {
       filterable: false,
       renderCell: ({row}) => (
         <TableActionCell
-          // onEdit={() => {
-          //   router.push({
-          //     pathname: '/tickets/form/[model_id]',
-          //     query: {model_id: row.id},
-          //   })
-          // }}
+          onEdit={() => {
+            router.push({
+              pathname: '/tickets/form/[model_id]',
+              query: {model_id: row.id},
+            })
+          }}
           onDelete={() => {
             setDeleteDialogOpen(row.id)
           }}
