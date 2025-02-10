@@ -97,7 +97,12 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'department.department_name.en',
       headerName: 'Department',
-      renderCell: ({row}) => `${row.area_manager?.name?.en}`,
+      renderCell: ({row}) =>
+        `${
+          row.area_manager?.name?.en
+            ? row.area_manager?.name?.en
+            : row.department?.department_name?.en
+        }`,
     },
     {
       ...defaultRowConfig,
