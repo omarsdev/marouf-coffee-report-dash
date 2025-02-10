@@ -1,4 +1,4 @@
-import {userApi} from 'lib/api/userApi'
+import {userApi} from 'lib/api/user'
 import create from 'zustand'
 import {getCookie, setCookie} from 'cookies-next'
 import {initializeRequest} from 'pages/_app'

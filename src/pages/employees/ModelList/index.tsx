@@ -12,6 +12,8 @@ import CustomButton from 'components/CustomButton'
 import {CiSearch} from 'react-icons/ci'
 import {toSearchQuery} from 'lib/utils'
 import {format} from 'date-fns'
+import {branchApi} from 'lib/api/branch'
+
 
 export default function ModelList() {
   const theme = useTheme()
@@ -31,6 +33,17 @@ export default function ModelList() {
       ),
     queryKey: ['users'],
   })
+  const { data: branchesData, isLoading: branchesLoading } = useQuery<any>({
+    queryFn: () => branchApi.get(),
+    queryKey: ['branches'],
+  });
+  const branches = Array.isArray(branchesData?.branches) ? branchesData.branches : [];
+
+  const branchesMap = branches.reduce((acc: Record<string, string>, branch: any) => {
+    acc[branch._id] = branch.name?.en || 'Unknown'; // Ensure safe access to name.en
+    return acc;
+  }, {});
+  
 
   const defaultRowConfig = {
     flex: 1,
@@ -74,7 +87,17 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'active',
       headerName: 'Active',
-      renderCell: ({row}) => `${row.active ? 'Active' : 'InActive'}`,
+      renderCell: ({row}) => (
+        <span style={{background: row.active ? 'green' : 'red', paddingTop: "5px", paddingBottom: "5px", paddingLeft: "10px", paddingRight: "10px", borderRadius: "20px", color: "white"}}>
+          {row.active ? 'Active' : 'InActive'}
+        </span>
+      ),
+    },
+    {
+      ...defaultRowConfig,
+      field: 'current_branch',
+      headerName: 'Current Branch',
+      renderCell: ({ row }) => branchesMap[row.current_branch] || '--',
     },
     {
       ...defaultRowConfig,
@@ -93,6 +116,12 @@ export default function ModelList() {
               query: {model_id: row.id},
             })
           }}
+          onView={() =>
+            router.push({
+              pathname: '/employees/details/[model_id]',
+              query: {model_id: row.id},
+            })
+          }
           onDelete={() => {
             setDeleteDialogOpen(row.id)
           }}
@@ -127,7 +156,7 @@ export default function ModelList() {
           []
         }
         columns={columns}
-        loading={localLoading || isLoading}
+        loading={localLoading || isLoading || branchesLoading }
         tableSize="tabbed"
         headerComponent={
           <Box

@@ -6,7 +6,7 @@ import CustomContainer from 'components/CustomContainer'
 import TextInput from 'components/TextInput'
 import CustomLabel from 'components/CustomLabel'
 import useForm from 'lib/hooks/useForm'
-import {userApi} from 'lib/api/userApi'
+import {userApi} from 'lib/api/user'
 import request from 'lib/api'
 import router from 'next/router'
 import Error from 'components/Error'
@@ -32,7 +32,7 @@ export default function Entry() {
         rehydrate({token, user: data})
         setCookies('token', token)
         request.setSession(token)
-        router.push('/employees')
+        router.push('/schedules')
       } else {
         setBackendError('You are not authorized to access this page')
       }

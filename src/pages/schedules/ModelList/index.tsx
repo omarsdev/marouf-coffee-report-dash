@@ -76,8 +76,23 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'completed',
       headerName: 'Status',
-      renderCell: ({row}) => `${row.completed ? 'Completed' : 'In Progress'}`,
+      renderCell: ({ row }) => (
+        <span
+          style={{
+            backgroundColor: row.completed === 0 ? '#5F6EB9' : '#00BF29',
+            paddingTop: "5px",
+            paddingBottom: "5px",
+            paddingLeft: "10px",
+            paddingRight: "10px",
+            borderRadius: "20px",
+            color: "white",
+          }}
+        >
+          {row.completed ? 'Completed' : 'In Progress'}
+        </span>
+      ),
     },
+    
     {
       ...defaultRowConfig,
       field: 'id',
