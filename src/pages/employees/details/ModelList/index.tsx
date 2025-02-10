@@ -60,8 +60,6 @@ export default function ModelList() {
     align: 'left',
   } as GridColDef
 
-  console.log(data)
-
   const columns: GridColDef[] = [
     {
       ...defaultRowConfig,
@@ -124,8 +122,6 @@ export default function ModelList() {
       ),
     },
   ]
-
-  console.log(data)
 
   return (
     <div>
