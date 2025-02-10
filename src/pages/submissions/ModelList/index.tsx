@@ -10,6 +10,7 @@ import {checklistApi} from 'lib/api/checklist'
 import {submissionsApi} from 'lib/api/submissions'
 import Image from 'next/image'
 import CustomLabel from 'components/CustomLabel'
+import {format} from 'date-fns'
 
 export default function ModelList() {
   const {
@@ -106,17 +107,8 @@ export default function ModelList() {
     <div>
       <div className="-mt-10 mb-6 flex-col gap-y-2">
         <CustomLabel type="primary" size="normal">
-          My Report report ID
-        </CustomLabel>
-        <CustomLabel
-          type="primary"
-          size="normal"
-          className="flex flex-row gap-2"
-        >
-          <CustomLabel type="primary" size="normal">
-            Employee:
-          </CustomLabel>{' '}
-          report ID
+          {data?.submission?.reportCopy?.title}{' '}
+          {data?.submission?.reportCopy?._id}
         </CustomLabel>
         <CustomLabel
           type="primary"
@@ -126,7 +118,7 @@ export default function ModelList() {
           <CustomLabel type="primary" size="normal">
             Submission Time:
           </CustomLabel>
-          report ID
+          {format(new Date(data?.submission?.submittedAt), 'yyyy/MM/dd')}
         </CustomLabel>
         <CustomLabel
           type="primary"
@@ -136,7 +128,9 @@ export default function ModelList() {
           <CustomLabel type="primary" size="normal">
             Location/Branch:
           </CustomLabel>
-          Madeina
+          {data?.submission?.check?.branch?.lng},
+          {data?.submission?.check?.branch?.lat} /{' '}
+          {data?.submission?.check?.branch?.name?.en}
         </CustomLabel>
         <CustomLabel
           type="primary"
@@ -146,7 +140,7 @@ export default function ModelList() {
           <CustomLabel type="primary" size="normal">
             Inside/Outside Branch:
           </CustomLabel>
-          True
+          {String(data?.submission?.check?.in_range)}
         </CustomLabel>
         <CustomLabel
           type="primary"
@@ -156,7 +150,8 @@ export default function ModelList() {
           <CustomLabel type="primary" size="normal">
             CheckIn/Checkout:
           </CustomLabel>
-          123/13
+          {format(new Date(data?.submission?.check?.time_start), 'p')}/
+          {format(new Date(data?.submission?.check?.time_end), 'p')}
         </CustomLabel>
       </div>
       <Table
