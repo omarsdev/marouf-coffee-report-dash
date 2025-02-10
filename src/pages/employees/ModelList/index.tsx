@@ -23,6 +23,7 @@ export default function ModelList() {
   const [filter, setFilter] = React.useState({
     role: null,
     name: null,
+    role_type: null,
   })
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
@@ -219,6 +220,10 @@ export default function ModelList() {
                   label: 'branch manager',
                   value: '3',
                 },
+                {
+                  label: 'Quality control',
+                  value: 'QC',
+                },
               ]}
               inputProps={{
                 default: '1',
@@ -227,9 +232,14 @@ export default function ModelList() {
               label="Role"
               placeholder="Role"
               className="w-full"
-              value={filter.role}
+              value={filter.role || filter.role_type}
               onChange={({target: {name, value}}) =>
-                setFilter((old) => ({...old, role: value}))
+                setFilter((old) => ({
+                  ...old,
+                  role_type: null,
+                  role: null,
+                  [value === 'QC' ? 'role_type' : 'role']: value,
+                }))
               }
               padding={2}
             />
