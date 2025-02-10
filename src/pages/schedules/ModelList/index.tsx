@@ -76,23 +76,23 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'completed',
       headerName: 'Status',
-      renderCell: ({ row }) => (
+      renderCell: ({row}) => (
         <span
           style={{
             backgroundColor: row.completed === 0 ? '#5F6EB9' : '#00BF29',
-            paddingTop: "5px",
-            paddingBottom: "5px",
-            paddingLeft: "10px",
-            paddingRight: "10px",
-            borderRadius: "20px",
-            color: "white",
+            paddingTop: '5px',
+            paddingBottom: '5px',
+            paddingLeft: '10px',
+            paddingRight: '10px',
+            borderRadius: '20px',
+            color: 'white',
           }}
         >
           {row.completed ? 'Completed' : 'In Progress'}
         </span>
       ),
     },
-    
+
     {
       ...defaultRowConfig,
       field: 'id',
@@ -112,6 +112,12 @@ export default function ModelList() {
           }}
           onDelete={() => {
             setDeleteDialogOpen(row.id)
+          }}
+          onView={() => {
+            router.push({
+              pathname: '/schedules/info/[model_id]',
+              query: {model_id: row.assignmentId},
+            })
           }}
         />
       ),
