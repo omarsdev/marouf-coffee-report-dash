@@ -141,8 +141,6 @@ export default function ModelList() {
     },
   ]
 
-  console.log(data?.submissions)
-
   return (
     <div>
       <Table

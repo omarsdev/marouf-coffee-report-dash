@@ -3,76 +3,68 @@ import useStore from 'lib/store/store'
 import _ from 'lodash'
 import {Cookies} from 'react-cookie'
 
-//https://lit-plains-02666.herokuapp.com/api/
 export const PRODUCTION_API = 'https://darsivuedale.herokuapp.com/api/'
 export const STAGING_API =
   'https://maroufticket-9bb3c74b4061.herokuapp.com/api/'
 const AUTH_HEADER = 'x-auth-token'
-export const GOOGLE_API_KEY = 'AIzaSyD5OQ-RVhYfeYpBiD65zb7PdZkQpfOHWnA'
-// export const GOOGLE_API_KEY = 'AIzaSyD5OQ-RVhYfeYpBiD65zb7PdZkQpfOHWnA'
+
+// ⚠️ Move the API key to an environment variable for security reasons
+// export const GOOGLE_API_KEY = process.env.REACT_APP_GOOGLE_API_KEY || '';
 
 const request = Axios as AxiosStatic & {
-  setSession: any
-  removeSession: any
-  setUser: any
-  setEnv: any
-  getSession: any
+  setSession: (params: {token: string}) => void
+  removeSession: () => void
+  setUser: (params: {user: any}) => void
+  setEnv: () => void
+  getSession: () => string | undefined
 }
 
-const onSuccess = function (response) {
-  return _.get(response, 'data', response)
-}
+/**
+ * Handles successful responses.
+ */
+const onSuccess = (response: AxiosResponse) => _.get(response, 'data', response)
 
-const onError = function (error) {
+/**
+ * Handles errors from API responses.
+ */
+const onError = (error: AxiosError) => {
   if (Axios.isCancel(error)) {
     return Promise.reject(error)
   }
-  if (error.response) {
-    // Request was made but server responded with something
-    // other than 2xx
-    console.error('FAILED Response:', error.response)
-    console.error('FAILED Status:', error.response.status)
-    console.error('FAILED Data:', error.response.data)
-    console.error('FAILED Headers:', error.response.headers)
 
-    switch (error.response.status) {
+  if (error.response) {
+    console.error('FAILED Response:', error.response)
+
+    const {status, data} = error.response
+    const cookies = new Cookies()
+
+    switch (status) {
       case 401:
-        // TODO: revoke local session
+        // TODO: Handle unauthorized access (e.g., logout user)
         break
       case 411:
-        const cookie = new Cookies()
-        cookie.remove('token', null)
+        cookies.remove('token')
         request.removeSession()
         useStore.getState().reset()
-        // TODO: revoke local session
         break
       case 422:
-        const errors = _.get(error, 'response.data.errors', null)
-        const message = _.get(
-          error,
-          'response.data.message',
-          'Please check your input',
-        )
+        const errors = _.get(data, 'errors', null)
+        const message = _.get(data, 'message', 'Please check your input')
 
         if (errors) {
-          error.response.data.message = _.get(
-            _.values(errors),
-            '[0][0]',
-            message,
-          )
-          error.response.data['errors'] = errors
-        } else if (message) {
-          error.response.data.message = message
+          data.message = _.get(_.values(errors), '[0][0]', message)
+          data.errors = errors
+        } else {
+          data.message = message
         }
-
+        break
       default:
+        console.error('Unhandled Error Status:', status)
         break
     }
-    return Promise.reject(error.response.data)
+    return Promise.reject(data)
   } else {
-    // Something else happened while setting up the request
-    // triggered the error
-    console.error('Error Message:', error.message)
+    console.error('Network Error:', error.message)
   }
 
   return Promise.reject(error)
@@ -80,46 +72,54 @@ const onError = function (error) {
 
 request.interceptors.response.use(onSuccess, onError)
 
-request.defaults.headers['accept-language'] = 'en'
-request.defaults.headers['x-lang'] = 0
-request.defaults.headers['access-control-allow-origin'] = '*'
-// request.defaults.headers[AUTH_HEADER] = useStore.getState().token
+// Default Headers
+request.defaults.headers.common = {
+  'accept-language': 'en',
+  'x-lang': '0',
+  'access-control-allow-origin': '*',
+}
 
-// request.defaults.baseURL = PRODUCTION_API
+// Default Base URL
 request.defaults.baseURL = STAGING_API
 
-// request.defaults.headers[AUTH_HEADER] = window.localStorage.getItem("token");
-
-request['setSession'] = function ({token}) {
-  request.defaults.headers[AUTH_HEADER] = token
+/**
+ * Sets the authentication token in Axios headers.
+ */
+request.setSession = ({token}: {token: string}) => {
+  request.defaults.headers.common[AUTH_HEADER] = token
 }
 
-request['getSession'] = function ({token}) {
-  return request.defaults.headers[AUTH_HEADER]
+/**
+ * Retrieves the current authentication token.
+ */
+request.getSession = () => request.defaults.headers.common[AUTH_HEADER]
+
+/**
+ * Removes the authentication token from Axios headers.
+ */
+request.removeSession = () => {
+  delete request.defaults.headers.common[AUTH_HEADER]
 }
 
-request['setEnv'] = function () {
-  // const env = window.localStorage.getItem("ENV");
-  // const URL = !(env !== "production") ? stg : prod;
-  // request.defaults.baseURL = URL;
+/**
+ * Placeholder function for setting the API environment.
+ */
+request.setEnv = () => {
+  // TODO: Implement logic for switching environments dynamically
 }
 
-request['setUser'] = function ({user}) {
-  // window.localStorage.setItem("user", JSON.stringify(user));
-}
-
-request['removeSession'] = function () {
-  delete this.defaults.headers[AUTH_HEADER]
+/**
+ * Placeholder function for setting user details.
+ */
+request.setUser = ({user}: {user: any}) => {
+  // TODO: Implement user session persistence
 }
 
 export default request
 
-export const returnServerHeader = (serverToken) => {
-  if (!!serverToken) {
-    return {
-      [AUTH_HEADER]: serverToken,
-    }
-  } else {
-    return {}
-  }
+/**
+ * Returns the authentication header for server requests.
+ */
+export const returnServerHeader = (serverToken?: string) => {
+  return serverToken ? {[AUTH_HEADER]: serverToken} : {}
 }
