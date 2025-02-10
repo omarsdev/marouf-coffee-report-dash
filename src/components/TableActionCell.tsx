@@ -16,6 +16,13 @@ export default function TableActionCell({
 }) {
   return (
     <div className="flex">
+      {onView && (
+        <Tooltip title="View">
+          <IconButton onClick={onView}>
+            <IoEyeOutline />
+          </IconButton>
+        </Tooltip>
+      )}
       {onEdit && (
         <Tooltip title="Edit">
           <IconButton onClick={onEdit}>
@@ -25,22 +32,15 @@ export default function TableActionCell({
       )}
       {onDelete && (
         <Tooltip title="Delete">
-          <IconButton onClick={onDelete} sx={{ml: 2}}>
+          <IconButton onClick={onDelete}>
             <RiDeleteBin2Fill />
           </IconButton>
         </Tooltip>
       )}
       {onReset && (
         <Tooltip title="Reset Password">
-          <IconButton onClick={onReset} sx={{ml: 2}}>
+          <IconButton onClick={onReset}>
             <RiLockPasswordFill />
-          </IconButton>
-        </Tooltip>
-      )}
-      {onView && (
-        <Tooltip title="View">
-          <IconButton onClick={onView} sx={{ml: 2}}>
-            <IoEyeOutline />
           </IconButton>
         </Tooltip>
       )}
