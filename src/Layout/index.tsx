@@ -6,17 +6,21 @@ import {Box, Container} from '@mui/material'
 import moment from 'moment'
 
 type LayoutProps = {
-  meta: any
-  children: ReactNode; // Add this line to include children
-
+  meta?: any
+  children: ReactNode // Add this line to include children
 }
 
 const DefaultLayout: FunctionComponent<LayoutProps> = ({
   children,
   meta,
 }: any) => {
-  const {title, description, titleAppendSiteName = false, url, ogImage} =
-    meta || {}
+  const {
+    title,
+    description,
+    titleAppendSiteName = false,
+    url,
+    ogImage,
+  } = meta || {}
   return (
     <>
       <NextSeo

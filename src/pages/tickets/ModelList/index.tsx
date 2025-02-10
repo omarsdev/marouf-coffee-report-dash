@@ -29,7 +29,7 @@ export default function ModelList() {
   const theme = useTheme()
   const {user} = useStore()
   const isSearchingRef = useRef(false)
-  const filterOptionsRef = useRef({
+  const filterOptionsRef = useRef<any>({
     department: departmentId || '',
     user: userId || '',
   })
