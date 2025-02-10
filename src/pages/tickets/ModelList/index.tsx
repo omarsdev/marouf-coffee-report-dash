@@ -4,7 +4,7 @@ import DeleteDialog from 'components/DeleteDialog'
 import Table from 'components/Table'
 import TableActionCell from 'components/TableActionCell'
 
-import router from 'next/router'
+import router, {useRouter} from 'next/router'
 
 import React, {useEffect, useRef} from 'react'
 import {branchApi} from 'lib/api/branch'
@@ -21,10 +21,16 @@ import {toSearchQuery} from 'lib/utils'
 import useStore from 'lib/store/store'
 
 export default function ModelList() {
+  const {
+    query: {departmentId},
+  } = useRouter()
+
   const theme = useTheme()
   const {user} = useStore()
   const isSearchingRef = useRef(false)
-  const filterOptionsRef = useRef({})
+  const filterOptionsRef = useRef({
+    department: departmentId || '',
+  })
 
   const [localLoading, setLocalLoading] = React.useState(false)
 
@@ -32,7 +38,7 @@ export default function ModelList() {
   const [filter, setFilter] = React.useState({
     from: null,
     to: null,
-    department: '',
+    department: departmentId || '',
     branch: '',
     ticket_title: '',
   })
@@ -62,10 +68,10 @@ export default function ModelList() {
   const {data, isLoading, isError, refetch} = useQuery<any>({
     queryFn: () => {
       return ticketsApi.get(
-        isSearchingRef.current ? toSearchQuery(filterOptionsRef.current) : '',
+        filterOptionsRef.current ? toSearchQuery(filterOptionsRef.current) : '',
       )
     },
-    queryKey: ['tickets'],
+    queryKey: ['tickets' + JSON.stringify(filterOptionsRef.current)],
     select: (data) => {
       // isSearchingRef.current = false
       // filterOptionsRef.current = {}

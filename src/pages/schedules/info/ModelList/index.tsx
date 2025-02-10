@@ -98,8 +98,6 @@ export default function ModelList() {
     },
   ]
 
-  console.log(data?.submissions?.[0]?.answers)
-
   return (
     <div>
       <Table

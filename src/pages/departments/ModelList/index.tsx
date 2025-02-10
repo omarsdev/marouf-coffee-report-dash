@@ -70,6 +70,12 @@ export default function ModelList() {
           onDelete={() => {
             setDeleteDialogOpen(row.id)
           }}
+          onView={() => {
+            router.push({
+              pathname: '/tickets',
+              query: {departmentId: row.id},
+            })
+          }}
         />
       ),
     },
