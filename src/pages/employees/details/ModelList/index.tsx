@@ -105,23 +105,9 @@ export default function ModelList() {
     },
     {
       ...defaultRowConfig,
-      field: 'TicketsSent',
-      headerName: 'Inside/Outside',
-      renderCell: ({row}) => (
-        <span
-          style={{
-            background: row?.check?.in_range ? 'green' : 'red',
-            paddingTop: '5px',
-            paddingBottom: '5px',
-            paddingLeft: '10px',
-            paddingRight: '10px',
-            borderRadius: '20px',
-            color: 'white',
-          }}
-        >
-          {row?.check?.in_range ? 'Inside' : 'Outside'}
-        </span>
-      ),
+      field: 'row.check.branch.name.en',
+      headerName: 'Branch',
+      renderCell: ({row}) => row?.check?.branch?.name?.en,
     },
     {
       ...defaultRowConfig,
@@ -142,6 +128,8 @@ export default function ModelList() {
       ),
     },
   ]
+
+  console.log(data?.submissions)
 
   return (
     <div>
