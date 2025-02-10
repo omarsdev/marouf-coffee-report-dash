@@ -28,16 +28,6 @@ export default function TicketsForm({setLoading}) {
     enabled: isEditting,
     queryKey: ['ticket' + model_id.toString()],
     select: (data) => {
-      const chosenKeys = [
-        'status',
-        'priority',
-        'branch',
-        'user',
-        'ticket_title',
-        'ticket_description',
-        'department',
-      ]
-      chosenKeys.map((key) => handleChange(key, String(get(data.ticket, key))))
       return data
     },
   })
@@ -91,6 +81,22 @@ export default function TicketsForm({setLoading}) {
   useEffect(() => {
     setLoading(isLoading || isLoadingBranch || isLoadingDepartments)
   }, [isLoading, isLoadingBranch, isLoadingDepartments])
+
+  useEffect(() => {
+    if (!data || !isEditting) {
+      return
+    }
+    const chosenKeys = [
+      'status',
+      'priority',
+      'branch',
+      'user',
+      'ticket_title',
+      'ticket_description',
+      'department',
+    ]
+    chosenKeys.map((key) => handleChange(key, String(get(data.ticket, key))))
+  }, [data, isEditting])
 
   return (
     <Layout
