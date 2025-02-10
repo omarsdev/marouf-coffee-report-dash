@@ -97,29 +97,29 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'department.department_name.en',
       headerName: 'Department',
-      renderCell: ({row}) => `${row.department?.department_name?.en}`,
+      renderCell: ({row}) => `${row.area_manager?.name?.en}`,
     },
     {
       ...defaultRowConfig,
       field: 'status',
       headerName: 'Status',
-      renderCell: ({ row }) => (
+      renderCell: ({row}) => (
         <span
           style={{
             backgroundColor: row.status === 0 ? '#5F6EB9' : '#00BF29',
-            paddingTop: "5px",
-            paddingBottom: "5px",
-            paddingLeft: "10px",
-            paddingRight: "10px",
-            borderRadius: "20px",
-            color: "white",
+            paddingTop: '5px',
+            paddingBottom: '5px',
+            paddingLeft: '10px',
+            paddingRight: '10px',
+            borderRadius: '20px',
+            color: 'white',
           }}
         >
           {row.status === 0 ? 'In Progress' : 'Completed'}
         </span>
       ),
     },
-    
+
     {
       ...defaultRowConfig,
       field: 'created_at',
