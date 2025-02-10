@@ -108,15 +108,13 @@ function MyApp({Component, pageProps}) {
       router.replace('/')
       return
     }
-    if (user) {
-      setLoading(false)
-      return
-    }
 
     const getUserInfo = async () => {
       try {
         const userData = await rehydrateUser()
-        router.push(userData?.role === 1 ? '/tickets' : '/schedules')
+        if (userData?.role === 1) {
+          router.push('/tickets')
+        }
       } catch (error) {
         router.push('/')
       } finally {
