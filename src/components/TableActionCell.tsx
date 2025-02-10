@@ -1,6 +1,7 @@
 import {IconButton, Tooltip} from '@mui/material'
 import React from 'react'
 import {RiDeleteBin2Fill, RiEdit2Fill, RiLockPasswordFill} from 'react-icons/ri'
+import {IoEyeOutline} from 'react-icons/io5'
 
 export default function TableActionCell({
   onDelete,
@@ -37,9 +38,9 @@ export default function TableActionCell({
         </Tooltip>
       )}
       {onView && (
-        <Tooltip title="Reset Password">
+        <Tooltip title="View">
           <IconButton onClick={onView} sx={{ml: 2}}>
-            <RiLockPasswordFill />
+            <IoEyeOutline />
           </IconButton>
         </Tooltip>
       )}

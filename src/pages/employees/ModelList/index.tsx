@@ -116,6 +116,12 @@ export default function ModelList() {
               query: {model_id: row.id},
             })
           }}
+          onView={() =>
+            router.push({
+              pathname: '/employees/details/[model_id]',
+              query: {model_id: row.id},
+            })
+          }
           onDelete={() => {
             setDeleteDialogOpen(row.id)
           }}

@@ -7,4 +7,17 @@ export const userApi = {
   getId: async (id: string) => request.get('/users/' + id),
   edit: async (id: string, data: any) => request.put('/users/' + id, data),
   delete: async (id: string) => request.delete('/users/' + id),
+  login: (data) => request.post('/auth', data),
+  rehydrate: (token?) =>
+    request.get(
+      '/users/me',
+      token
+        ? {
+            headers: {
+              'x-auth-token': token,
+            },
+          }
+        : {},
+    ),
+  update: (data: any, id) => request.put('/users/' + id, data),
 }
