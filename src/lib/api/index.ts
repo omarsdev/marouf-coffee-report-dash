@@ -70,6 +70,16 @@ const onError = (error: AxiosError) => {
   return Promise.reject(error)
 }
 
+request.interceptors.request.use((config) => {
+  const token = useStore.getState().token
+  if (token) {
+    config.headers['x-auth-token'] = token
+  }
+  config.headers['Content-Type'] = 'application/json'
+
+  return config
+})
+
 request.interceptors.response.use(onSuccess, onError)
 
 // Default Headers

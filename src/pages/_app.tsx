@@ -103,6 +103,9 @@ function MyApp({Component, pageProps}) {
   }, [])
 
   useEffect(() => {
+    if (!loading) {
+      return
+    }
     if (!token) {
       setLoading(false)
       router.replace('/')
