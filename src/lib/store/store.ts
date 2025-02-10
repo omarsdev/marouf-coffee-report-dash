@@ -14,7 +14,7 @@ interface StoreState {
 
 const initNetworkRouter = async (): Promise<void> => {
   try {
-    const token = new Cookies().get('token').get('token') as string | null
+    const token = new Cookies().get('token') as string | null
     if (token) {
       await initializeRequest({token})
     }
@@ -47,6 +47,7 @@ const useStore = create<StoreState>((set) => ({
       set({user: data})
       return data
     } catch (error) {
+      set({user: null, token: null})
       console.error('Error rehydrating user:', error)
       return null
     }
