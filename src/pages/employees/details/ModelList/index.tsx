@@ -78,8 +78,8 @@ export default function ModelList() {
       field: 'userId.time_started',
       headerName: 'Time Started',
       renderCell: ({row}) =>
-        row.userId?.time_started
-          ? format(new Date(row.userId?.time_started), 'p')
+        row?.check?.time_start
+          ? format(new Date(row?.check?.time_start), 'p')
           : '-',
     },
     {
@@ -87,8 +87,8 @@ export default function ModelList() {
       field: 'userId.time_ended',
       headerName: 'Time Ended',
       renderCell: ({row}) =>
-        row.userId?.time_ended
-          ? format(new Date(row.userId?.time_ended), 'p')
+        row?.check?.time_end
+          ? format(new Date(row?.check?.time_end), 'p')
           : '-',
     },
     {
@@ -96,10 +96,10 @@ export default function ModelList() {
       field: 'timespent',
       headerName: 'Time Spent',
       renderCell: ({row}) =>
-        row.userId?.time_started && row.userId?.time_ended
+        row?.check?.time_start && row?.check?.time_end
           ? getTimeDifference(
-              new Date(row.userId.time_started),
-              new Date(row.userId.time_ended),
+              new Date(row?.check?.time_start),
+              new Date(row?.check?.time_end),
             )
           : '-',
     },
