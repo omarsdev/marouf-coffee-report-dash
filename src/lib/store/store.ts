@@ -1,6 +1,6 @@
 import {userApi} from 'lib/api/user'
 import create from 'zustand'
-import {getCookie, setCookie} from 'cookies-next'
+import {Cookies} from 'react-cookie'
 import {initializeRequest} from 'pages/_app'
 
 interface StoreState {
@@ -14,7 +14,7 @@ interface StoreState {
 
 const initNetworkRouter = async (): Promise<void> => {
   try {
-    const token = getCookie('token') as string | null
+    const token = new Cookies().get('token') as string | null
     if (token) {
       await initializeRequest({token})
     }
@@ -25,13 +25,13 @@ const initNetworkRouter = async (): Promise<void> => {
 
 const useStore = create<StoreState>((set) => ({
   user: null,
-  token: (getCookie('token') as string | null) || null,
+  token: (new Cookies().get('token') as string | null) || null,
   settings: null,
 
   rehydrate: (hydrationObject: any) => {
     set({...hydrationObject})
     if (hydrationObject.token) {
-      setCookie('token', hydrationObject.token, {
+      new Cookies().set('token', hydrationObject.token, {
         maxAge: 7 * 24 * 60 * 60, // Expires in 7 days
         path: '/',
         secure: process.env.NODE_ENV === 'production',
@@ -47,6 +47,7 @@ const useStore = create<StoreState>((set) => ({
       set({user: data})
       return data
     } catch (error) {
+      set({user: null, token: null})
       console.error('Error rehydrating user:', error)
       return null
     }

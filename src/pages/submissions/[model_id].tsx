@@ -14,14 +14,14 @@ export default function Branches({setLoading}) {
   return (
     <Layout
       meta={{
-        title: 'Submissions',
+        title: 'Answers',
       }}
     >
       <PanelSegmentation
         panels={[
           {
-            title: 'Submissions',
-            description: 'Get all the Checklist here',
+            title: 'Submission Answers',
+            description: 'Get all the Submission Answers here',
             component: <ModelList />,
           },
         ]}

@@ -38,7 +38,6 @@
     "babel-jest": "^26.6.3",
     "cookie-cutter": "^0.2.0",
     "cookies": "^0.8.0",
-    "cookies-next": "^5.1.0",
     "date-fns": "^2.29.1",
     "dotenv-flow": "^3.2.0",
     "emoji-picker-react": "^3.5.0",

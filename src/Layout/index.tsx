@@ -7,9 +7,8 @@ import moment from 'moment'
 import useStore from 'lib/store/store'
 
 type LayoutProps = {
-  meta: any
-  children: ReactNode; // Add this line to include children
-
+  meta?: any
+  children: ReactNode // Add this line to include children
 }
 
 const DefaultLayout: FunctionComponent<LayoutProps> = ({
@@ -17,20 +16,13 @@ const DefaultLayout: FunctionComponent<LayoutProps> = ({
   meta,
   cookies
 }: any) => {
-  const {title, description, titleAppendSiteName = false, url, ogImage} =
-    meta || {}
-    const {token, user, rehydrateUser} = useStore()
-    useEffect(() => {
-      if (user) {
-        return
-      }
-      if (token) {
-        const getUserInfo = async () => {
-           await rehydrateUser()
-        }
-        getUserInfo()
-      }
-    }, [user])
+  const {
+    title,
+    description,
+    titleAppendSiteName = false,
+    url,
+    ogImage,
+  } = meta || {}
   return (
     <>
       <NextSeo
