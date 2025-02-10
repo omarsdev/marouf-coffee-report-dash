@@ -61,10 +61,9 @@ export default function ModelList() {
     },
     {
       ...defaultRowConfig,
-      field: 'created_at',
+      field: 'dueDate',
       headerName: 'Date',
-      renderCell: ({row}) =>
-        `${format(new Date(row.created_at), 'dd/MM/yyyy')}`,
+      renderCell: ({row}) => `${format(new Date(row.dueDate), 'dd/MM/yyyy')}`,
     },
     {
       ...defaultRowConfig,
