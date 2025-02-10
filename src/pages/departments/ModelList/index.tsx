@@ -52,6 +52,26 @@ export default function ModelList() {
     },
     {
       ...defaultRowConfig,
+      field: 'ticketsee',
+      headerName: 'See Tickets',
+      renderCell: ({row}) => {
+        return (
+          <div
+            style={{cursor: 'pointer'}}
+            onClick={() => {
+              router.push({
+                pathname: '/tickets',
+                query: {departmentId: row.id},
+              })
+            }}
+          >
+            See tickets
+          </div>
+        )
+      },
+    },
+    {
+      ...defaultRowConfig,
       field: 'id',
       headerName: '',
       description: '',
@@ -69,12 +89,6 @@ export default function ModelList() {
           }}
           onDelete={() => {
             setDeleteDialogOpen(row.id)
-          }}
-          onView={() => {
-            router.push({
-              pathname: '/tickets',
-              query: {departmentId: row.id},
-            })
           }}
         />
       ),
