@@ -106,19 +106,21 @@ export default function ModelList() {
     {
       ...defaultRowConfig,
       field: 'TicketsSent',
-      headerName: 'Tickets Sent',
+      headerName: 'Inside/Outside',
       renderCell: ({row}) => (
-        <div
-          style={{cursor: 'pointer'}}
-          onClick={() => {
-            router.push({
-              pathname: '/tickets',
-              query: {userId: row.userId._id},
-            })
+        <span
+          style={{
+            background: row?.check?.in_range ? 'green' : 'red',
+            paddingTop: '5px',
+            paddingBottom: '5px',
+            paddingLeft: '10px',
+            paddingRight: '10px',
+            borderRadius: '20px',
+            color: 'white',
           }}
         >
-          See Details
-        </div>
+          {row?.check?.in_range ? 'Inside' : 'Outside'}
+        </span>
       ),
     },
     {
