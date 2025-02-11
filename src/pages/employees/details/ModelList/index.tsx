@@ -116,12 +116,17 @@ export default function ModelList() {
       renderCell: ({row}) => (
         <div
           style={{cursor: 'pointer'}}
-          onClick={() =>
+          onClick={() => {
             router.push({
               pathname: '/submissions/[model_id]',
-              query: {model_id: row.id},
+              query: {
+                model_id: row.id,
+                submittedAt: row.submittedAt,
+                time_start: row.check.time_start,
+                time_end: row.check.time_end,
+              },
             })
-          }
+          }}
         >
           See Answers
         </div>
