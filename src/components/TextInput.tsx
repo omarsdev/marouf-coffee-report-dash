@@ -24,7 +24,6 @@ interface Props {
   type?: string
   multiline?
   secureEntry?: Boolean
-  sx?: any
   disabled?
   query?
   pb?
@@ -51,7 +50,7 @@ export default function TextInput({
   multiline = false,
   placeholder,
   value,
-  inputProps,
+  inputProps = {},
   className,
   onChange,
   name,
@@ -100,15 +99,21 @@ export default function TextInput({
         id={'input_id=' + name}
         autoComplete="new-password"
         error={!!error}
-        inputProps={[
-          {...(!!inputProps ? inputProps : {})},
-          {
-            autocomplete: 'password',
-            form: {
-              autocomplete: 'off',
-            },
+        inputProps={{
+          ...inputProps,
+          autoComplete: 'password',
+          form: {
+            autoComplete: 'off',
           },
-        ]}
+        }}
+        // {...(!!inputProps ? inputProps : {})},
+        //   {
+        //     autocomplete: 'password',
+        //     form: {
+        //       autocomplete: 'off',
+        //     },
+        //   },
+        // }
         name={name}
         multiline={multiline}
         placeholder={placeholder}
