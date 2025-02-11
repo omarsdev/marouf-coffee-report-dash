@@ -13,9 +13,12 @@ import CustomLabel from 'components/CustomLabel'
 import {format} from 'date-fns'
 
 export default function ModelList() {
-  const {
-    query: {model_id},
-  } = useRouter()
+  const {query} = useRouter()
+
+  const model_id = query.model_id as string
+  const submittedAt = query.submittedAt as string
+  const time_start = query.time_start as string
+  const time_end = query.time_end as string
 
   const theme = useTheme()
   const [localLoading, setLocalLoading] = React.useState(false)
@@ -118,7 +121,11 @@ export default function ModelList() {
           <CustomLabel type="primary" size="normal">
             Submission Time:
           </CustomLabel>
-          {format(new Date(data?.submission?.submittedAt), 'yyyy/MM/dd')}
+          {submittedAt ? (
+            format(new Date(submittedAt), 'yyyy/MM/dd')
+          ) : (
+            <span>Invalid time</span>
+          )}
         </CustomLabel>
         <CustomLabel
           type="primary"
@@ -150,8 +157,14 @@ export default function ModelList() {
           <CustomLabel type="primary" size="normal">
             CheckIn/Checkout:
           </CustomLabel>
-          {format(new Date(data?.submission?.check?.time_start), 'p')}/
-          {format(new Date(data?.submission?.check?.time_end), 'p')}
+          {time_start && typeof time_end ? (
+            <>
+              {format(new Date(time_start), 'p')} /{' '}
+              {format(new Date(time_end), 'p')}
+            </>
+          ) : (
+            <span>Invalid time</span>
+          )}
         </CustomLabel>
       </div>
       <Table
