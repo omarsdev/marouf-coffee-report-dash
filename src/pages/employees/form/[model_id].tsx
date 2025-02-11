@@ -45,9 +45,14 @@ export default function EmployeesForm({setLoading}) {
   })
 
   const submitCreate = async () => {
+    const payload = {
+      ...values,
+      role_type: values.role === 'QC' ? 'QC' : undefined,
+      role: values.role === 'QC' ? undefined : values.role,
+    }
     try {
       setLoading(true)
-      await userApi.create({...values})
+      await userApi.create(payload)
       router.back()
     } catch (e) {
       console.error(e)
@@ -57,9 +62,14 @@ export default function EmployeesForm({setLoading}) {
     }
   }
   const submitUpdate = async () => {
+    const payload = {
+      ...values,
+      role_type: values.role === 'QC' ? 'QC' : undefined,
+      role: values.role === 'QC' ? undefined : values.role,
+    }
     try {
       setLoading(true)
-      await userApi.edit(model_id.toString(), {...values})
+      await userApi.edit(model_id.toString(), payload)
       router.back()
     } catch (e) {
       console.error(e)
@@ -155,6 +165,10 @@ export default function EmployeesForm({setLoading}) {
             {
               label: 'Area Manager',
               value: '2',
+            },
+            {
+              label: 'Quality control',
+              value: 'QC',
             },
             {
               label: 'Branch User',

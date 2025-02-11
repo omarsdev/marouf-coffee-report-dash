@@ -58,6 +58,7 @@ export default function CustomSelect({
       fontSize: 16,
       borderRadius: 7,
       padding: '16px 26px 16px 12px',
+      minWidth: 50,
       //@ts-ignore
       transition: theme.transitions.create(['border-color', 'box-shadow']),
       // Use the system font instead of the default Roboto font.

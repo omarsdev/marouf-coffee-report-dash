@@ -10,6 +10,7 @@ interface StoreState {
   rehydrate: (hydrationObject: Partial<StoreState>) => void
   rehydrateUser: () => Promise<any | null>
   reset: () => void
+  setToken: (token: string) => void
 }
 
 const initNetworkRouter = async (): Promise<void> => {
@@ -54,6 +55,7 @@ const useStore = create<StoreState>((set) => ({
   },
 
   reset: () => set({user: null, token: null, settings: null}),
+  setToken: (token: string) => set({token}),
 }))
 
 export default useStore

@@ -22,8 +22,8 @@ export const ColorModeContext = createContext({toggleColorMode: () => {}})
 export const isLoggedIn = (cookies) =>
   !!cookies?.['token'] && cookies?.['token'] !== 'null'
 
-export const initializeRequest = (cookies) => {
-  request.setSession({token: cookies['token']})
+export const initializeRequest = (token) => {
+  request.setSession({token})
 }
 
 export const parseServerSideCookies = (ctx) => {
@@ -72,7 +72,7 @@ function MyApp({Component, pageProps}) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    initializeRequest({token: pageProps.cookies?.token})
+    initializeRequest(pageProps.cookies?.token)
   }, [])
 
   const colorMode = useMemo(
@@ -103,20 +103,21 @@ function MyApp({Component, pageProps}) {
   }, [])
 
   useEffect(() => {
+    if (!loading) {
+      return
+    }
     if (!token) {
       setLoading(false)
       router.replace('/')
-      return
-    }
-    if (user) {
-      setLoading(false)
       return
     }
 
     const getUserInfo = async () => {
       try {
         const userData = await rehydrateUser()
-        router.push(userData?.role === 1 ? '/tickets' : '/schedules')
+        if (userData?.role === 1) {
+          router.push('/tickets')
+        }
       } catch (error) {
         router.push('/')
       } finally {

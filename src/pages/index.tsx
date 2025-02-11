@@ -10,7 +10,7 @@ import {userApi} from 'lib/api/user'
 import request from 'lib/api'
 import router from 'next/router'
 import Error from 'components/Error'
-import {useCookies} from 'react-cookie'
+import {useCookies, Cookies} from 'react-cookie'
 import useStore from 'lib/store/store'
 
 export default function Entry() {
@@ -30,8 +30,8 @@ export default function Entry() {
       const data = (await userApi.rehydrate(token)) as any
       if (data?.role === 0 || data?.role === 1) {
         rehydrate({token, user: data})
-        setCookies('token', token)
-        request.setSession(token)
+        new Cookies().set('token', token)
+        request.setSession({token})
         router.push('/schedules')
       } else {
         setBackendError('You are not authorized to access this page')

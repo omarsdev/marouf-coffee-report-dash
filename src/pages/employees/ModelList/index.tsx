@@ -13,7 +13,7 @@ import {CiSearch} from 'react-icons/ci'
 import {toSearchQuery} from 'lib/utils'
 import {format} from 'date-fns'
 import {branchApi} from 'lib/api/branch'
-
+import TextInput from 'components/TextInput'
 
 export default function ModelList() {
   const theme = useTheme()
@@ -22,6 +22,8 @@ export default function ModelList() {
 
   const [filter, setFilter] = React.useState({
     role: null,
+    name: null,
+    role_type: null,
   })
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
@@ -33,17 +35,21 @@ export default function ModelList() {
       ),
     queryKey: ['users'],
   })
-  const { data: branchesData, isLoading: branchesLoading } = useQuery<any>({
+  const {data: branchesData, isLoading: branchesLoading} = useQuery<any>({
     queryFn: () => branchApi.get(),
     queryKey: ['branches'],
-  });
-  const branches = Array.isArray(branchesData?.branches) ? branchesData.branches : [];
+  })
+  const branches = Array.isArray(branchesData?.branches)
+    ? branchesData.branches
+    : []
 
-  const branchesMap = branches.reduce((acc: Record<string, string>, branch: any) => {
-    acc[branch._id] = branch.name?.en || 'Unknown'; // Ensure safe access to name.en
-    return acc;
-  }, {});
-  
+  const branchesMap = branches.reduce(
+    (acc: Record<string, string>, branch: any) => {
+      acc[branch._id] = branch.name?.en || 'Unknown' // Ensure safe access to name.en
+      return acc
+    },
+    {},
+  )
 
   const defaultRowConfig = {
     flex: 1,
@@ -81,15 +87,27 @@ export default function ModelList() {
       field: 'time_started',
       headerName: 'Time Started',
       renderCell: ({row}) =>
-        `${row.time_started ? format(new Date(row.time_started), 'p') : ''}`,
+        row.active
+          ? `${row.time_started ? format(new Date(row.time_started), 'p') : ''}`
+          : '-',
     },
     {
       ...defaultRowConfig,
       field: 'active',
       headerName: 'Active',
       renderCell: ({row}) => (
-        <span style={{background: row.active ? 'green' : 'red', paddingTop: "5px", paddingBottom: "5px", paddingLeft: "10px", paddingRight: "10px", borderRadius: "20px", color: "white"}}>
-          {row.active ? 'Active' : 'InActive'}
+        <span
+          style={{
+            background: row.active ? 'green' : 'red',
+            paddingTop: '5px',
+            paddingBottom: '5px',
+            paddingLeft: '10px',
+            paddingRight: '10px',
+            borderRadius: '20px',
+            color: 'white',
+          }}
+        >
+          {row.active ? 'online' : 'offline'}
         </span>
       ),
     },
@@ -97,7 +115,28 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'current_branch',
       headerName: 'Current Branch',
-      renderCell: ({ row }) => branchesMap[row.current_branch] || '--',
+      renderCell: ({row}) =>
+        row.active ? branchesMap[row.current_branch] || '--' : '-',
+    },
+    {
+      ...defaultRowConfig,
+      field: 'deleted',
+      headerName: 'Status',
+      renderCell: ({row}) => (
+        <span
+          style={{
+            background: !row.deleted ? 'green' : 'red',
+            paddingTop: '5px',
+            paddingBottom: '5px',
+            paddingLeft: '10px',
+            paddingRight: '10px',
+            borderRadius: '20px',
+            color: 'white',
+          }}
+        >
+          {row.deleted ? 'deactivate' : 'activate'}
+        </span>
+      ),
     },
     {
       ...defaultRowConfig,
@@ -122,9 +161,13 @@ export default function ModelList() {
               query: {model_id: row.id},
             })
           }
-          onDelete={() => {
-            setDeleteDialogOpen(row.id)
-          }}
+          onDelete={
+            !row.deleted
+              ? () => {
+                  setDeleteDialogOpen(row.id)
+                }
+              : undefined
+          }
         />
       ),
     },
@@ -156,7 +199,7 @@ export default function ModelList() {
           []
         }
         columns={columns}
-        loading={localLoading || isLoading || branchesLoading }
+        loading={localLoading || isLoading || branchesLoading}
         tableSize="tabbed"
         headerComponent={
           <Box
@@ -177,6 +220,10 @@ export default function ModelList() {
                   label: 'branch manager',
                   value: '3',
                 },
+                {
+                  label: 'Quality control',
+                  value: 'QC',
+                },
               ]}
               inputProps={{
                 default: '1',
@@ -185,11 +232,24 @@ export default function ModelList() {
               label="Role"
               placeholder="Role"
               className="w-full"
-              value={filter.role}
+              value={filter.role || filter.role_type}
               onChange={({target: {name, value}}) =>
-                setFilter({...filter, role: value})
+                setFilter((old) => ({
+                  ...old,
+                  role_type: null,
+                  role: null,
+                  [value === 'QC' ? 'role_type' : 'role']: value,
+                }))
               }
               padding={2}
+            />
+            <TextInput
+              label="Search by Name"
+              className="w-full"
+              value={filter.name}
+              onChange={(value) => setFilter((old) => ({...old, name: value}))}
+              padding={2}
+              query={true}
             />
             <CustomButton
               onClick={async () => {
