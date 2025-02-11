@@ -9,7 +9,7 @@ export const STAGING_API =
 const AUTH_HEADER = 'x-auth-token'
 
 // ⚠️ Move the API key to an environment variable for security reasons
-// export const GOOGLE_API_KEY = process.env.REACT_APP_GOOGLE_API_KEY || '';
+export const GOOGLE_API_KEY = process.env.REACT_APP_GOOGLE_API_KEY || '';
 
 const request = Axios as AxiosStatic & {
   setSession: (params: {token: string}) => void
