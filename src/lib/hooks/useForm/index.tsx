@@ -16,6 +16,7 @@ export default function useForm({
 }: useFormInterface) {
   const [errors, setErrors] = useState<typeof initial>({})
   const [vals, setVals] = useState<typeof initial>(initial || {})
+
   const handleChange = (path, value) => {
     setVals((prev) => {
       let _obj = cloneDeep(prev)

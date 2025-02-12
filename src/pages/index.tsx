@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 import Head from 'next/head'
 import DarkModeToggle from '../components/dark-mode-toggle'
 import {Button, Checkbox, useTheme} from '@mui/material'
@@ -17,20 +17,39 @@ export default function Entry() {
   const theme = useTheme()
   const {rehydrate} = useStore()
 
-  const [_, setCookies] = useCookies([])
+  const [rememberMe, setRememberMe] = useState(false)
+
+  const [_, setCookies] = useCookies()
   const handleLogin = async () => {
     clearErrors()
     setBackendError('')
     try {
       await request.removeSession()
       let {token} = (await userApi.login({
-        email: values.email_a.toLowerCase(),
+        email: values.email_a.toLowerCase().trim(),
         password: values.password_2,
       })) as any
       const data = (await userApi.rehydrate(token)) as any
       if (data?.role === 0 || data?.role === 1) {
         rehydrate({token, user: data})
-        new Cookies().set('token', token)
+        if (rememberMe) {
+          setCookies('token', token, {
+            path: '/',
+            secure: true,
+            maxAge: 7 * 24 * 60 * 60,
+            expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            sameSite: 'strict',
+            httpOnly: false,
+          })
+        } else {
+          setCookies('token', token, {
+            path: '/',
+            secure: true,
+            sameSite: 'strict',
+            httpOnly: false,
+          })
+        }
+
         request.setSession({token})
         router.push('/schedules')
       } else {
@@ -95,7 +114,8 @@ export default function Entry() {
               <div className="flex items-center">
                 <Checkbox
                   sx={{color: 'text.primary', p: 0, m: 0, pr: 1}}
-                  checked={false}
+                  value={rememberMe}
+                  onChange={() => setRememberMe(!rememberMe)}
                 />
                 <div>Remember Me?</div>
               </div>
@@ -115,7 +135,11 @@ export default function Entry() {
           <div className="w-1/2 h-full relative flex flex-col justify-center items-center">
             <CustomLabel className="z-50 text-center">
               <div className="text-primary-500 z-50 text-xl mb-1">Visit us</div>
-              <div className="text-white z-50 text-2xl">Powered By Vuedale</div>
+              <div
+                className={`text-${theme.palette.text.primary} z-50 text-2xl`}
+              >
+                Powered By Vuedale
+              </div>
             </CustomLabel>
           </div>
         </CustomContainer>
