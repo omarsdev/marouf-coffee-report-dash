@@ -126,7 +126,7 @@ function MyApp({Component, pageProps}) {
     }
 
     getUserInfo()
-  }, [user, token])
+  }, [token])
 
   const theme = useMemo(
     () =>
