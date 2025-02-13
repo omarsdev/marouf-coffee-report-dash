@@ -16,12 +16,16 @@ import {checklistApi} from 'lib/api/checklist'
 import {branchApi} from 'lib/api/branch'
 import {schedulesApi} from 'lib/api/schedules'
 import {DesktopDatePicker} from '@mui/x-date-pickers'
-export default function SchedulesForm({setLoading}) {
-  const {
-    query: {model_id},
-  } = useRouter()
-  const isEditting = model_id.toString() !== 'new'
+import {eachDayOfInterval, format, parseISO} from 'date-fns'
 
+function getDatesBetween(from, to) {
+  return eachDayOfInterval({
+    start: new Date(from),
+    end: new Date(to),
+  }).map((date) => format(date, 'yyyy-MM-dd'))
+}
+
+export default function SchedulesForm({setLoading}) {
   const [backendError, setBackendError] = React.useState<string>('')
 
   const {data: reports, isLoading: isLoadingReports} = useQuery<any>({
@@ -39,24 +43,16 @@ export default function SchedulesForm({setLoading}) {
     queryKey: ['branches'],
   })
 
-  const {data: schedule, isLoading: isLoadingChecklist} = useQuery<any>({
-    queryFn: () => schedulesApi.getId(model_id.toString()),
-    enabled: isEditting,
-    queryKey: ['schedule' + model_id.toString()],
-    select: (data) => {
-      const chosenKeys = ['dueDate', 'assignedAt']
-      handleChange('reportId', data?.assignment?.reportId?._id)
-      handleChange('branches', [data?.assignment?.branch])
-      handleChange('userId', [data?.assignment?.userId?._id])
-      chosenKeys.map((key) => handleChange(key, get(data?.assignment, key)))
-      return data
-    },
-  })
-
-  const submitUpdate = async () => {
+  const submitCreate = async () => {
+    const payload = {
+      ...values,
+      assignmentDates: getDatesBetween(values.from, values.to),
+      from: undefined,
+      to: undefined,
+    }
     try {
       setLoading(true)
-      await schedulesApi.update(model_id.toString(), {...values})
+      await schedulesApi.create(payload)
       router.back()
     } catch (e) {
       console.error(e)
@@ -68,36 +64,27 @@ export default function SchedulesForm({setLoading}) {
 
   const {values, errors, handleChange, handleSubmit, clearErrors} = useForm({
     initial: {
-      assignedAt: new Date(),
-      dueDate: new Date(),
+      from: new Date(),
+      to: new Date(),
     },
     // validationSchema:
-    onSubmit: submitUpdate,
+    onSubmit: submitCreate,
   })
 
   useEffect(() => {
-    if (isEditting) {
-      setLoading(isLoadingChecklist)
-    } else {
-      setLoading(
-        isLoadingChecklist ||
-          isLoadingReports ||
-          isLoadingUser ||
-          isLoadingBranch,
-      )
-    }
-  }, [isLoadingChecklist, isLoadingReports, isLoadingUser, isLoadingBranch])
+    setLoading(isLoadingReports || isLoadingUser || isLoadingBranch)
+  }, [isLoadingReports, isLoadingUser, isLoadingBranch])
 
   return (
     <Layout
       meta={{
-        title: 'Edit Schedules',
+        title: 'Add Schedules',
       }}
     >
-      <CustomLabel size="bigTitle">{'Edit Schedules'}</CustomLabel>
+      <CustomLabel size="bigTitle">{'Add Schedules'}</CustomLabel>
 
       <CustomLabel type="secondary" padding={3} size="normal">
-        {'Edit an existing Schedules'}
+        {'Create a new Schedules'}
       </CustomLabel>
 
       <CustomContainer
@@ -118,14 +105,21 @@ export default function SchedulesForm({setLoading}) {
           inputProps={{
             default: '1',
           }}
-          value={values.reportId}
+          value={values.reports || []}
           label="reports"
           helperText="Choose reports"
           className="w-full"
-          onChange={({target: {name, value}}) =>
-            handleChange('reportId', value)
-          }
+          // onChange={({target: {name, value}}) =>
+          //   handleChange('reportId', value)
+          // }
+          onChange={({target: {value}}) => {
+            const newValue = Array.isArray(value)
+              ? value
+              : [...(value || []), value]
+            handleChange('reports', newValue)
+          }}
           padding={2}
+          multiple={true}
         />
 
         <CustomSelect
@@ -169,24 +163,26 @@ export default function SchedulesForm({setLoading}) {
           multiple={true}
         />
 
-        <DesktopDatePicker
-          label="Assigned At"
-          value={values.assignedAt}
-          onChange={(value) => handleChange('assignedAt', value)}
-          renderInput={(props) => <TextField {...props} />}
-        />
+        <>
+          <DesktopDatePicker
+            label="From"
+            value={values.from}
+            onChange={(value) => handleChange('from', value)}
+            renderInput={(props) => <TextField {...props} />}
+          />
 
-        <DesktopDatePicker
-          label="Due Date"
-          value={values.dueDate}
-          onChange={(value) => handleChange('dueDate', value)}
-          renderInput={(props) => <TextField {...props} />}
-        />
+          <DesktopDatePicker
+            label="to"
+            value={values.to}
+            onChange={(value) => handleChange('to', value)}
+            renderInput={(props) => <TextField {...props} />}
+          />
+        </>
 
         <Error backendError={backendError} />
 
         <FormBottomWidget
-          isEdit={isEditting}
+          isEdit={false}
           onSubmit={() => {
             handleSubmit()
           }}

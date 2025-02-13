@@ -25,7 +25,7 @@ export default function Branches(props) {
             button: (
               <CustomButton
                 onClick={() => {
-                  router.push('/schedules/form/new')
+                  router.push('/schedules/new')
                 }}
                 startIcon={<GridAddIcon />}
                 width="10rem"
