@@ -110,12 +110,12 @@ export default function ModelList() {
       filterable: false,
       renderCell: ({row}) => (
         <TableActionCell
-          onEdit={() => {
-            router.push({
-              pathname: '/schedules/form/[model_id]',
-              query: {model_id: row.id},
-            })
-          }}
+          // onEdit={() => {
+          //   router.push({
+          //     pathname: '/schedules/form/[model_id]',
+          //     query: {model_id: row.id},
+          //   })
+          // }}
           onDelete={() => {
             setDeleteDialogOpen(row.id)
           }}
