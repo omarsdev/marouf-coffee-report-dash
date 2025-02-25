@@ -92,7 +92,7 @@ request.defaults.headers.common = {
 }
 
 // Default Base URL
-request.defaults.baseURL = PRODUCTION_API
+request.defaults.baseURL = STAGING_API
 
 /**
  * Sets the authentication token in Axios headers.
