@@ -14,6 +14,7 @@ import {toSearchQuery} from 'lib/utils'
 import {format} from 'date-fns'
 import {branchApi} from 'lib/api/branch'
 import TextInput from 'components/TextInput'
+import TruncatedText from 'components/TranchedText'
 
 export default function ModelList() {
   const theme = useTheme()
@@ -115,8 +116,15 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'current_branch',
       headerName: 'Current Branch',
-      renderCell: ({row}) =>
-        row.active ? branchesMap[row.current_branch] || '--' : '-',
+      renderCell: ({row}) => (
+        <>
+          {row.active ? (
+            <TruncatedText text={branchesMap[row.current_branch] || '--'} />
+          ) : (
+            <>{'-'}</>
+          )}
+        </>
+      ),
     },
     {
       ...defaultRowConfig,
