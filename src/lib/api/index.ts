@@ -3,9 +3,10 @@ import useStore from 'lib/store/store'
 import _ from 'lodash'
 import {Cookies} from 'react-cookie'
 
-export const PRODUCTION_API = 'https://darsivuedale.herokuapp.com/api/'
+export const PRODUCTION_API =
+  'https://marouf-ticket-ac294cbae16f.herokuapp.com/api/'
 export const STAGING_API =
-  'https://maroufticket-9bb3c74b4061.herokuapp.com/api/'
+  'https://stg-marouf-ticket-c3fae247ad08.herokuapp.com/api/'
 const AUTH_HEADER = 'x-auth-token'
 
 // ⚠️ Move the API key to an environment variable for security reasons
@@ -91,7 +92,7 @@ request.defaults.headers.common = {
 }
 
 // Default Base URL
-request.defaults.baseURL = STAGING_API
+request.defaults.baseURL = PRODUCTION_API
 
 /**
  * Sets the authentication token in Axios headers.
