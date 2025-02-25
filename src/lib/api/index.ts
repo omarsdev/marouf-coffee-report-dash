@@ -4,7 +4,7 @@ import _ from 'lodash'
 import {Cookies} from 'react-cookie'
 
 export const PRODUCTION_API =
-  'https://marouf-ticket-ac294cbae16f.herokuapp.com/'
+  'https://marouf-ticket-ac294cbae16f.herokuapp.com/api/'
 export const STAGING_API =
   'https://stg-marouf-ticket-c3fae247ad08.herokuapp.com/api/'
 const AUTH_HEADER = 'x-auth-token'
