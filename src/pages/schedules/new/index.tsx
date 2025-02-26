@@ -1,32 +1,61 @@
-import {TextField} from '@mui/material'
+import {
+  Box,
+  FormControlLabel,
+  Switch,
+  TextField,
+  ToggleButtonGroup,
+  Typography,
+} from '@mui/material'
 import CustomContainer from 'components/CustomContainer'
 import CustomLabel from 'components/CustomLabel'
 import CustomSelect from 'components/CustomSelect'
 import FormBottomWidget from 'components/FormBottomWidget'
 import useForm from 'lib/hooks/useForm'
-import router, {useRouter} from 'next/router'
+import router from 'next/router'
 import {redirectGuest} from 'pages/_app'
 import React, {useEffect} from 'react'
 import Layout from '../../../Layout'
 import Error from 'components/Error'
 import {useQuery} from '@tanstack/react-query'
 import {userApi} from 'lib/api/user'
-import {get, map} from 'lodash'
 import {checklistApi} from 'lib/api/checklist'
 import {branchApi} from 'lib/api/branch'
 import {schedulesApi} from 'lib/api/schedules'
 import {DesktopDatePicker} from '@mui/x-date-pickers'
 import {eachDayOfInterval, format, parseISO} from 'date-fns'
-
-function getDatesBetween(from, to) {
-  return eachDayOfInterval({
-    start: new Date(from),
-    end: new Date(to),
-  }).map((date) => format(date, 'yyyy-MM-dd'))
-}
+import DateRangePicker from 'components/DateRangePicker'
+import {DAYS_OF_WEEK} from 'lib/constants'
+import DayToggleButton from 'components/DayToggleButton'
 
 export default function SchedulesForm({setLoading}) {
   const [backendError, setBackendError] = React.useState<string>('')
+  const [calenderData, setCalenderData] = React.useState<{
+    fromDate: Date
+    toDate: Date
+    days: string[]
+    repeat: boolean
+    individueleDate: Date
+  }>({
+    fromDate: new Date(),
+    toDate: new Date(),
+    days: [],
+    repeat: false,
+    individueleDate: new Date(),
+  })
+
+  const selectedDays = React.useMemo(() => {
+    const {fromDate, toDate, days, repeat, individueleDate} = calenderData
+    const start = new Date(fromDate)
+    const end = new Date(toDate)
+
+    if (repeat && start < end) {
+      return eachDayOfInterval({start, end})
+        .filter((date) => days.includes(date.getDay()))
+        .map((date) => format(date, 'yyyy-MM-dd'))
+    } else if (!repeat && individueleDate) {
+      return [format(individueleDate, 'yyyy-MM-dd')]
+    } else return []
+  }, [calenderData])
 
   const {data: reports, isLoading: isLoadingReports} = useQuery<any>({
     queryFn: () => checklistApi.get(),
@@ -46,7 +75,7 @@ export default function SchedulesForm({setLoading}) {
   const submitCreate = async () => {
     const payload = {
       ...values,
-      assignmentDates: getDatesBetween(values.from, values.to),
+      assignmentDates: selectedDays,
       from: undefined,
       to: undefined,
     }
@@ -62,11 +91,12 @@ export default function SchedulesForm({setLoading}) {
     }
   }
 
+  const handleChangeCalender = (path: string, value: any) => {
+    setCalenderData({...calenderData, [path]: value})
+  }
+
   const {values, errors, handleChange, handleSubmit, clearErrors} = useForm({
-    initial: {
-      from: new Date(),
-      to: new Date(),
-    },
+    initial: {},
     // validationSchema:
     onSubmit: submitCreate,
   })
@@ -163,21 +193,52 @@ export default function SchedulesForm({setLoading}) {
           multiple={true}
         />
 
-        <>
-          <DesktopDatePicker
-            label="From"
-            value={values.from}
-            onChange={(value) => handleChange('from', value)}
-            renderInput={(props) => <TextField {...props} />}
+        <Box mb={2}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={calenderData.repeat}
+                onChange={() =>
+                  handleChangeCalender('repeat', !calenderData.repeat)
+                }
+                name="repeat"
+              />
+            }
+            label="Repeat"
           />
+        </Box>
 
+        {calenderData.repeat ? (
+          <>
+            <DateRangePicker
+              values={calenderData}
+              handleChange={handleChangeCalender}
+            />
+            <Box mb={3}>
+              <Typography variant="subtitle1" gutterBottom>
+                Repeat on:
+              </Typography>
+              <ToggleButtonGroup
+                value={calenderData.days}
+                onChange={(_, days) => handleChangeCalender('days', days)}
+                size="small"
+                color="primary"
+                className="flex gap-2"
+              >
+                {DAYS_OF_WEEK.map(({label, value}) => (
+                  <DayToggleButton label={label} value={value} />
+                ))}
+              </ToggleButtonGroup>
+            </Box>
+          </>
+        ) : (
           <DesktopDatePicker
-            label="to"
-            value={values.to}
-            onChange={(value) => handleChange('to', value)}
-            renderInput={(props) => <TextField {...props} />}
+            label="Individual Date"
+            value={calenderData.individueleDate}
+            onChange={(value) => handleChangeCalender('individueleDate', value)}
+            renderInput={(props) => <TextField fullWidth {...props} />}
           />
-        </>
+        )}
 
         <Error backendError={backendError} />
 
