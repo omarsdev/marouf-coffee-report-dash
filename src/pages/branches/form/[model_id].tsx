@@ -32,8 +32,6 @@ export default function BranchesForm({setLoading}) {
     queryKey: ['branch' + model_id.toString()],
   })
 
-  console.log('singleBranchData', singleBranchData)
-
   const submitCreateBranch = async () => {
     try {
       setLoading(true)
@@ -84,7 +82,6 @@ export default function BranchesForm({setLoading}) {
       )
     }
   }, [singleBranchData])
-  console.log('values', values)
 
   return (
     <Layout
