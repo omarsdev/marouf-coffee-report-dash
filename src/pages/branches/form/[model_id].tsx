@@ -26,22 +26,10 @@ export default function BranchesForm({setLoading}) {
     queryKey: ['area_managers'],
   })
 
-  const {isLoading: isLoadingBranch} = useQuery<any>({
+  const {data: singleBranchData, isLoading: isLoadingBranch} = useQuery<any>({
     queryFn: () => branchApi.getId(model_id.toString()),
     enabled: isEditting,
     queryKey: ['branch' + model_id.toString()],
-    select: (data) => {
-      const chosenKeys = [
-        'name.en',
-        'name.ar',
-        'lat',
-        'lng',
-        'miles',
-        'area_manager',
-      ]
-      chosenKeys.map((key) => handleChange(key, get(data?.branch, key)))
-      return data
-    },
   })
 
   const submitCreateBranch = async () => {
@@ -74,6 +62,26 @@ export default function BranchesForm({setLoading}) {
     // validationSchema:
     onSubmit: isEditting ? submitUpdateBranch : submitCreateBranch,
   })
+
+  useEffect(() => {
+    setLoading(isLoadingBranch)
+  }, [isLoadingBranch])
+
+  useEffect(() => {
+    if (isEditting && singleBranchData) {
+      const chosenKeys = [
+        'name.en',
+        'name.ar',
+        'lat',
+        'lng',
+        'miles',
+        'area_manager',
+      ]
+      chosenKeys.map((key) =>
+        handleChange(key, get(singleBranchData?.branch, key)),
+      )
+    }
+  }, [singleBranchData])
 
   return (
     <Layout
