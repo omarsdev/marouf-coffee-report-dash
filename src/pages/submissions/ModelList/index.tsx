@@ -1,14 +1,14 @@
 import {useTheme} from '@mui/material'
-import {GridColDef} from '@mui/x-data-grid'
-import DeleteDialog from 'components/DeleteDialog'
+import {
+  GridColDef,
+  GridToolbarContainer,
+  GridToolbarExport,
+} from '@mui/x-data-grid'
 import Table from 'components/Table'
-import TableActionCell from 'components/TableActionCell'
-import router, {useRouter} from 'next/router'
+import {useRouter} from 'next/router'
 import React from 'react'
 import {useQuery} from '@tanstack/react-query'
-import {checklistApi} from 'lib/api/checklist'
 import {submissionsApi} from 'lib/api/submissions'
-import Image from 'next/image'
 import CustomLabel from 'components/CustomLabel'
 import {format} from 'date-fns'
 
@@ -22,8 +22,6 @@ export default function ModelList() {
 
   const theme = useTheme()
   const [localLoading, setLocalLoading] = React.useState(false)
-
-  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
 
   const {data, isLoading, isError, refetch} = useQuery<any>({
     queryFn: () => submissionsApi.getById(String(model_id)),
@@ -57,6 +55,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'questionId.text',
       headerName: 'Title',
+      valueGetter: (params) => params.row.questionId?.text || '',
       renderCell: ({row}) => `${row?.questionId?.text}`,
     },
     {
@@ -79,6 +78,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'image',
       headerName: 'Image',
+      valueGetter: ({row}) => getNoteValue(row.note).image || 'N/A',
       renderCell: ({row}) => {
         return getNoteValue(row.note).image ? (
           <div
@@ -119,7 +119,7 @@ export default function ModelList() {
           className="flex flex-row gap-2"
         >
           <CustomLabel type="primary" size="normal">
-            Submission Time:
+            Date:
           </CustomLabel>
           {submittedAt ? (
             format(new Date(submittedAt), 'yyyy/MM/dd')
@@ -147,7 +147,9 @@ export default function ModelList() {
           <CustomLabel type="primary" size="normal">
             Inside/Outside Branch:
           </CustomLabel>
-          {String(data?.submission?.check?.in_range)}
+          {data?.submission?.check?.in_range
+            ? 'Inside locaiton'
+            : 'Outside locaiton'}
         </CustomLabel>
         <CustomLabel
           type="primary"
@@ -176,6 +178,7 @@ export default function ModelList() {
             }))) ||
           []
         }
+        exportButton
         columns={columns}
         loading={localLoading || isLoading}
         tableSize="tabbed"
