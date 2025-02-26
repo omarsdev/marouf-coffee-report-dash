@@ -15,6 +15,8 @@ import {get} from 'lodash'
 import {branchApi} from 'lib/api/branch'
 import {departmentsApi} from 'lib/api/departments'
 import {ticketsApi} from 'lib/api/tickets'
+import CustomImage from 'components/CustomImage'
+import {Box} from '@mui/material'
 export default function TicketsForm({setLoading}) {
   const {
     query: {model_id},
@@ -121,6 +123,18 @@ export default function TicketsForm({setLoading}) {
         type="secondary"
         padding={3}
       >
+        {isEditting &&
+          data?.ticket &&
+          data?.ticket?.ticket_images?.length > 0 && (
+            <Box
+              sx={{
+                mb: 2,
+              }}
+            >
+              <CustomImage src={data?.ticket?.ticket_images[0]} />
+            </Box>
+          )}
+
         <TextInput
           label="Tittle"
           className="w-full"
