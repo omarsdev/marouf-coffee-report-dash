@@ -70,7 +70,8 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'dueDate',
       headerName: 'Date',
-      renderCell: ({row}) => `${format(new Date(row.dueDate), 'dd/MM/yyyy')}`,
+      renderCell: ({row}) =>
+        `${format(new Date(row.assignedAt), 'dd/MM/yyyy')}`,
     },
     {
       ...defaultRowConfig,
@@ -94,7 +95,7 @@ export default function ModelList() {
             color: 'white',
           }}
         >
-          {row.completed ? 'Completed' : 'In Progress'}
+          {!row.completed ? 'Completed' : 'In Progress'}
         </span>
       ),
     },
