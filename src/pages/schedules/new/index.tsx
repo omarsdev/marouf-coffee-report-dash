@@ -96,10 +96,7 @@ export default function SchedulesForm({setLoading}) {
   }
 
   const {values, errors, handleChange, handleSubmit, clearErrors} = useForm({
-    initial: {
-      from: new Date(),
-      to: new Date(),
-    },
+    initial: {},
     // validationSchema:
     onSubmit: submitCreate,
   })
