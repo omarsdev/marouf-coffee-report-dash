@@ -28,7 +28,7 @@ export default function Employees({setLoading}) {
   }, [])
 
   return (
-    <Layout>
+    <Layout meta={'Employee Details'}>
       <PanelSegmentation
         panels={[
           {

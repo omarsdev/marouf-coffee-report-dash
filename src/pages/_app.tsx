@@ -20,7 +20,7 @@ import _ from 'lodash'
 export const ColorModeContext = createContext({toggleColorMode: () => {}})
 
 export const isLoggedIn = (cookies) =>
-  !!cookies['token'] && cookies['token'] !== 'null'
+  !!cookies?.['token'] && cookies?.['token'] !== 'null'
 
 export const initializeRequest = (token) => {
   request.setSession({token})
