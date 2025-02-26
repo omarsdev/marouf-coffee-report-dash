@@ -1,5 +1,9 @@
 import {useTheme} from '@mui/material'
-import {GridColDef} from '@mui/x-data-grid'
+import {
+  GridColDef,
+  GridToolbarContainer,
+  GridToolbarExport,
+} from '@mui/x-data-grid'
 import Table from 'components/Table'
 import {useRouter} from 'next/router'
 import React from 'react'
@@ -51,6 +55,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'questionId.text',
       headerName: 'Title',
+      valueGetter: (params) => params.row.questionId?.text || '',
       renderCell: ({row}) => `${row?.questionId?.text}`,
     },
     {
@@ -73,6 +78,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'image',
       headerName: 'Image',
+      valueGetter: ({row}) => getNoteValue(row.note).image || 'N/A',
       renderCell: ({row}) => {
         return getNoteValue(row.note).image ? (
           <div
@@ -172,6 +178,7 @@ export default function ModelList() {
             }))) ||
           []
         }
+        exportButton
         columns={columns}
         loading={localLoading || isLoading}
         tableSize="tabbed"

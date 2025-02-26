@@ -1,15 +1,10 @@
-import {LinearProgress} from '@mui/material'
-import {
-  DataGrid,
-  GridAddIcon,
-  GridColDef,
-  GridOverlay,
-  GridValueGetterParams,
-} from '@mui/x-data-grid'
+import {Box, LinearProgress} from '@mui/material'
+import {DataGrid, GridOverlay} from '@mui/x-data-grid'
 import React from 'react'
 import CustomButton from './CustomButton'
 import CustomContainer from './CustomContainer'
-import CustomLabel from './CustomLabel'
+import {FaDownload} from 'react-icons/fa'
+import DownloadCsvButton from './DownloadCsvButton'
 
 interface Props {
   columns
@@ -17,6 +12,7 @@ interface Props {
   tableSize?: 'regular' | 'tabbed'
   loading?
   headerComponent?
+  exportButton?: boolean
 }
 
 const tableSizes = {
@@ -46,6 +42,7 @@ export default function Table({
   tableSize = 'regular',
   loading,
   headerComponent,
+  exportButton,
 }: Props) {
   return (
     <div>
@@ -119,10 +116,17 @@ export default function Table({
             columns={columns}
             components={{
               LoadingOverlay: CustomLoadingOverlay,
+              Toolbar: () =>
+                exportButton ? (
+                  <DownloadCsvButton columns={columns} rows={rows} />
+                ) : (
+                  []
+                ),
             }}
             loading={loading}
             pageSize={tableSizes[tableSize].rowCount}
             disableSelectionOnClick
+
             // initialState={{
             //   pagination: {
             //     paginationModel: {page: 0, pageSize: 5},
