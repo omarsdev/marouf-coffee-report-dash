@@ -63,13 +63,13 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'name.en',
       headerName: 'English Name',
-      renderCell: ({row}) => `${row.name.en}`,
+      renderCell: ({row}) => <TruncatedText text={row.name.en} />,
     },
     {
       ...defaultRowConfig,
       field: 'name.ar',
       headerName: 'Arabic Name',
-      renderCell: ({row}) => `${row.name.ar}`,
+      renderCell: ({row}) => <TruncatedText text={row.name.ar} />,
     },
     {
       ...defaultRowConfig,
