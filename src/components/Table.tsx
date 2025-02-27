@@ -120,7 +120,7 @@ export default function Table({
                 exportButton ? (
                   <DownloadCsvButton columns={columns} rows={rows} />
                 ) : (
-                  []
+                  <></>
                 ),
             }}
             loading={loading}
