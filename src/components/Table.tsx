@@ -116,12 +116,15 @@ export default function Table({
             columns={columns}
             components={{
               LoadingOverlay: CustomLoadingOverlay,
-              Toolbar: () =>
-                exportButton ? (
-                  <DownloadCsvButton columns={columns} rows={rows} />
-                ) : (
-                  []
-                ),
+              Toolbar: () => (
+                <>
+                  {exportButton ? (
+                    <DownloadCsvButton columns={columns} rows={rows} />
+                  ) : (
+                    []
+                  )}
+                </>
+              ),
             }}
             loading={loading}
             pageSize={tableSizes[tableSize].rowCount}

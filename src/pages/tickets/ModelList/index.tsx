@@ -210,15 +210,15 @@ export default function ModelList() {
             alignItems="center"
           >
             <DesktopDatePicker
-              label="To"
-              value={filter.to}
-              onChange={(value) => setFilter({...filter, to: value})}
-              renderInput={(props) => <TextField {...props} />}
-            />
-            <DesktopDatePicker
               label="From"
               value={filter.from}
               onChange={(value) => setFilter({...filter, from: value})}
+              renderInput={(props) => <TextField {...props} />}
+            />
+            <DesktopDatePicker
+              label="To"
+              value={filter.to}
+              onChange={(value) => setFilter({...filter, to: value})}
               renderInput={(props) => <TextField {...props} />}
             />
             <CustomSelect
