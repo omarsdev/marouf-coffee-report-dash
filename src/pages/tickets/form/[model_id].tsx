@@ -126,13 +126,15 @@ export default function TicketsForm({setLoading}) {
         {isEditting &&
           data?.ticket &&
           data?.ticket?.ticket_images?.length > 0 && (
-            <Box
-              sx={{
-                mb: 2,
-              }}
-            >
-              <CustomImage src={data?.ticket?.ticket_images[0]} />
-            </Box>
+            <a href={data?.ticket?.ticket_images[0]} target="_blank">
+              <Box
+                sx={{
+                  mb: 2,
+                }}
+              >
+                <CustomImage src={data?.ticket?.ticket_images[0]} />
+              </Box>
+            </a>
           )}
 
         <TextInput
@@ -243,6 +245,14 @@ export default function TicketsForm({setLoading}) {
             handleChange('department', value)
           }
           padding={2}
+        />
+        <TextInput
+          label="Note"
+          className="w-full"
+          value={values?.note}
+          name="note"
+          onChange={handleChange}
+          padding={1}
         />
 
         <Error backendError={backendError} />

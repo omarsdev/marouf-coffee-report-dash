@@ -31,7 +31,7 @@ export default function ModelList() {
     } else {
       try {
         const data = JSON.parse(props)
-        return data
+        return {note: data?.note ?? '', image: data?.image ?? ''}
       } catch (error) {
         return {note: '', image: ''}
       }
@@ -64,6 +64,7 @@ export default function ModelList() {
       field: 'note',
       headerName: 'Note',
       renderCell: ({row}) => {
+        console.log('getNoteValue(row.note)', getNoteValue(row.note))
         return getNoteValue(row.note).note
       },
     },
@@ -74,7 +75,7 @@ export default function ModelList() {
       renderCell: ({row}) => {
         return getNoteValue(row.note).image ? (
           <div
-            className="h-full w-full"
+            className="h-full w-full flex justify-start"
             onClick={() => {
               window.open(
                 getNoteValue(row.note).image,
@@ -87,7 +88,6 @@ export default function ModelList() {
               style={{
                 objectFit: 'contain',
               }}
-              className="h-full w-full"
               src={getNoteValue(row.note).image}
             />
           </div>
