@@ -292,7 +292,15 @@ export default function ModelList() {
                   filterOptionsRef.current = {
                     ...(filterOptionsRef.current && filterOptionsRef.current),
                     ...filter,
-                    end_date: addDays(filter.end_date, 1),
+                    start_date: filter?.start_date
+                      ? format(filter?.start_date, 'yyyy/MM/dd') + 'Z'
+                      : undefined,
+                    end_date: filter.end_date
+                      ? format(
+                          addDays(new Date(filter.end_date), 1),
+                          'yyyy/MM/dd',
+                        ) + 'Z'
+                      : undefined,
                   }
                   await refetch()
                 } catch (e) {
