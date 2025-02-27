@@ -50,7 +50,7 @@ export default function SchedulesForm({setLoading}) {
 
     if (repeat && start < end) {
       return eachDayOfInterval({start, end})
-        .filter((date) => days.includes(date.getDay()))
+        .filter((date) => days.includes(Number(date.getDay())))
         .map((date) => format(date, 'yyyy-MM-dd'))
     } else if (!repeat && individueleDate) {
       return [format(individueleDate, 'yyyy-MM-dd')]
