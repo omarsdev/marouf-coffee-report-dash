@@ -11,7 +11,7 @@ import CustomSelect from 'components/CustomSelect'
 import CustomButton from 'components/CustomButton'
 import {CiSearch} from 'react-icons/ci'
 import {toSearchQuery} from 'lib/utils'
-import {differenceInMinutes, format} from 'date-fns'
+import {differenceInMinutes, endOfDay, format, addDays} from 'date-fns'
 import {assignmentsApi} from 'lib/api/assignments'
 import {DesktopDatePicker} from '@mui/x-date-pickers'
 import useForm from 'lib/hooks/useForm'
@@ -178,6 +178,7 @@ export default function ModelList() {
                   filterOptionsRef.current = {
                     ...(filterOptionsRef.current && filterOptionsRef.current),
                     ...values,
+                    to: addDays(values.to, 1),
                   }
                   await refetch()
                 } catch (e) {
