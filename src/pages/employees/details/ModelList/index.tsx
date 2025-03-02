@@ -179,11 +179,11 @@ export default function ModelList() {
                   setLocalLoading(true)
                   filterOptionsRef.current = {
                     ...(filterOptionsRef.current && filterOptionsRef.current),
-                    from: values?.from ? values?.from + 'Z' : undefined,
+                    from: values?.from ? values?.from + 'Z' : null,
                     to: values.to
                       ? format(addDays(new Date(values.to), 1), 'yyyy/MM/dd') +
                         'Z'
-                      : undefined,
+                      : null,
                   }
                   await refetch()
                 } catch (e) {

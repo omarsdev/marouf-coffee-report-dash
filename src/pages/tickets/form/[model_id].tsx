@@ -96,6 +96,8 @@ export default function TicketsForm({setLoading}) {
       'ticket_title',
       'ticket_description',
       'department',
+      'progress_note',
+      'transfer_note',
     ]
     chosenKeys.map((key) => handleChange(key, String(get(data.ticket, key))))
   }, [data, isEditting])
