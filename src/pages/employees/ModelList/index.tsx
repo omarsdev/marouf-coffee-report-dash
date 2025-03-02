@@ -84,9 +84,10 @@ export default function ModelList() {
       renderCell: ({row}) => `${row.phone}`,
     },
     {
-      ...defaultRowConfig,
+      // ...defaultRowConfig,
       field: 'time_started',
       headerName: 'Time Started',
+      width: 100,
       renderCell: ({row}) =>
         row.active
           ? `${row.time_started ? format(new Date(row.time_started), 'p') : ''}`
@@ -96,6 +97,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'active',
       headerName: 'Active',
+      width: 100,
       renderCell: ({row}) => (
         <span
           style={{
@@ -113,39 +115,15 @@ export default function ModelList() {
       ),
     },
     {
-      ...defaultRowConfig,
+      // ...defaultRowConfig,
       field: 'current_branch',
       headerName: 'Current Branch',
+      width: 250,
       renderCell: ({row}) => (
-        <>
-          {row.active ? (
-            <TruncatedText text={branchesMap[row.current_branch] || '--'} />
-          ) : (
-            <>{'-'}</>
-          )}
-        </>
+        <>{row.active ? <>{branchesMap[row.current_branch]}</> : <>{'-'}</>}</>
       ),
     },
-    {
-      ...defaultRowConfig,
-      field: 'deleted',
-      headerName: 'Status',
-      renderCell: ({row}) => (
-        <span
-          style={{
-            background: !row.deleted ? 'green' : 'red',
-            paddingTop: '5px',
-            paddingBottom: '5px',
-            paddingLeft: '10px',
-            paddingRight: '10px',
-            borderRadius: '20px',
-            color: 'white',
-          }}
-        >
-          {row.deleted ? 'deactivate' : 'activate'}
-        </span>
-      ),
-    },
+
     {
       ...defaultRowConfig,
       field: 'id',

@@ -103,9 +103,28 @@ export default function EmployeesForm({setLoading}) {
         {isEditting ? 'Edit an existing Employee' : 'Create a new Employee'}
       </CustomLabel>
 
+      {isEditting && data?.user && (
+        <span
+          style={{
+            background: !data?.user?.deleted ? 'green' : 'red',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '85px',
+            padding: '2px',
+            marginBottom: 5,
+            borderRadius: '20px',
+            color: 'white',
+          }}
+        >
+          {data?.user?.deleted ? 'deactivate' : 'activate'}
+        </span>
+      )}
+
       <CustomContainer
         style={{
           overflow: 'hidden',
+          marginTop: '1rem',
         }}
         className="overflow-hidden mb-14"
         radius="medium"
