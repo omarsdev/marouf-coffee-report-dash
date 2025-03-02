@@ -294,13 +294,13 @@ export default function ModelList() {
                     ...filter,
                     start_date: filter?.start_date
                       ? format(filter?.start_date, 'yyyy/MM/dd') + 'Z'
-                      : undefined,
+                      : null,
                     end_date: filter.end_date
                       ? format(
                           addDays(new Date(filter.end_date), 1),
                           'yyyy/MM/dd',
                         ) + 'Z'
-                      : undefined,
+                      : null,
                   }
                   await refetch()
                 } catch (e) {
