@@ -38,8 +38,15 @@ export default function ModelList() {
     queryFn: () =>
       schedulesApi.get(
         isSearchingRef.current
-          ? toSearchQuery({...filterOptionsRef.current, ...pagination})
-          : toSearchQuery(pagination),
+          ? toSearchQuery({
+              ...filterOptionsRef.current,
+              pageNumber: pagination.pageNumber + 1,
+              pageSize: pagination.pageSize,
+            })
+          : toSearchQuery({
+              pageNumber: pagination.pageNumber + 1,
+              pageSize: pagination.pageSize,
+            }),
       ),
     queryKey: ['schedules'],
   })
