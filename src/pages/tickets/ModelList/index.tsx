@@ -10,7 +10,7 @@ import React, {useEffect, useRef} from 'react'
 import {branchApi} from 'lib/api/branch'
 import {useQuery} from '@tanstack/react-query'
 import {ticketsApi} from 'lib/api/tickets'
-import {format} from 'date-fns'
+import {addDays, format} from 'date-fns'
 import CustomButton from 'components/CustomButton'
 import {DesktopDatePicker} from '@mui/x-date-pickers'
 import CustomSelect from 'components/CustomSelect'
@@ -38,8 +38,8 @@ export default function ModelList() {
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
   const [filter, setFilter] = React.useState({
-    from: null,
-    to: null,
+    start_date: null,
+    end_date: null,
     department: departmentId || '',
     user: userId || '',
     branch: '',
@@ -211,14 +211,14 @@ export default function ModelList() {
           >
             <DesktopDatePicker
               label="From"
-              value={filter.from}
-              onChange={(value) => setFilter({...filter, from: value})}
+              value={filter.start_date}
+              onChange={(value) => setFilter({...filter, start_date: value})}
               renderInput={(props) => <TextField {...props} />}
             />
             <DesktopDatePicker
               label="To"
-              value={filter.to}
-              onChange={(value) => setFilter({...filter, to: value})}
+              value={filter.end_date}
+              onChange={(value) => setFilter({...filter, end_date: value})}
               renderInput={(props) => <TextField {...props} />}
             />
             <CustomSelect
@@ -292,6 +292,15 @@ export default function ModelList() {
                   filterOptionsRef.current = {
                     ...(filterOptionsRef.current && filterOptionsRef.current),
                     ...filter,
+                    start_date: filter?.start_date
+                      ? format(filter?.start_date, 'yyyy/MM/dd') + 'Z'
+                      : undefined,
+                    end_date: filter.end_date
+                      ? format(
+                          addDays(new Date(filter.end_date), 1),
+                          'yyyy/MM/dd',
+                        ) + 'Z'
+                      : undefined,
                   }
                   await refetch()
                 } catch (e) {

@@ -54,6 +54,8 @@ export default function ModelList() {
     onSubmit: () => {},
   })
 
+  console.log('values', values)
+
   const defaultRowConfig = {
     flex: 1,
     headerAlign: 'left',
@@ -177,8 +179,11 @@ export default function ModelList() {
                   setLocalLoading(true)
                   filterOptionsRef.current = {
                     ...(filterOptionsRef.current && filterOptionsRef.current),
-                    ...values,
-                    to: addDays(values.to, 1),
+                    from: values?.from ? values?.from + 'Z' : undefined,
+                    to: values.to
+                      ? format(addDays(new Date(values.to), 1), 'yyyy/MM/dd') +
+                        'Z'
+                      : undefined,
                   }
                   await refetch()
                 } catch (e) {

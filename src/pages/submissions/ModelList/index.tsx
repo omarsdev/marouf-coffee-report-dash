@@ -37,7 +37,7 @@ export default function ModelList() {
     } else {
       try {
         const data = JSON.parse(props)
-        return data
+        return {note: data?.note ?? '', image: data?.image ?? ''}
       } catch (error) {
         return {note: '', image: ''}
       }
