@@ -183,6 +183,17 @@ export default function TicketsForm({setLoading}) {
           padding={2}
         />
 
+        {isEditting && (
+          <TextInput
+            label="Progress Note"
+            className="w-full"
+            value={values?.progress_note}
+            name="progress_note"
+            onChange={handleChange}
+            padding={1}
+          />
+        )}
+
         <CustomSelect
           id="bootstrap"
           options={[
@@ -246,14 +257,16 @@ export default function TicketsForm({setLoading}) {
           }
           padding={2}
         />
-        <TextInput
-          label="Note"
-          className="w-full"
-          value={values?.note}
-          name="note"
-          onChange={handleChange}
-          padding={1}
-        />
+        {isEditting && (
+          <TextInput
+            label="Transfer Note"
+            className="w-full"
+            value={values?.transfer_note}
+            name="transfer_note"
+            onChange={handleChange}
+            padding={1}
+          />
+        )}
 
         <Error backendError={backendError} />
 

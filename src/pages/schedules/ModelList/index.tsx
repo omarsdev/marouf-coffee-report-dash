@@ -4,7 +4,7 @@ import DeleteDialog from 'components/DeleteDialog'
 import Table from 'components/Table'
 import TableActionCell from 'components/TableActionCell'
 import router from 'next/router'
-import React, {useRef} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {branchApi} from 'lib/api/branch'
 import {useQuery} from '@tanstack/react-query'
 import {schedulesApi} from 'lib/api/schedules'
@@ -23,6 +23,11 @@ export default function ModelList() {
 
   const [localLoading, setLocalLoading] = React.useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
+  const [pagination, setPagination] = React.useState({
+    pageNumber: 0,
+    pageSize: 10,
+  })
+
   const [filter, setFilter] = React.useState({
     date: null,
     userId: null,
@@ -32,7 +37,16 @@ export default function ModelList() {
   const {data, isLoading, isError, refetch} = useQuery<any>({
     queryFn: () =>
       schedulesApi.get(
-        isSearchingRef.current ? toSearchQuery(filterOptionsRef.current) : '',
+        isSearchingRef.current
+          ? toSearchQuery({
+              ...filterOptionsRef.current,
+              pageNumber: pagination.pageNumber + 1,
+              pageSize: pagination.pageSize,
+            })
+          : toSearchQuery({
+              pageNumber: pagination.pageNumber + 1,
+              pageSize: pagination.pageSize,
+            }),
       ),
     queryKey: ['schedules'],
   })
@@ -46,6 +60,10 @@ export default function ModelList() {
     queryFn: () => userApi.get(),
     queryKey: ['users'],
   })
+
+  useEffect(() => {
+    refetch()
+  }, [JSON.stringify(pagination)])
 
   const defaultRowConfig = {
     flex: 1,
@@ -158,6 +176,10 @@ export default function ModelList() {
         }
         columns={columns}
         loading={localLoading || isLoading || isLoadingBranch || isLoadingUser}
+        onPaginationChange={(page, pageSize) =>
+          setPagination({pageNumber: page, pageSize})
+        }
+        totalRowCount={data?.count}
         tableSize="tabbed"
         headerComponent={
           <Box
