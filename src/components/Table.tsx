@@ -1,18 +1,18 @@
-import {Box, LinearProgress} from '@mui/material'
+import {LinearProgress} from '@mui/material'
 import {DataGrid, GridOverlay} from '@mui/x-data-grid'
+import CustomContainer from 'components/CustomContainer'
+import DownloadCsvButton from 'components/DownloadCsvButton'
 import React from 'react'
-import CustomButton from './CustomButton'
-import CustomContainer from './CustomContainer'
-import {FaDownload} from 'react-icons/fa'
-import DownloadCsvButton from './DownloadCsvButton'
 
 interface Props {
-  columns
-  rows
+  columns: any
+  rows: any
   tableSize?: 'regular' | 'tabbed'
-  loading?
-  headerComponent?
+  loading?: boolean
+  headerComponent?: React.ReactNode
   exportButton?: boolean
+  onPaginationChange?: (page: number, pageSize: number) => void
+  totalRowCount?: number
 }
 
 const tableSizes = {
@@ -22,7 +22,7 @@ const tableSizes = {
   },
   tabbed: {
     tableHeight: 520,
-    rowCount: 6,
+    rowCount: 10,
   },
 }
 
@@ -43,7 +43,21 @@ export default function Table({
   loading,
   headerComponent,
   exportButton,
+  onPaginationChange,
+  totalRowCount, // Destructure totalRowCount
 }: Props) {
+  const handlePageChange = (newPage: number) => {
+    if (onPaginationChange) {
+      onPaginationChange(newPage, tableSizes[tableSize].rowCount)
+    }
+  }
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    if (onPaginationChange) {
+      onPaginationChange(0, newPageSize)
+    }
+  }
+
   return (
     <div>
       <div className="w-full flex items-start justify-between">
@@ -129,12 +143,17 @@ export default function Table({
             loading={loading}
             pageSize={tableSizes[tableSize].rowCount}
             disableSelectionOnClick
-
-            // initialState={{
-            //   pagination: {
-            //     paginationModel: {page: 0, pageSize: 5},
-            //   },
-            // }}
+            initialState={{
+              pagination: {
+                page: 0,
+                pageSize: tableSizes[tableSize].rowCount,
+              },
+            }}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            paginationMode="server"
+            rowCount={totalRowCount}
+            pagination
           />
         </div>
       </CustomContainer>
