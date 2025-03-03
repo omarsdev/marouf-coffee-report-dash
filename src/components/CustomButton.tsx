@@ -10,6 +10,7 @@ interface Props {
   padding?: number
   width?: string
   fullWidth?: Boolean
+  disabled?: boolean
 }
 
 export default function CustomButton(props: Props) {
@@ -41,6 +42,7 @@ export default function CustomButton(props: Props) {
       //@ts-ignore
       fullWidth={!!props.fullWidth}
       className="font-bold "
+      disabled={!!props?.disabled}
       // size='large'
       variant="outlined"
     >

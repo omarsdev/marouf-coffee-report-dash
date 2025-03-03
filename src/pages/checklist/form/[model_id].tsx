@@ -5,7 +5,7 @@ import TextInput from 'components/TextInput'
 import useForm from 'lib/hooks/useForm'
 import router, {useRouter} from 'next/router'
 import {redirectGuest} from 'pages/_app'
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import Layout from '../../../Layout'
 import Error from 'components/Error'
 import {useQuery} from '@tanstack/react-query'
@@ -13,6 +13,8 @@ import {get} from 'lodash'
 import {checklistApi} from 'lib/api/checklist'
 import {questionsApi} from 'lib/api/questions'
 import CustomAutocomplete from 'components/CustomAutoComplete'
+import {Button} from '@mui/material'
+import CustomButton from 'components/CustomButton'
 export default function CheckListForm({setLoading}) {
   const {
     query: {model_id},
@@ -20,8 +22,13 @@ export default function CheckListForm({setLoading}) {
   const isEditting = model_id.toString() !== 'new'
 
   const [backendError, setBackendError] = React.useState<string>('')
+  const [question, setQuestion] = useState<string | null>(null)
 
-  const {data: questions, isLoading} = useQuery<any>({
+  const {
+    data: questions,
+    isLoading,
+    refetch: refetechQuestions,
+  } = useQuery<any>({
     queryFn: () => questionsApi.get(),
     queryKey: ['questions'],
   })
@@ -67,6 +74,24 @@ export default function CheckListForm({setLoading}) {
       setBackendError(e?.message)
     } finally {
       setLoading(false)
+    }
+  }
+  const submitCreateQuestion = async () => {
+    try {
+      setLoading(true)
+      await questionsApi.create({
+        text: question,
+        type: 'MultipleChoice',
+        media_status: 'no_media',
+        options: ['Yes', 'No'],
+        required: true,
+      })
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setQuestion('')
+      setLoading(false)
+      refetechQuestions()
     }
   }
 
@@ -137,6 +162,21 @@ export default function CheckListForm({setLoading}) {
           onChange={handleChange}
           padding={1}
         />
+        <div className="w-full flex gap-5 items-center">
+          <TextInput
+            label="New Question"
+            style={{width: '100%'}}
+            value={question}
+            onChange={(_, value: string) => setQuestion(value)}
+            padding={1}
+          />
+          <CustomButton
+            onClick={submitCreateQuestion}
+            width="10rem"
+            disabled={!question}
+            title="Create Question"
+          />
+        </div>
 
         {values.questions && (
           <CustomAutocomplete
