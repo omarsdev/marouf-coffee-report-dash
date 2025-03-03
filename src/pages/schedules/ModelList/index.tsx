@@ -12,7 +12,7 @@ import {format} from 'date-fns'
 import {DesktopDatePicker} from '@mui/x-date-pickers'
 import CustomButton from 'components/CustomButton'
 import {CiSearch} from 'react-icons/ci'
-import {toSearchQuery} from 'lib/utils'
+import {calculateYesPercentage, toSearchQuery} from 'lib/utils'
 import CustomSelect from 'components/CustomSelect'
 import {userApi} from 'lib/api/user'
 
@@ -80,8 +80,10 @@ export default function ModelList() {
     },
     {
       ...defaultRowConfig,
+      flex: 0,
       field: 'branch.name.en',
       headerName: 'Branch',
+      width: 250,
       renderCell: ({row}) => `${row.branch?.name?.en}`,
     },
     {
@@ -117,7 +119,16 @@ export default function ModelList() {
         </span>
       ),
     },
-
+    {
+      ...defaultRowConfig,
+      field: 'answers',
+      headerName: 'Answers',
+      renderCell: ({row}) => (
+        <div>
+          {calculateYesPercentage(row?.submission?.answers ?? undefined)} %
+        </div>
+      ),
+    },
     {
       ...defaultRowConfig,
       field: 'id',
