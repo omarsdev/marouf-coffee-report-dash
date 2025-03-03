@@ -10,7 +10,7 @@ import {userApi} from 'lib/api/user'
 import CustomSelect from 'components/CustomSelect'
 import CustomButton from 'components/CustomButton'
 import {CiSearch} from 'react-icons/ci'
-import {toSearchQuery} from 'lib/utils'
+import {calculateYesPercentage, toSearchQuery} from 'lib/utils'
 import {differenceInMinutes, endOfDay, format, addDays} from 'date-fns'
 import {assignmentsApi} from 'lib/api/assignments'
 import {DesktopDatePicker} from '@mui/x-date-pickers'
@@ -57,7 +57,6 @@ export default function ModelList() {
   console.log('values', values)
 
   const defaultRowConfig = {
-    flex: 1,
     headerAlign: 'left',
     align: 'left',
   } as GridColDef
@@ -73,12 +72,16 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'row.submittedAt',
       headerName: 'Submitted Date',
+      width: 200,
+
       renderCell: ({row}) => format(new Date(row?.submittedAt), 'yyyy/MM/dd'),
     },
     {
       ...defaultRowConfig,
       field: 'userId.time_started',
       headerName: 'Time Started',
+      width: 100,
+
       renderCell: ({row}) =>
         row?.check?.time_start
           ? format(new Date(row?.check?.time_start), 'p')
@@ -88,6 +91,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'userId.time_ended',
       headerName: 'Time Ended',
+      width: 100,
       renderCell: ({row}) =>
         row?.check?.time_end
           ? format(new Date(row?.check?.time_end), 'p')
@@ -97,6 +101,8 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'timespent',
       headerName: 'Time Spent',
+      width: 100,
+
       renderCell: ({row}) =>
         row?.check?.time_start && row?.check?.time_end
           ? getTimeDifference(
@@ -109,16 +115,32 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'row.check.branch.name.en',
       headerName: 'Branch',
+      width: 250,
+
       renderCell: ({row}) => row?.check?.branch?.name?.en,
     },
     {
       ...defaultRowConfig,
+      flex: 1,
       field: 'answers',
       headerName: 'Answers',
+      renderCell: ({row}) => <div>{calculateYesPercentage(row.answers)} %</div>,
+    },
+    {
+      ...defaultRowConfig,
+      field: 'id',
+      headerName: '',
+      description: '',
+      sortable: false,
+      hideSortIcons: true,
+      hideable: false,
+      filterable: false,
+      width: 50,
+      flex: 1,
+
       renderCell: ({row}) => (
-        <div
-          style={{cursor: 'pointer'}}
-          onClick={() => {
+        <TableActionCell
+          onView={() =>
             router.push({
               pathname: '/submissions/[model_id]',
               query: {
@@ -128,10 +150,8 @@ export default function ModelList() {
                 time_end: row.check.time_end,
               },
             })
-          }}
-        >
-          See Answers
-        </div>
+          }
+        />
       ),
     },
   ]
