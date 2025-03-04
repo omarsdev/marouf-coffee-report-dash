@@ -35,6 +35,10 @@ export default function ModelList() {
   })
 
   const [localLoading, setLocalLoading] = React.useState(false)
+  const [pagination, setPagination] = React.useState({
+    pageNumber: 0,
+    pageSize: 10,
+  })
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
   const [filter, setFilter] = React.useState({
@@ -76,7 +80,16 @@ export default function ModelList() {
   const {data, isLoading, isError, refetch} = useQuery<any>({
     queryFn: () => {
       return ticketsApi.get(
-        filterOptionsRef.current ? toSearchQuery(filterOptionsRef.current) : '',
+        filterOptionsRef.current
+          ? toSearchQuery({
+              ...filterOptionsRef.current,
+              pageNumber: pagination.pageNumber + 1,
+              pageSize: pagination.pageSize,
+            })
+          : toSearchQuery({
+              pageNumber: pagination.pageNumber + 1,
+              pageSize: pagination.pageSize,
+            }),
       )
     },
     queryKey: ['tickets' + JSON.stringify(filterOptionsRef.current)],
@@ -93,6 +106,10 @@ export default function ModelList() {
     headerAlign: 'left',
     align: 'left',
   } as GridColDef
+
+  useEffect(() => {
+    refetch()
+  }, [JSON.stringify(pagination)])
 
   const columns: GridColDef[] = [
     {
@@ -201,6 +218,10 @@ export default function ModelList() {
           localLoading || isLoading || isLoadingBranch || isLoadingDepartments
         }
         tableSize="tabbed"
+        onPaginationChange={(page, pageSize) =>
+          setPagination({pageNumber: page, pageSize})
+        }
+        totalRowCount={data?.count}
         headerComponent={
           <Box
             flexDirection="row"

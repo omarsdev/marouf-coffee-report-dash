@@ -4,20 +4,34 @@ import DeleteDialog from 'components/DeleteDialog'
 import Table from 'components/Table'
 import TableActionCell from 'components/TableActionCell'
 import router from 'next/router'
-import React from 'react'
+import React, {useEffect} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import {checklistApi} from 'lib/api/checklist'
+import {toSearchQuery} from 'lib/utils'
 
 export default function ModelList() {
   const theme = useTheme()
   const [localLoading, setLocalLoading] = React.useState(false)
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
+  const [pagination, setPagination] = React.useState({
+    pageNumber: 0,
+    pageSize: 10,
+  })
 
   const {data, isLoading, isError, refetch} = useQuery<any>({
-    queryFn: () => checklistApi.get(),
+    queryFn: () =>
+      checklistApi.get(
+        toSearchQuery({
+          pageNumber: pagination.pageNumber + 1,
+          pageSize: pagination.pageSize,
+        }),
+      ),
     queryKey: ['checklist'],
   })
+  useEffect(() => {
+    refetch()
+  }, [JSON.stringify(pagination)])
 
   const defaultRowConfig = {
     flex: 1,
@@ -82,6 +96,10 @@ export default function ModelList() {
             data?.reports?.map((model) => ({...model, id: model._id}))) ||
           []
         }
+        onPaginationChange={(page, pageSize) =>
+          setPagination({pageNumber: page, pageSize})
+        }
+        totalRowCount={data?.count}
         columns={columns}
         loading={localLoading || isLoading}
         tableSize="tabbed"

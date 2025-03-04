@@ -7,17 +7,32 @@ import router from 'next/router'
 import React, {useEffect} from 'react'
 import {branchApi} from 'lib/api/branch'
 import {useQuery} from '@tanstack/react-query'
+import {toSearchQuery} from 'lib/utils'
 
 export default function ModelList() {
   const theme = useTheme()
   const [localLoading, setLocalLoading] = React.useState(false)
+  const [pagination, setPagination] = React.useState({
+    pageNumber: 0,
+    pageSize: 10,
+  })
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
 
   const {data, isLoading, isError, refetch} = useQuery<any>({
-    queryFn: () => branchApi.get(),
+    queryFn: () =>
+      branchApi.get(
+        toSearchQuery({
+          pageNumber: pagination.pageNumber + 1,
+          pageSize: pagination.pageSize,
+        }),
+      ),
     queryKey: ['branches'],
   })
+
+  useEffect(() => {
+    refetch()
+  }, [JSON.stringify(pagination)])
 
   const defaultRowConfig = {
     flex: 1,
@@ -99,6 +114,10 @@ export default function ModelList() {
             data?.branches?.map((model) => ({...model, id: model._id}))) ||
           []
         }
+        onPaginationChange={(page, pageSize) =>
+          setPagination({pageNumber: page, pageSize})
+        }
+        totalRowCount={data?.count}
         columns={columns}
         loading={localLoading || isLoading}
         tableSize="tabbed"
