@@ -4,7 +4,7 @@ import DeleteDialog from 'components/DeleteDialog'
 import Table from 'components/Table'
 import TableActionCell from 'components/TableActionCell'
 import router from 'next/router'
-import React, {useRef} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import {userApi} from 'lib/api/user'
 import CustomSelect from 'components/CustomSelect'
@@ -27,12 +27,26 @@ export default function ModelList() {
     role_type: null,
   })
 
+  const [pagination, setPagination] = React.useState({
+    pageNumber: 0,
+    pageSize: 10,
+  })
+
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
 
   const {data, isLoading, isError, refetch} = useQuery<any>({
     queryFn: () =>
       userApi.get(
-        filterOptionsRef.current ? toSearchQuery(filterOptionsRef.current) : '',
+        filterOptionsRef.current
+          ? toSearchQuery({
+              ...filterOptionsRef.current,
+              pageNumber: pagination.pageNumber + 1,
+              pageSize: pagination.pageSize,
+            })
+          : toSearchQuery({
+              pageNumber: pagination.pageNumber + 1,
+              pageSize: pagination.pageSize,
+            }),
       ),
     queryKey: ['users'],
   })
@@ -51,6 +65,10 @@ export default function ModelList() {
     },
     {},
   )
+
+  useEffect(() => {
+    refetch()
+  }, [JSON.stringify(pagination)])
 
   const defaultRowConfig = {
     flex: 1,
@@ -184,6 +202,10 @@ export default function ModelList() {
             data?.users?.map((model) => ({...model, id: model._id}))) ||
           []
         }
+        onPaginationChange={(page, pageSize) =>
+          setPagination({pageNumber: page, pageSize})
+        }
+        totalRowCount={data?.count}
         columns={columns}
         loading={localLoading || isLoading || branchesLoading}
         tableSize="tabbed"

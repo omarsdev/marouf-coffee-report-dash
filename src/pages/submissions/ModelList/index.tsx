@@ -6,11 +6,12 @@ import {
 } from '@mui/x-data-grid'
 import Table from 'components/Table'
 import {useRouter} from 'next/router'
-import React from 'react'
+import React, {useEffect} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import {submissionsApi} from 'lib/api/submissions'
 import CustomLabel from 'components/CustomLabel'
 import {format} from 'date-fns'
+import {toSearchQuery} from 'lib/utils'
 
 export default function ModelList() {
   const {query} = useRouter()
@@ -22,9 +23,20 @@ export default function ModelList() {
 
   const theme = useTheme()
   const [localLoading, setLocalLoading] = React.useState(false)
+  const [pagination, setPagination] = React.useState({
+    pageNumber: 0,
+    pageSize: 10,
+  })
 
   const {data, isLoading, isError, refetch} = useQuery<any>({
-    queryFn: () => submissionsApi.getById(String(model_id)),
+    queryFn: () =>
+      submissionsApi.getById(
+        String(model_id),
+        toSearchQuery({
+          pageNumber: pagination.pageNumber + 1,
+          pageSize: pagination.pageSize,
+        }),
+      ),
     queryKey: ['submissionsById' + model_id],
     select: (data) => {
       return data
@@ -43,6 +55,10 @@ export default function ModelList() {
       }
     }
   }
+
+  useEffect(() => {
+    refetch()
+  }, [JSON.stringify(pagination)])
 
   const defaultRowConfig = {
     flex: 1,
@@ -178,6 +194,10 @@ export default function ModelList() {
             }))) ||
           []
         }
+        onPaginationChange={(page, pageSize) =>
+          setPagination({pageNumber: page, pageSize})
+        }
+        totalRowCount={data?.count}
         exportButton
         columns={columns}
         loading={localLoading || isLoading}
