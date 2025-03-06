@@ -175,7 +175,7 @@ export default function ModelList() {
           <CustomLabel type="primary" size="normal">
             CheckIn/Checkout:
           </CustomLabel>
-          {time_start && typeof time_end ? (
+          {time_start && time_end ? (
             <>
               {format(new Date(time_start), 'p')} /{' '}
               {format(new Date(time_end), 'p')}
