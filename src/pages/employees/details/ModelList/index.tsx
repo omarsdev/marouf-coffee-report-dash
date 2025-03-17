@@ -54,8 +54,6 @@ export default function ModelList() {
     onSubmit: () => {},
   })
 
-  console.log('values', values)
-
   const defaultRowConfig = {
     headerAlign: 'left',
     align: 'left',
@@ -64,45 +62,69 @@ export default function ModelList() {
   const columns: GridColDef[] = [
     {
       ...defaultRowConfig,
-      field: 'row.reportCopy.title',
+
+      field: 'reportCopy.title',
       headerName: 'Title',
+      sortable: true, // Enable sorting
       renderCell: ({row}) => row?.reportCopy?.title,
+      valueGetter: ({row}) => row.reportCopy?.title,
+      sortComparator: (v1, v2, row1, row2) => {
+        return (row1.value || '').localeCompare(row2.value || '')
+      },
     },
     {
       ...defaultRowConfig,
-      field: 'row.submittedAt',
+      field: 'submittedAt',
       headerName: 'Submitted Date',
       width: 200,
-
       renderCell: ({row}) => format(new Date(row?.submittedAt), 'yyyy/MM/dd'),
+      valueGetter: ({row}) => row.submittedAt,
+      sortComparator: (v1, v2) =>
+        new Date(v1).getTime() - new Date(v2).getTime(),
     },
     {
       ...defaultRowConfig,
-      field: 'userId.time_started',
+      field: 'check.time_start',
       headerName: 'Time Started',
       width: 100,
-
       renderCell: ({row}) =>
         row?.check?.time_start
           ? format(new Date(row?.check?.time_start), 'p')
           : '-',
+      valueGetter: ({row}) => row.check?.time_start,
+      sortComparator: (v1, v2, row1, row2) => {
+        const date1 = new Date(v1)
+        const date2 = new Date(v2)
+
+        return date1.getTime() - date2.getTime()
+      },
     },
     {
       ...defaultRowConfig,
-      field: 'userId.time_ended',
+      field: 'check.time_end',
       headerName: 'Time Ended',
       width: 100,
+      sortable: true, // Enable sorting
       renderCell: ({row}) =>
         row?.check?.time_end
           ? format(new Date(row?.check?.time_end), 'p')
           : '-',
+      valueGetter: ({row}) => row.check?.time_end,
+      sortComparator: (v1, v2) =>
+        new Date(v1 || 0).getTime() - new Date(v2 || 0).getTime(),
     },
     {
       ...defaultRowConfig,
       field: 'timespent',
       headerName: 'Time Spent',
       width: 100,
-
+      valueGetter: ({row}) =>
+        row?.check?.time_start && row?.check?.time_end
+          ? differenceInMinutes(
+              new Date(row?.check?.time_start),
+              new Date(row?.check?.time_end),
+            )
+          : {},
       renderCell: ({row}) =>
         row?.check?.time_start && row?.check?.time_end
           ? getTimeDifference(
@@ -110,21 +132,33 @@ export default function ModelList() {
               new Date(row?.check?.time_end),
             )
           : '-',
+      sortComparator: (v1, v2) => {
+        return (v1 || 0) - (v2 || 0)
+      }, // Assuming getTimeDifference returns a numeric value
     },
     {
       ...defaultRowConfig,
-      field: 'row.check.branch.name.en',
+      field: 'check.branch.name.en',
       headerName: 'Branch',
       width: 250,
-
+      sortable: true, // Enable sorting
       renderCell: ({row}) => row?.check?.branch?.name?.en,
+      valueGetter: ({row}) => row?.check?.branch?.name?.en,
+      sortComparator: (v1, v2, row1, row2) =>
+        (row1.value || '').localeCompare(row2.value || ''),
     },
     {
       ...defaultRowConfig,
       flex: 1,
       field: 'answers',
       headerName: 'Answers',
+      sortable: true, // Enable sorting
       renderCell: ({row}) => <div>{calculateYesPercentage(row.answers)} %</div>,
+      valueGetter: ({row}) => calculateYesPercentage(row.answers),
+
+      sortComparator: (v1, v2, row1, row2) => {
+        return (v1 || 0) - (v2 || 0)
+      },
     },
     {
       ...defaultRowConfig,
@@ -137,11 +171,10 @@ export default function ModelList() {
       filterable: false,
       width: 50,
       flex: 1,
-
       renderCell: ({row}) => (
         <TableActionCell
-          onView={() =>
-            router.push({
+          onView={() => {
+            return router.push({
               pathname: '/submissions/[model_id]',
               query: {
                 model_id: row.id,
@@ -150,7 +183,7 @@ export default function ModelList() {
                 time_end: row.check.time_end,
               },
             })
-          }
+          }}
         />
       ),
     },

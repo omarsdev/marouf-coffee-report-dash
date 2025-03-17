@@ -139,6 +139,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'status',
       headerName: 'Status',
+      sortable: true,
       renderCell: ({row}) => (
         <span
           style={{

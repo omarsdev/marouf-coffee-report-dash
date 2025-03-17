@@ -13,6 +13,7 @@ interface Props {
   exportButton?: boolean
   onPaginationChange?: (page: number, pageSize: number) => void
   totalRowCount?: number
+  hideFooterPagination?: boolean
 }
 
 const tableSizes = {
@@ -44,7 +45,8 @@ export default function Table({
   headerComponent,
   exportButton,
   onPaginationChange,
-  totalRowCount, // Destructure totalRowCount
+  totalRowCount,
+  hideFooterPagination = false,
 }: Props) {
   const handlePageChange = (newPage: number) => {
     if (onPaginationChange) {
@@ -154,6 +156,7 @@ export default function Table({
             paginationMode="server"
             rowCount={totalRowCount}
             pagination
+            hideFooterPagination={hideFooterPagination}
           />
         </div>
       </CustomContainer>
