@@ -141,7 +141,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'answers',
       headerName: 'Answers',
-      valueGetter: ({row}) => calculateYesPercentage(row?.submission.answers),
+      valueGetter: ({row}) => calculateYesPercentage(row?.submission?.answers),
 
       sortComparator: (v1, v2, row1, row2) => {
         return (v1 || 0) - (v2 || 0)
