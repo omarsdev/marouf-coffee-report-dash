@@ -62,11 +62,17 @@ export default function ModelList() {
       field: 'questionId.text',
       headerName: 'Title',
       renderCell: ({row}) => `${row?.questionId?.text}`,
+      valueGetter: ({row}) => row?.questionId?.text,
+      sortComparator: (v1, v2, row1, row2) => {
+        return (row1.value || '').localeCompare(row2.value || '')
+      },
     },
     {
       ...defaultRowConfig,
       field: 'answer',
       headerName: 'Answer',
+      sortable: false,
+      hideSortIcons: true,
       renderCell: ({row}) => {
         return row.answer
       },
@@ -75,8 +81,9 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'note',
       headerName: 'Note',
+      sortable: false,
+      hideSortIcons: true,
       renderCell: ({row}) => {
-        console.log('getNoteValue(row.note)', getNoteValue(row.note))
         return getNoteValue(row.note).note
       },
     },
@@ -84,6 +91,8 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'image',
       headerName: 'Image',
+      sortable: false,
+      hideSortIcons: true,
       renderCell: ({row}) => {
         return getNoteValue(row.note).image ? (
           <div

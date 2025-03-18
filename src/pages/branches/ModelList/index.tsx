@@ -46,23 +46,33 @@ export default function ModelList() {
       field: 'name.en',
       headerName: 'English Name',
       renderCell: ({row}) => `${row.name.en}`,
+      valueGetter: ({row}) => row.name.en,
+      sortComparator: (v1, v2, row1, row2) =>
+        (row1.value || '').localeCompare(row2.value || ''),
     },
     {
       ...defaultRowConfig,
       field: 'name.ar',
       headerName: 'Arabic Name',
       renderCell: ({row}) => `${row.name.ar}`,
+      valueGetter: ({row}) => row.name.ar,
+      sortComparator: (v1, v2, row1, row2) =>
+        (row1.value || '').localeCompare(row2.value || ''),
     },
     {
       ...defaultRowConfig,
       headerName: 'Location',
       renderCell: ({row}) => `${row.lng},${row.lat}`,
+      sortable: false,
+      hideSortIcons: true,
     },
     {
       ...defaultRowConfig,
       field: 'miles',
       flex: 0.25,
       headerName: 'Miles',
+      sortable: false,
+      hideSortIcons: true,
     },
     {
       ...defaultRowConfig,
