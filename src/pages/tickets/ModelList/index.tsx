@@ -117,12 +117,20 @@ export default function ModelList() {
       field: 'ticket_title',
       headerName: 'Ticket Title',
       renderCell: ({row}) => `${row.ticket_title}`,
+      valueGetter: ({row}) => row.ticket_title,
+      sortComparator: (v1, v2, row1, row2) => {
+        return (row1.value || '').localeCompare(row2.value || '')
+      },
     },
     {
       ...defaultRowConfig,
       field: 'branch.name.en',
       headerName: 'Branch',
       renderCell: ({row}) => `${row.branch?.name?.en}`,
+      valueGetter: ({row}) => row.branch?.name?.en,
+      sortComparator: (v1, v2, row1, row2) => {
+        return (row1.value || '').localeCompare(row2.value || '')
+      },
     },
     {
       ...defaultRowConfig,
@@ -134,6 +142,13 @@ export default function ModelList() {
             ? row.area_manager?.name?.en
             : row.department?.department_name?.en
         }`,
+      valueGetter: ({row}) =>
+        row.area_manager?.name?.en
+          ? row.area_manager?.name?.en
+          : row.department?.department_name?.en,
+      sortComparator: (v1, v2, row1, row2) => {
+        return (row1.value || '').localeCompare(row2.value || '')
+      },
     },
     {
       ...defaultRowConfig,
@@ -163,6 +178,9 @@ export default function ModelList() {
       headerName: 'Date',
       renderCell: ({row}) =>
         `${format(new Date(row.created_at), 'dd/MM/yyyy')}`,
+      valueGetter: ({row}) => row.created_at,
+      sortComparator: (v1, v2) =>
+        new Date(v1 || 0).getDate() - new Date(v2 || 0).getDate(),
     },
     {
       ...defaultRowConfig,

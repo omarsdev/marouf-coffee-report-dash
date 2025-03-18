@@ -82,29 +82,41 @@ export default function ModelList() {
       field: 'name.en',
       headerName: 'English Name',
       renderCell: ({row}) => <TruncatedText text={row.name.en} />,
+      valueGetter: ({row}) => row.name.en,
+      sortComparator: (v1, v2, row1, row2) =>
+        (row1.value || '').localeCompare(row2.value || ''),
     },
     {
       ...defaultRowConfig,
       field: 'name.ar',
       headerName: 'Arabic Name',
       renderCell: ({row}) => <TruncatedText text={row.name.ar} />,
+      valueGetter: ({row}) => row.name.ar,
+      sortComparator: (v1, v2, row1, row2) =>
+        (row1.value || '').localeCompare(row2.value || ''),
     },
     {
       ...defaultRowConfig,
       field: 'email',
       headerName: 'Email',
       renderCell: ({row}) => `${row.email}`,
+      sortable: false,
+      hideSortIcons: true,
     },
     {
       ...defaultRowConfig,
       field: 'phone',
       headerName: 'Phone',
       renderCell: ({row}) => `${row.phone}`,
+      sortable: false,
+      hideSortIcons: true,
     },
     {
       // ...defaultRowConfig,
       field: 'time_started',
       headerName: 'Time Started',
+      sortable: false,
+      hideSortIcons: true,
       width: 100,
       renderCell: ({row}) =>
         row.active
@@ -116,6 +128,8 @@ export default function ModelList() {
       field: 'active',
       headerName: 'Active',
       width: 100,
+      sortable: false,
+      hideSortIcons: true,
       renderCell: ({row}) => (
         <span
           style={{
@@ -137,6 +151,8 @@ export default function ModelList() {
       field: 'current_branch',
       headerName: 'Current Branch',
       width: 250,
+      sortable: false,
+      hideSortIcons: true,
       renderCell: ({row}) => (
         <>{row.active ? <>{branchesMap[row.current_branch]}</> : <>{'-'}</>}</>
       ),

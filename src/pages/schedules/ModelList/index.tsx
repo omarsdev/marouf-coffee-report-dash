@@ -77,6 +77,11 @@ export default function ModelList() {
       field: 'userId.name.en',
       headerName: 'Username',
       renderCell: ({row}) => `${row.userId?.name?.en}`,
+      valueGetter: ({row}) => row.userId?.name?.en,
+
+      sortComparator: (v1, v2, row1, row2) => {
+        return (row1.value || '').localeCompare(row2.value || '')
+      },
     },
     {
       ...defaultRowConfig,
@@ -85,24 +90,37 @@ export default function ModelList() {
       headerName: 'Branch',
       width: 250,
       renderCell: ({row}) => `${row.branch?.name?.en}`,
+      valueGetter: ({row}) => row.branch?.name?.en,
+
+      sortComparator: (v1, v2, row1, row2) => {
+        return (row1.value || '').localeCompare(row2.value || '')
+      },
     },
     {
       ...defaultRowConfig,
       field: 'dueDate',
       headerName: 'Date',
+      valueGetter: ({row}) => row.assignedAt,
       renderCell: ({row}) =>
         `${format(new Date(row.assignedAt), 'dd/MM/yyyy')}`,
+      sortComparator: (v1, v2) =>
+        new Date(v1 || 0).getDate() - new Date(v2 || 0).getDate(),
     },
     {
       ...defaultRowConfig,
       field: 'reportId.title',
       headerName: 'Report',
       renderCell: ({row}) => `${row.reportId?.title}`,
+      sortComparator: (v1, v2, row1, row2) => {
+        return (row1.value || '').localeCompare(row2.value || '')
+      },
     },
     {
       ...defaultRowConfig,
       field: 'completed',
       headerName: 'Status',
+      sortable: false,
+      hideSortIcons: true,
       renderCell: ({row}) => (
         <span
           style={{
@@ -123,6 +141,11 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'answers',
       headerName: 'Answers',
+      valueGetter: ({row}) => calculateYesPercentage(row?.submission.answers),
+
+      sortComparator: (v1, v2, row1, row2) => {
+        return (v1 || 0) - (v2 || 0)
+      },
       renderCell: ({row}) => (
         <div>
           {calculateYesPercentage(row?.submission?.answers ?? undefined)} %

@@ -46,29 +46,45 @@ export default function ModelList() {
       field: 'department_name.en',
       headerName: 'English Name',
       renderCell: ({row}) => `${row.department_name?.en}`,
+      valueGetter: ({row}) => row.department_name.en,
+      sortComparator: (v1, v2, row1, row2) =>
+        (row1.value || '').localeCompare(row2.value || ''),
     },
     {
       ...defaultRowConfig,
       field: 'department_name.ar',
       headerName: 'Arabic Name',
       renderCell: ({row}) => `${row.department_name?.ar}`,
+      valueGetter: ({row}) => row.department_name.ar,
+      sortComparator: (v1, v2, row1, row2) =>
+        (row1.value || '').localeCompare(row2.value || ''),
     },
     {
       ...defaultRowConfig,
       field: 'user.name.en',
       headerName: 'User Name',
       renderCell: ({row}) => `${row.user?.name?.en}`,
+      valueGetter: ({row}) => row.user?.name.ar,
+      sortComparator: (v1, v2, row1, row2) =>
+        (row1.value || '').localeCompare(row2.value || ''),
     },
     {
       ...defaultRowConfig,
       field: 'ticketCount',
       headerName: 'On Going Tickets',
+      sortable: false,
+      hideSortIcons: true,
+      filterable: false,
       renderCell: ({row}) => `${row.ticketCount}`,
     },
     {
       ...defaultRowConfig,
       field: 'ticketsee',
       headerName: 'See Tickets',
+      sortable: false,
+      hideSortIcons: true,
+      filterable: false,
+
       renderCell: ({row}) => {
         return (
           <div
