@@ -1,15 +1,13 @@
+import React, {useCallback, useEffect, useRef} from 'react'
 import {
   Input,
   InputBase,
   InputBaseProps,
   InputLabel,
-  InputProps,
   MenuItem,
   Select,
-  SelectProps,
 } from '@mui/material'
-import {styled} from '@mui/system'
-import React, {ChangeEvent} from 'react'
+import {maxHeight, maxWidth, styled} from '@mui/system'
 
 interface Option {
   label: string
@@ -17,6 +15,7 @@ interface Option {
 }
 
 type Padding = 1 | 2 | 3 | 4 | 5
+
 interface Props {
   label?: string
   placeholder?: string
@@ -32,6 +31,10 @@ interface Props {
   hasEmpty?: boolean
   value?: any
   multiple?: boolean
+  fetchNextPage?: () => void
+  isFetchingNextPage?: boolean
+  hasNextPage?: boolean
+  isLoading?: boolean
 }
 
 export default function CustomSelect({
@@ -49,7 +52,34 @@ export default function CustomSelect({
   options,
   hasEmpty,
   multiple,
+  fetchNextPage,
+  isFetchingNextPage,
+  hasNextPage,
+  isLoading,
 }: Props) {
+  const menuRef = useRef<HTMLUListElement | null>(null)
+  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false)
+
+  const handleScroll = useCallback(
+    (event: React.UIEvent<HTMLElement>) => {
+      const target = event.target as HTMLElement
+      const buffer = 100
+      const bottom =
+        target.scrollHeight - target.scrollTop <= target.clientHeight + buffer
+      if (bottom && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage && fetchNextPage()
+      }
+    },
+    [hasNextPage, isFetchingNextPage, fetchNextPage],
+  )
+
+  useEffect(() => {
+    // Reset scroll position when new options are loaded
+    if (menuRef.current) {
+      menuRef.current.scrollTop = 0
+    }
+  }, [options])
+
   const BootstrapInput = styled(InputBase)(({theme}) => ({
     '& .MuiInputBase-input': {
       position: 'relative',
@@ -61,20 +91,14 @@ export default function CustomSelect({
       minWidth: 50,
       //@ts-ignore
       transition: theme.transitions.create(['border-color', 'box-shadow']),
-      // Use the system font instead of the default Roboto font.
       '&:hover': {
         borderColor: theme.palette.primary,
-        // boxShadow: '0 0 0 0.2rem rgba(0,123,255,.25)',
       },
     },
   }))
 
   return (
-    <div
-      style={{
-        paddingBottom: padding ? padding * 10 : 0,
-      }}
-    >
+    <div style={{paddingBottom: padding ? padding * 10 : 0}}>
       {label && (
         <InputLabel error={!!error} shrink htmlFor={id}>
           {label}
@@ -91,6 +115,12 @@ export default function CustomSelect({
         displayEmpty={!!hasEmpty}
         onChange={onChange}
         multiple={multiple}
+        MenuProps={{
+          PaperProps: {
+            onScroll: handleScroll,
+            ref: menuRef,
+          },
+        }}
         renderValue={(selected) => (
           <div style={{whiteSpace: 'pre-wrap'}}>
             {Array.isArray(selected)
@@ -102,6 +132,9 @@ export default function CustomSelect({
               : options?.find((opt) => opt?.value === selected)?.label}
           </div>
         )}
+        onOpen={() => setIsDropdownOpen(true)}
+        onClose={() => setIsDropdownOpen(false)}
+        open={isDropdownOpen}
       >
         {!!hasEmpty && (
           <MenuItem value={''}>
@@ -109,8 +142,17 @@ export default function CustomSelect({
           </MenuItem>
         )}
         {options?.map((option) => {
-          return <MenuItem value={option.value}>{option.label}</MenuItem>
+          return (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          )
         })}
+        {isFetchingNextPage && (
+          <MenuItem disabled>
+            <em>Loading...</em>
+          </MenuItem>
+        )}
       </Select>
       {(error || helperText) && (
         <div className="pt-1">
