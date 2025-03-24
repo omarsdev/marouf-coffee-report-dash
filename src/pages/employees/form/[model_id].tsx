@@ -86,7 +86,14 @@ export default function EmployeesForm({setLoading}) {
 
   useEffect(() => {
     if (isEditting && data) {
-      const chosenKeys = ['name.en', 'name.ar', 'email', 'phone', 'password']
+      const chosenKeys = [
+        'name.en',
+        'name.ar',
+        'email',
+        'phone',
+        'password',
+        'branch_access',
+      ]
       chosenKeys.map((key) => handleChange(key, get(data?.user, key)))
 
       if (data?.user?.role === 2 && data?.user?.role_type === 'QC') {

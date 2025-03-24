@@ -16,7 +16,7 @@ import {redirectGuest} from 'pages/_app'
 import React, {useEffect} from 'react'
 import Layout from '../../../Layout'
 import Error from 'components/Error'
-import {useQuery} from '@tanstack/react-query'
+import {useInfiniteQuery, useQuery} from '@tanstack/react-query'
 import {userApi} from 'lib/api/user'
 import {checklistApi} from 'lib/api/checklist'
 import {branchApi} from 'lib/api/branch'
@@ -26,6 +26,7 @@ import {eachDayOfInterval, format, parseISO} from 'date-fns'
 import DateRangePicker from 'components/DateRangePicker'
 import {DAYS_OF_WEEK} from 'lib/constants'
 import DayToggleButton from 'components/DayToggleButton'
+import {toSearchQuery} from 'lib/utils'
 
 export default function SchedulesForm({setLoading}) {
   const [backendError, setBackendError] = React.useState<string>('')
@@ -62,10 +63,42 @@ export default function SchedulesForm({setLoading}) {
     queryKey: ['checklist'],
   })
 
-  const {data: users, isLoading: isLoadingUser} = useQuery<any>({
-    queryFn: () => userApi.get(),
+  const {
+    data: usersData,
+    fetchNextPage,
+    hasNextPage,
+    isFetching: isLoadingUsers,
+    isFetchingNextPage,
+    isLoading: isLoadingUser,
+  } = useInfiniteQuery({
     queryKey: ['users'],
+    queryFn: async ({pageParam = 1}) => {
+      return await userApi.get(
+        toSearchQuery({pageNumber: pageParam, pageSize: 20}),
+      )
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: any, allPages) => {
+      const totalFetched = allPages.reduce(
+        (sum, page) => sum + page?.users?.length,
+        0,
+      )
+      const totalAvailable = lastPage.count // count comes from your API
+      // If totalFetched is less than totalAvailable, return the next page number
+      return totalFetched < totalAvailable ? allPages?.length + 1 : undefined
+    },
   })
+
+  const userOptions = React.useMemo(() => {
+    return (
+      usersData?.pages.flatMap((page: any) =>
+        page.users.map((user) => ({
+          label: user.name?.en,
+          value: user._id,
+        })),
+      ) || []
+    )
+  }, [usersData])
 
   const {data: branches, isLoading: isLoadingBranch} = useQuery<any>({
     queryFn: () => branchApi.get(),
@@ -153,20 +186,21 @@ export default function SchedulesForm({setLoading}) {
         />
 
         <CustomSelect
-          id="bootstrap"
-          options={users?.users?.map((question) => ({
-            label: question?.name?.en,
-            value: question?._id,
-          }))}
-          inputProps={{
-            default: '1',
-          }}
+          id="user-select"
+          options={userOptions}
+          // inputProps={{
+          //   default: '1',
+          // }}
           value={values.userId}
           label="User"
           helperText="Choose User"
           className="w-full"
           onChange={({target: {name, value}}) => handleChange('userId', value)}
           padding={2}
+          fetchNextPage={fetchNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          hasNextPage={hasNextPage}
+          isLoading={isLoadingUsers}
         />
 
         <CustomSelect
