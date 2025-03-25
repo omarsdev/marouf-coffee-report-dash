@@ -15,6 +15,7 @@ interface Props {
   pagination?: {pageNumber: number; pageSize: number}
   totalRowCount?: number
   hideFooterPagination?: boolean
+  excelColumns?: any
 }
 
 const tableSizes = {
@@ -49,6 +50,7 @@ export default function Table({
   totalRowCount,
   hideFooterPagination = false,
   pagination,
+  excelColumns,
 }: Props) {
   const handlePageChange = (newPage: number) => {
     if (onPaginationChange) {
@@ -128,6 +130,9 @@ export default function Table({
         >
           <DataGrid
             rows={rows}
+            sx={{
+              borderWidth: 0,
+            }}
             getRowClassName={() => 'datagridx-row'}
             className="w-full"
             disableExtendRowFullWidth
@@ -137,7 +142,10 @@ export default function Table({
               Toolbar: () => (
                 <>
                   {exportButton ? (
-                    <DownloadCsvButton columns={columns} rows={rows} />
+                    <DownloadCsvButton
+                      columns={excelColumns ?? columns}
+                      rows={rows}
+                    />
                   ) : (
                     []
                   )}

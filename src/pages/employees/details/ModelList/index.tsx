@@ -28,7 +28,11 @@ const getTimeDifference = (startedDate, endedDate) => {
   }
 }
 
-export default function ModelList() {
+interface ModelListProps {
+  areaMangerName: string
+}
+
+export default function ModelList({areaMangerName}: ModelListProps) {
   const {
     query: {model_id},
   } = useRouter()
@@ -181,6 +185,8 @@ export default function ModelList() {
                 submittedAt: row.submittedAt,
                 time_start: row.check.time_start,
                 time_end: row.check.time_end,
+                areaMangerName,
+                answers: calculateYesPercentage(row.answers),
               },
             })
           }}
