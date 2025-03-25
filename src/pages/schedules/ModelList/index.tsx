@@ -251,6 +251,7 @@ export default function ModelList() {
         }
         columns={columns}
         loading={localLoading || isLoading || isLoadingBranch}
+        pagination={pagination}
         onPaginationChange={(page, pageSize) =>
           setPagination({pageNumber: page, pageSize})
         }

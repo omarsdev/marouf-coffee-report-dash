@@ -130,6 +130,7 @@ export default function ModelList() {
             }))) ||
           []
         }
+        pagination={pagination}
         onPaginationChange={(page, pageSize) =>
           setPagination({pageNumber: page, pageSize})
         }

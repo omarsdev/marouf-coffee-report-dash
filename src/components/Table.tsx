@@ -12,6 +12,7 @@ interface Props {
   headerComponent?: React.ReactNode
   exportButton?: boolean
   onPaginationChange?: (page: number, pageSize: number) => void
+  pagination?: {pageNumber: number; pageSize: number}
   totalRowCount?: number
   hideFooterPagination?: boolean
 }
@@ -47,10 +48,14 @@ export default function Table({
   onPaginationChange,
   totalRowCount,
   hideFooterPagination = false,
+  pagination,
 }: Props) {
   const handlePageChange = (newPage: number) => {
     if (onPaginationChange) {
-      onPaginationChange(newPage, tableSizes[tableSize].rowCount)
+      onPaginationChange(
+        newPage,
+        pagination?.pageSize ?? tableSizes[tableSize].rowCount,
+      )
     }
   }
 
@@ -122,9 +127,6 @@ export default function Table({
           style={{height: tableSizes[tableSize].tableHeight}}
         >
           <DataGrid
-            sx={{
-              borderWidth: 0,
-            }}
             rows={rows}
             getRowClassName={() => 'datagridx-row'}
             className="w-full"
@@ -143,16 +145,17 @@ export default function Table({
               ),
             }}
             loading={loading}
-            pageSize={tableSizes[tableSize].rowCount}
+            pageSize={pagination?.pageSize ?? tableSizes[tableSize].rowCount}
             disableSelectionOnClick
+            rowsPerPageOptions={[10, 25, 50, 100]}
+            onPageSizeChange={handlePageSizeChange}
             initialState={{
               pagination: {
                 page: 0,
-                pageSize: tableSizes[tableSize].rowCount,
+                pageSize: 10,
               },
             }}
             onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
             paginationMode="server"
             rowCount={totalRowCount}
             pagination
