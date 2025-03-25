@@ -174,10 +174,32 @@ export default function ModelList() {
   return (
     <div>
       <div className="-mt-10 mb-6 flex-col gap-y-2">
+        <CustomLabel
+          type="primary"
+          size="normal"
+          className="flex flex-row gap-2"
+        >
+          <CustomLabel type="primary" size="normal">
+            Area Manger Name :
+          </CustomLabel>
+          {areaMangerName}
+        </CustomLabel>
+        <CustomLabel
+          type="primary"
+          size="normal"
+          className="flex flex-row gap-2"
+        >
+          <CustomLabel type="primary" size="normal">
+            Answers :
+          </CustomLabel>
+          {answers + '%'}
+        </CustomLabel>
         <CustomLabel type="primary" size="normal">
-          {data?.submission?.reportCopy?.title}{' '}
+          {data?.submission?.reportCopy?.title}
+          {' : '}
           {data?.submission?.reportCopy?._id}
         </CustomLabel>
+
         <CustomLabel
           type="primary"
           size="normal"
