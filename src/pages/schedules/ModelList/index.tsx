@@ -31,10 +31,15 @@ export default function ModelList() {
   })
 
   const [filter, setFilter] = React.useState({
-    date: null,
-    userId: null,
-    branch: '',
+    date: (router.query.date as any) ?? null,
+    branch: (router.query.branch as any) ?? null,
+    userId: router.query.userId || '',
   })
+
+  useEffect(() => {
+    isSearchingRef.current = true
+    filterOptionsRef.current = filter
+  }, [router.query])
 
   const {data, isLoading, isError, refetch} = useQuery<any>({
     queryFn: () =>
@@ -105,6 +110,42 @@ export default function ModelList() {
   useEffect(() => {
     refetch()
   }, [JSON.stringify(pagination)])
+
+  const handleSearch = async () => {
+    try {
+      setLocalLoading(true)
+      isSearchingRef.current = true
+
+      const newQuery = {
+        date: filter.date
+          ? format(new Date(filter.date), 'yyyy/MM/dd')
+          : undefined,
+        branch: filter.branch || undefined,
+        userId: filter.userId || undefined,
+      }
+
+      router.push(
+        {
+          pathname: router.pathname,
+          query: newQuery,
+        },
+        undefined,
+        {shallow: true},
+      )
+
+      // Store filters in ref and refetch data
+      filterOptionsRef.current = {
+        ...(filterOptionsRef.current || {}),
+        ...filter,
+      }
+
+      await refetch()
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setLocalLoading(false)
+    }
+  }
 
   const defaultRowConfig = {
     flex: 1,
@@ -313,21 +354,7 @@ export default function ModelList() {
               hasEmpty={true}
             />
             <CustomButton
-              onClick={async () => {
-                try {
-                  setLocalLoading(true)
-                  isSearchingRef.current = true
-                  filterOptionsRef.current = {
-                    ...(filterOptionsRef.current && filterOptionsRef.current),
-                    ...filter,
-                  }
-                  await refetch()
-                } catch (e) {
-                  console.error(e)
-                } finally {
-                  setLocalLoading(false)
-                }
-              }}
+              onClick={handleSearch}
               startIcon={<CiSearch />}
               width="10rem"
               title="Search"
