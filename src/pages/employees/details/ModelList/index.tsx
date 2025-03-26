@@ -69,7 +69,9 @@ export default function ModelList({areaMangerName}: ModelListProps) {
 
       field: 'reportCopy.title',
       headerName: 'Title',
-      sortable: true, // Enable sorting
+      sortable: true,
+      width: 250,
+
       renderCell: ({row}) => row?.reportCopy?.title,
       valueGetter: ({row}) => row.reportCopy?.title,
       sortComparator: (v1, v2, row1, row2) => {
@@ -80,7 +82,6 @@ export default function ModelList({areaMangerName}: ModelListProps) {
       ...defaultRowConfig,
       field: 'submittedAt',
       headerName: 'Submitted Date',
-      width: 200,
       renderCell: ({row}) => format(new Date(row?.submittedAt), 'yyyy/MM/dd'),
       valueGetter: ({row}) => row.submittedAt,
       sortComparator: (v1, v2) =>
@@ -122,23 +123,55 @@ export default function ModelList({areaMangerName}: ModelListProps) {
       field: 'timespent',
       headerName: 'Time Spent',
       width: 100,
-      valueGetter: ({row}) =>
-        row?.check?.time_start && row?.check?.time_end
-          ? differenceInMinutes(
-              new Date(row?.check?.time_start),
-              new Date(row?.check?.time_end),
-            )
-          : {},
-      renderCell: ({row}) =>
-        row?.check?.time_start && row?.check?.time_end
-          ? getTimeDifference(
-              new Date(row?.check?.time_start),
-              new Date(row?.check?.time_end),
-            )
-          : '-',
+      valueGetter: ({row}) => {
+        if (row?.check?.time_start && row?.check?.time_end) {
+          const minutes = Math.abs(
+            differenceInMinutes(
+              new Date(row.check.time_start),
+              new Date(row.check.time_end),
+            ),
+          )
+          const hours = Math.floor(minutes / 60)
+          const remainingMinutes = minutes % 60
+
+          return hours > 0
+            ? `${hours}:${remainingMinutes.toString().padStart(2, '0')} hr`
+            : `${remainingMinutes} min`
+        }
+        return '-'
+      },
+      renderCell: ({row}) => {
+        if (row?.check?.time_start && row?.check?.time_end) {
+          const minutes = Math.abs(
+            differenceInMinutes(
+              new Date(row.check.time_start),
+              new Date(row.check.time_end),
+            ),
+          )
+          const hours = Math.floor(minutes / 60)
+          const remainingMinutes = minutes % 60
+
+          return hours > 0
+            ? `${hours}:${remainingMinutes.toString().padStart(2, '0')} hr`
+            : `${remainingMinutes} min`
+        }
+        return '-'
+      },
       sortComparator: (v1, v2) => {
-        return (v1 || 0) - (v2 || 0)
-      }, // Assuming getTimeDifference returns a numeric value
+        const getTotalMinutes = (timeStr) => {
+          if (!timeStr || timeStr === '-') return 0
+          if (timeStr.includes('hr')) {
+            const [hours, minutes] = timeStr
+              .replace(' hr', '')
+              .split(':')
+              .map(Number)
+            return hours * 60 + minutes
+          }
+          return parseInt(timeStr.replace(' min', ''), 10)
+        }
+
+        return getTotalMinutes(v1) - getTotalMinutes(v2)
+      },
     },
     {
       ...defaultRowConfig,
@@ -186,7 +219,7 @@ export default function ModelList({areaMangerName}: ModelListProps) {
                 time_start: row.check.time_start,
                 time_end: row.check.time_end,
                 areaMangerName,
-                answers: calculateYesPercentage(row.answers),
+                score: calculateYesPercentage(row.answers),
               },
             })
           }}
@@ -203,6 +236,7 @@ export default function ModelList({areaMangerName}: ModelListProps) {
             data?.submissions?.map((model) => ({...model, id: model._id}))) ||
           []
         }
+        exportButton
         columns={columns}
         loading={localLoading || isLoading}
         tableSize="tabbed"

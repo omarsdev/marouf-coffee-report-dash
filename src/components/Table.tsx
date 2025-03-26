@@ -1,4 +1,4 @@
-import {LinearProgress} from '@mui/material'
+import {Box, LinearProgress} from '@mui/material'
 import {DataGrid, GridOverlay} from '@mui/x-data-grid'
 import CustomContainer from 'components/CustomContainer'
 import DownloadCsvButton from 'components/DownloadCsvButton'
@@ -69,7 +69,10 @@ export default function Table({
 
   return (
     <div>
-      <div className="w-full flex items-start justify-between">
+      <Box
+        className="w-full flex items-start justify-end"
+        sx={{paddingY: '10px'}}
+      >
         {/* <div>
                     <CustomLabel
                         size='bigTitle'
@@ -83,7 +86,12 @@ export default function Table({
                         {description}
                     </CustomLabel>
                 </div> */}
-      </div>
+        {exportButton ? (
+          <DownloadCsvButton columns={excelColumns ?? columns} rows={rows} />
+        ) : (
+          <></>
+        )}
+      </Box>
       <CustomContainer
         style={{
           pt: 1,
@@ -139,18 +147,6 @@ export default function Table({
             columns={columns}
             components={{
               LoadingOverlay: CustomLoadingOverlay,
-              Toolbar: () => (
-                <>
-                  {exportButton ? (
-                    <DownloadCsvButton
-                      columns={excelColumns ?? columns}
-                      rows={rows}
-                    />
-                  ) : (
-                    []
-                  )}
-                </>
-              ),
             }}
             loading={loading}
             pageSize={pagination?.pageSize ?? tableSizes[tableSize].rowCount}

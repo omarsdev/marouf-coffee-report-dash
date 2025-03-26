@@ -21,11 +21,8 @@ export default function ModelList() {
   const time_start = query.time_start as string
   const time_end = query.time_end as string
   const areaMangerName = query.areaMangerName
-  const answers = query.answers
+  const score = query.score
 
-  console.log({areaMangerName, answers})
-
-  const theme = useTheme()
   const [localLoading, setLocalLoading] = React.useState(false)
 
   const {data, isLoading, isError, refetch} = useQuery<any>({
@@ -114,10 +111,10 @@ export default function ModelList() {
   const excelColumns: GridColDef[] = [
     ...columns,
     {
-      field: 'answers',
-      headerName: 'answers percentage',
-      renderCell: () => answers + '%',
-      valueGetter: () => answers + '%',
+      field: 'Score',
+      headerName: 'Score',
+      renderCell: () => score + '%',
+      valueGetter: () => score + '%',
     },
     {
       field: 'name',
@@ -169,8 +166,13 @@ export default function ModelList() {
       valueGetter: () =>
         time_end ? format(new Date(time_end), 'p') : 'Invalid Date',
     },
+    {
+      field: 'checkList',
+      headerName: 'Check List Name',
+      renderCell: () => data?.submission?.reportCopy?.title,
+      valueGetter: () => data?.submission?.reportCopy?.title,
+    },
   ]
-
   return (
     <div>
       <div className="-mt-10 mb-6 flex-col gap-y-2">
@@ -190,9 +192,9 @@ export default function ModelList() {
           className="flex flex-row gap-2"
         >
           <CustomLabel type="primary" size="normal">
-            Answers :
+            Scores :
           </CustomLabel>
-          {answers + '%'}
+          {score + '%'}
         </CustomLabel>
         <CustomLabel type="primary" size="normal">
           {data?.submission?.reportCopy?.title}
