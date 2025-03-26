@@ -236,6 +236,7 @@ export default function ModelList() {
         loading={
           localLoading || isLoading || isLoadingBranch || isLoadingDepartments
         }
+        pagination={pagination}
         tableSize="tabbed"
         onPaginationChange={(page, pageSize) =>
           setPagination({pageNumber: page, pageSize})

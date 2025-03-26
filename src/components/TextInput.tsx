@@ -28,6 +28,7 @@ interface Props {
   query?
   pb?
   style?: React.CSSProperties
+  required?: boolean
 }
 
 const ColorTextField = styled(TextField)<TextFieldProps>(({theme}) => ({
@@ -63,6 +64,7 @@ export default function TextInput({
   query,
   pb,
   style = {},
+  required,
 }: Props) {
   const _onChange = (
     event,
@@ -88,7 +90,12 @@ export default function TextInput({
       }}
     >
       {label && (
-        <InputLabel shrink error={!!error} htmlFor={'input_id=' + name}>
+        <InputLabel
+          shrink
+          error={!!error}
+          htmlFor={'input_id=' + name}
+          required={required}
+        >
           {label}
         </InputLabel>
       )}

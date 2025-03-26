@@ -20,6 +20,10 @@ export default function ModelList() {
   const submittedAt = query.submittedAt as string
   const time_start = query.time_start as string
   const time_end = query.time_end as string
+  const areaMangerName = query.areaMangerName
+  const answers = query.answers
+
+  console.log({areaMangerName, answers})
 
   const theme = useTheme()
   const [localLoading, setLocalLoading] = React.useState(false)
@@ -107,13 +111,95 @@ export default function ModelList() {
     },
   ]
 
+  const excelColumns: GridColDef[] = [
+    ...columns,
+    {
+      field: 'answers',
+      headerName: 'answers percentage',
+      renderCell: () => answers + '%',
+      valueGetter: () => answers + '%',
+    },
+    {
+      field: 'name',
+      headerName: 'area Manger Name',
+      renderCell: () => areaMangerName,
+      valueGetter: () => areaMangerName,
+    },
+
+    {
+      field: 'date',
+      headerName: 'Date',
+      renderCell: () =>
+        submittedAt
+          ? format(new Date(submittedAt), 'yyyy/MM/dd')
+          : 'Invalid time',
+      valueGetter: () => areaMangerName,
+    },
+    {
+      field: 'branch',
+      headerName: 'Branch',
+      renderCell: () => data?.submission?.check?.branch?.name?.en,
+      valueGetter: () => data?.submission?.check?.branch?.name?.en,
+    },
+    {
+      field: 'inside',
+      headerName: ' Inside/Outside Branch:',
+      renderCell: () =>
+        data?.submission?.check?.in_range
+          ? 'Inside locaiton'
+          : 'Outside locaiton',
+      valueGetter: () =>
+        data?.submission?.check?.in_range
+          ? 'Inside locaiton'
+          : 'Outside locaiton',
+    },
+    {
+      field: 'checkIn',
+      headerName: 'checkIn',
+      renderCell: () =>
+        time_start ? format(new Date(time_start), 'p') : 'Invalid Date',
+      valueGetter: () =>
+        time_start ? format(new Date(time_start), 'p') : 'Invalid Date',
+    },
+    {
+      field: 'checkOut',
+      headerName: 'checkOut',
+      renderCell: () =>
+        time_end ? format(new Date(time_end), 'p') : 'Invalid Date',
+      valueGetter: () =>
+        time_end ? format(new Date(time_end), 'p') : 'Invalid Date',
+    },
+  ]
+
   return (
     <div>
       <div className="-mt-10 mb-6 flex-col gap-y-2">
+        <CustomLabel
+          type="primary"
+          size="normal"
+          className="flex flex-row gap-2"
+        >
+          <CustomLabel type="primary" size="normal">
+            Area Manger Name :
+          </CustomLabel>
+          {areaMangerName}
+        </CustomLabel>
+        <CustomLabel
+          type="primary"
+          size="normal"
+          className="flex flex-row gap-2"
+        >
+          <CustomLabel type="primary" size="normal">
+            Answers :
+          </CustomLabel>
+          {answers + '%'}
+        </CustomLabel>
         <CustomLabel type="primary" size="normal">
-          {data?.submission?.reportCopy?.title}{' '}
+          {data?.submission?.reportCopy?.title}
+          {' : '}
           {data?.submission?.reportCopy?._id}
         </CustomLabel>
+
         <CustomLabel
           type="primary"
           size="normal"
@@ -179,6 +265,7 @@ export default function ModelList() {
             }))) ||
           []
         }
+        excelColumns={excelColumns}
         hideFooterPagination
         exportButton
         columns={columns}

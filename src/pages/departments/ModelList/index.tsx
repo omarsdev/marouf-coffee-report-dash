@@ -154,6 +154,7 @@ export default function ModelList() {
         onPaginationChange={(page, pageSize) =>
           setPagination({pageNumber: page, pageSize})
         }
+        pagination={pagination}
         totalRowCount={data?.count}
         columns={columns}
         loading={isLoading || localLoading}

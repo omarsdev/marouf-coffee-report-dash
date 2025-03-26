@@ -3,7 +3,7 @@ import {GridColDef} from '@mui/x-data-grid'
 import DeleteDialog from 'components/DeleteDialog'
 import Table from 'components/Table'
 import TableActionCell from 'components/TableActionCell'
-import router from 'next/router'
+import router, {useRouter} from 'next/router'
 import React, {useEffect, useRef} from 'react'
 import {branchApi} from 'lib/api/branch'
 import {useInfiniteQuery, useQuery} from '@tanstack/react-query'
@@ -20,6 +20,8 @@ export default function ModelList() {
   const theme = useTheme()
   const isSearchingRef = useRef(false)
   const filterOptionsRef = useRef({})
+  const router = useRouter()
+  const isReady = router.isReady
 
   const [localLoading, setLocalLoading] = React.useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
@@ -60,24 +62,32 @@ export default function ModelList() {
     data: usersData,
     fetchNextPage,
     hasNextPage,
-    isFetching: isLoadingUsers,
     isFetchingNextPage,
+    isLoading: isLoadingUsers,
   } = useInfiniteQuery({
-    queryKey: ['users'],
+    enabled: isReady,
     queryFn: async ({pageParam = 1}) => {
-      return await userApi.get(
-        toSearchQuery({pageNumber: pageParam, pageSize: 20}),
-      )
+      try {
+        const response: any = await userApi.get(
+          toSearchQuery({pageNumber: pageParam, pageSize: 20}),
+        )
+        return response?.users ? response : {users: [], count: 0}
+      } catch (error) {
+        console.error('API Error:', error)
+        return {users: [], count: 0}
+      }
     },
+    queryKey: ['users', isReady],
     initialPageParam: 1,
-    getNextPageParam: (lastPage: any, allPages) => {
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage || !Array.isArray(lastPage.users)) return undefined
       const totalFetched = allPages.reduce(
-        (sum, page) => sum + page?.users?.length,
+        (sum, page) => sum + (page?.users?.length || 0),
         0,
       )
-      const totalAvailable = lastPage.count // count comes from your API
-      // If totalFetched is less than totalAvailable, return the next page number
-      return totalFetched < totalAvailable ? allPages?.length + 1 : undefined
+      return totalFetched < (lastPage?.count || 0)
+        ? allPages.length + 1
+        : undefined
     },
   })
 
@@ -241,6 +251,7 @@ export default function ModelList() {
         }
         columns={columns}
         loading={localLoading || isLoading || isLoadingBranch}
+        pagination={pagination}
         onPaginationChange={(page, pageSize) =>
           setPagination({pageNumber: page, pageSize})
         }
