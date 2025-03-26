@@ -15,6 +15,7 @@ import {CiSearch} from 'react-icons/ci'
 import {calculateYesPercentage, toSearchQuery} from 'lib/utils'
 import CustomSelect from 'components/CustomSelect'
 import {userApi} from 'lib/api/user'
+import CustomAutocomplete from 'components/CustomAutoComplete'
 
 export default function ModelList() {
   const theme = useTheme()
@@ -317,7 +318,7 @@ export default function ModelList() {
               }}
               renderInput={(props) => <TextField {...props} />}
             />
-            <CustomSelect
+            <CustomAutocomplete
               id="bootstrap"
               options={branches?.branches?.map((branch) => ({
                 label: branch?.name?.en,
@@ -331,7 +332,7 @@ export default function ModelList() {
               placeholder="Branch"
               className="w-full"
               value={filter.branch}
-              onChange={({target: {name, value}}) =>
+              onChange={({target: {value}}) =>
                 setFilter((old) => ({...old, branch: value}))
               }
               padding={2}
