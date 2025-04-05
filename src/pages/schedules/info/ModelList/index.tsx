@@ -14,17 +14,11 @@ export default function ModelList() {
 
   const theme = useTheme()
   const [localLoading, setLocalLoading] = React.useState(false)
-  const [pagination, setPagination] = React.useState({
-    pageNumber: 0,
-    pageSize: 10,
-  })
 
   const {data, isLoading, isError, refetch} = useQuery<any>({
     queryFn: () =>
       submissionsApi.getAssignmentSubmission(
         toSearchQuery({
-          pageNumber: pagination.pageNumber + 1,
-          pageSize: pagination.pageSize,
           assignmentId: model_id,
         }),
       ),
@@ -46,9 +40,6 @@ export default function ModelList() {
       }
     }
   }
-  useEffect(() => {
-    refetch()
-  }, [JSON.stringify(pagination)])
 
   const defaultRowConfig = {
     flex: 1,
@@ -130,12 +121,8 @@ export default function ModelList() {
             }))) ||
           []
         }
-        pagination={pagination}
-        onPaginationChange={(page, pageSize) =>
-          setPagination({pageNumber: page, pageSize})
-        }
-        totalRowCount={data?.count}
         columns={columns}
+        hideFooterPagination
         loading={localLoading || isLoading}
         tableSize="tabbed"
       />
