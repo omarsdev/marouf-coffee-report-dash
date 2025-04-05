@@ -20,6 +20,7 @@ type Checklist = {
   'Time Ended': string
   'Time Spent': string
   Branch?: string
+  Answers: string
 }
 
 interface GmailExcelPopupProps {
