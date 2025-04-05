@@ -1,4 +1,4 @@
-import {Box, TextField, useTheme} from '@mui/material'
+import {Box, Button, TextField, useTheme} from '@mui/material'
 import {GridColDef} from '@mui/x-data-grid'
 import DeleteDialog from 'components/DeleteDialog'
 import Table from 'components/Table'
@@ -16,6 +16,7 @@ import {assignmentsApi} from 'lib/api/assignments'
 import {DesktopDatePicker} from '@mui/x-date-pickers'
 import useForm from 'lib/hooks/useForm'
 import {submissionsApi} from 'lib/api/submissions'
+import {GmailExcelPopup} from 'components/GmailEmailSender'
 
 const getTimeDifference = (startedDate, endedDate) => {
   const diffInMinutes = differenceInMinutes(endedDate, startedDate)
@@ -33,6 +34,8 @@ interface ModelListProps {
 }
 
 export default function ModelList({areaMangerName}: ModelListProps) {
+  const [open, setOpen] = React.useState(false)
+
   const {
     query: {model_id},
   } = useRouter()
@@ -228,6 +231,40 @@ export default function ModelList({areaMangerName}: ModelListProps) {
     },
   ]
 
+  const excelData = React.useMemo(() => {
+    if (data) {
+      return data?.submissions?.map((i) => ({
+        title: i?.reportCopy?.title,
+        'Submitted Date': format(new Date(i?.submittedAt), 'yyyy/MM/dd'),
+        'Time Started': i?.check?.time_start
+          ? format(new Date(i?.check?.time_start), 'p')
+          : '-',
+        'Time Ended': i?.check?.time_end
+          ? format(new Date(i?.check?.time_end), 'p')
+          : '-',
+        'Time Spent': (() => {
+          if (i?.check?.time_start && i?.check?.time_end) {
+            const minutes = Math.abs(
+              differenceInMinutes(
+                new Date(i.check.time_start),
+                new Date(i.check.time_end),
+              ),
+            )
+            const hours = Math.floor(minutes / 60)
+            const remainingMinutes = minutes % 60
+
+            return hours > 0
+              ? `${hours}:${remainingMinutes.toString().padStart(2, '0')} hr`
+              : `${remainingMinutes} min`
+          }
+          return '-'
+        })(),
+        Branch: i?.check?.branch?.name?.en,
+        Answers: calculateYesPercentage(i.answers) + '%',
+      }))
+    }
+  }, [data])
+
   return (
     <div>
       <Table
@@ -237,58 +274,79 @@ export default function ModelList({areaMangerName}: ModelListProps) {
           []
         }
         exportButton
+        hideFooterPagination
         columns={columns}
         loading={localLoading || isLoading}
         tableSize="tabbed"
         headerComponent={
           <Box
-            flexDirection="row"
             display="flex"
-            justifyContent="flex-end"
-            gap="20px"
+            justifyContent="space-between"
             alignItems="center"
           >
-            <DesktopDatePicker
-              label="From"
-              value={values.from}
-              onChange={(value) =>
-                handleChange('from', format(value, 'yyyy/MM/dd'))
-              }
-              renderInput={(props) => <TextField {...props} />}
-            />
-
-            <DesktopDatePicker
-              label="To"
-              value={values.to}
-              onChange={(value) =>
-                handleChange('to', format(value, 'yyyy/MM/dd'))
-              }
-              renderInput={(props) => <TextField {...props} />}
-            />
-
-            <CustomButton
-              onClick={async () => {
-                try {
-                  setLocalLoading(true)
-                  filterOptionsRef.current = {
-                    ...(filterOptionsRef.current && filterOptionsRef.current),
-                    from: values?.from ? values?.from + 'Z' : null,
-                    to: values.to
-                      ? format(addDays(new Date(values.to), 1), 'yyyy/MM/dd') +
-                        'Z'
-                      : null,
-                  }
-                  await refetch()
-                } catch (e) {
-                  console.error(e)
-                } finally {
-                  setLocalLoading(false)
+            <Box
+              flexDirection="row"
+              display="flex"
+              justifyContent="flex-end"
+              gap="20px"
+              alignItems="center"
+            >
+              <DesktopDatePicker
+                label="From"
+                value={values.from}
+                onChange={(value) =>
+                  handleChange('from', format(value, 'yyyy/MM/dd'))
                 }
-              }}
-              startIcon={<CiSearch />}
-              width="10rem"
-              title="Search"
-            />
+                renderInput={(props) => <TextField {...props} />}
+              />
+
+              <DesktopDatePicker
+                label="To"
+                value={values.to}
+                onChange={(value) =>
+                  handleChange('to', format(value, 'yyyy/MM/dd'))
+                }
+                renderInput={(props) => <TextField {...props} />}
+              />
+
+              <CustomButton
+                onClick={async () => {
+                  try {
+                    setLocalLoading(true)
+                    filterOptionsRef.current = {
+                      ...(filterOptionsRef.current && filterOptionsRef.current),
+                      from: values?.from ? values?.from + 'Z' : null,
+                      to: values.to
+                        ? format(
+                            addDays(new Date(values.to), 1),
+                            'yyyy/MM/dd',
+                          ) + 'Z'
+                        : null,
+                    }
+                    await refetch()
+                  } catch (e) {
+                    console.error(e)
+                  } finally {
+                    setLocalLoading(false)
+                  }
+                }}
+                startIcon={<CiSearch />}
+                width="10rem"
+                title="Search"
+              />
+            </Box>
+            <>
+              <CustomButton
+                title="Send Summary via Gmail"
+                onClick={() => setOpen(true)}
+              />
+
+              <GmailExcelPopup
+                open={open}
+                onClose={() => setOpen(false)}
+                data={excelData}
+              />
+            </>
           </Box>
         }
       />
