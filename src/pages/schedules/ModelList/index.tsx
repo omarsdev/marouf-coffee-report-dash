@@ -341,7 +341,7 @@ export default function ModelList() {
               id="user-select"
               options={userOptions}
               label="User"
-              className="w-full"
+              className="w-[2rem]"
               onChange={({target: {value}}) =>
                 setFilter((old) => ({...old, userId: value}))
               }
