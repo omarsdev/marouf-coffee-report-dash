@@ -13,7 +13,7 @@ const TruncatedText = ({text}: {text: string}) => {
             overflow: 'hidden',
             textOverflow: 'ellipsis',
           }}
-          children={text.length > 30 ? text.slice(0, 30) + '...' : text}
+          children={text.length > 40 ? text.slice(0, 40) + '...' : text}
         />
       }
     />

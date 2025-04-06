@@ -165,8 +165,9 @@ export default function BranchesForm({setLoading}) {
           }}
           // hasEmpty
           // variant='outlined'
-          value={values.area_manager}
-          label="Choose Area manager"
+          value={values.area_manager ?? []}
+          multiple
+          label="Choose Area manager , QC"
           // helperText="Choose Area manager"
           className="w-full"
           onChange={({target: {name, value}}) =>

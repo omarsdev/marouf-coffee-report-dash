@@ -8,6 +8,7 @@ import CustomLabel from 'components/CustomLabel'
 import CustomContainer from 'components/CustomContainer'
 import router from 'next/router'
 import {useTheme} from '@mui/material'
+import styles from './Header.module.css'
 
 interface Props {}
 
@@ -60,78 +61,60 @@ export default function Header() {
 
   return (
     <Box
-      sx={{
-        bgcolor: 'background.default',
-        color: 'text.primary',
-      }}
-      className="w-full flex absolute top-0 z-50 items-center py-4"
+      sx={{bgcolor: 'background.default', color: 'text.primary'}}
+      className={styles.header}
     >
-      <div
-        style={{paddingLeft: '12rem'}}
-        className="w-full flex justify-start items-center"
-      >
+      {/* Left: Search */}
+      <div className={styles.left}>
         <CustomContainer
           noShadow
           type="secondary"
           padding={1}
           radius="medium"
-          className="flex items-center"
-          style={{width: '28rem'}}
+          className={styles.searchContainer}
         >
           <RiSearchLine
-            style={{
-              color: theme.palette.text.secondary,
-            }}
-            className="mr-4"
+            style={{color: theme.palette.text.secondary}}
             size={'1.2rem'}
           />
           <input
-            style={{
-              backgroundColor: 'transparent',
-              width: '100%',
-            }}
+            className={styles.searchInput}
             name="search"
             placeholder="Search"
             onChange={search}
           />
         </CustomContainer>
       </div>
-      <div className="flex items-center">
-        <CustomLabel className=" flex items-center" type="secondary">
-          <RiCalendar2Line className="mr-2" size={'1.2rem'} />
+
+      {/* Middle: Date Display */}
+      <div className={styles.center}>
+        <CustomLabel className={styles.dateLabel} type="secondary">
+          <RiCalendar2Line className={styles.icon} size={'1.2rem'} />
           Today
         </CustomLabel>
-        <div
-          // style={{ color: "#3DBEC9" }}
-          className="flex ml-2.5 font-medium whitespace-nowrap"
-        >
-          {moment().format('MMMM DD')}
-        </div>
+        <div className={styles.date}>{moment().format('MMMM DD')}</div>
       </div>
-      <div
-        style={{paddingRight: '5rem'}}
-        className="w-full flex justify-end items-center"
-      >
+
+      {/* Right: Profile & Theme Toggle */}
+      <div className={styles.right}>
         <DarkModeToggle />
         <ProfileMenu />
       </div>
-      {filteredData?.length > 0 && (
-        <CustomContainer
-          className="w-1/4 h-auto absolute left-48 top-14 p-4 flex flex-col"
-          radius="medium"
-        >
-          {filteredData?.map((item) => {
-            return (
-              <button
-                className={`w-full align items-start flex p-2 hover:bg-gray-500 ${
-                  theme.palette.mode === 'dark' ? 'hover:text-black' : ''
-                }`}
-                onClick={() => router.push(item.href)}
-              >
-                {item.name}
-              </button>
-            )
-          })}
+
+      {/* Search Results Dropdown */}
+      {filteredData && filteredData.length > 0 && (
+        <CustomContainer className={styles.searchDropdown} radius="medium">
+          {filteredData.map((item) => (
+            <button
+              key={item.href}
+              className={`${styles.searchResult} ${
+                theme.palette.mode === 'dark' ? styles.darkMode : ''
+              }`}
+              onClick={() => router.push(item.href)}
+            >
+              {item.name}
+            </button>
+          ))}
         </CustomContainer>
       )}
     </Box>

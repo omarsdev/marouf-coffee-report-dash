@@ -4,7 +4,7 @@ import DeleteDialog from 'components/DeleteDialog'
 import Table from 'components/Table'
 import TableActionCell from 'components/TableActionCell'
 import router from 'next/router'
-import React, {useRef} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import {userApi} from 'lib/api/user'
 import CustomSelect from 'components/CustomSelect'
@@ -27,12 +27,26 @@ export default function ModelList() {
     role_type: null,
   })
 
+  const [pagination, setPagination] = React.useState({
+    pageNumber: 0,
+    pageSize: 10,
+  })
+
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
 
   const {data, isLoading, isError, refetch} = useQuery<any>({
     queryFn: () =>
       userApi.get(
-        filterOptionsRef.current ? toSearchQuery(filterOptionsRef.current) : '',
+        filterOptionsRef.current
+          ? toSearchQuery({
+              ...filterOptionsRef.current,
+              pageNumber: pagination.pageNumber + 1,
+              pageSize: pagination.pageSize,
+            })
+          : toSearchQuery({
+              pageNumber: pagination.pageNumber + 1,
+              pageSize: pagination.pageSize,
+            }),
       ),
     queryKey: ['users'],
   })
@@ -52,6 +66,10 @@ export default function ModelList() {
     {},
   )
 
+  useEffect(() => {
+    refetch()
+  }, [JSON.stringify(pagination)])
+
   const defaultRowConfig = {
     flex: 1,
     headerAlign: 'left',
@@ -64,29 +82,42 @@ export default function ModelList() {
       field: 'name.en',
       headerName: 'English Name',
       renderCell: ({row}) => <TruncatedText text={row.name.en} />,
+      valueGetter: ({row}) => row.name.en,
+      sortComparator: (v1, v2, row1, row2) =>
+        (row1.value || '').localeCompare(row2.value || ''),
     },
     {
       ...defaultRowConfig,
       field: 'name.ar',
       headerName: 'Arabic Name',
       renderCell: ({row}) => <TruncatedText text={row.name.ar} />,
+      valueGetter: ({row}) => row.name.ar,
+      sortComparator: (v1, v2, row1, row2) =>
+        (row1.value || '').localeCompare(row2.value || ''),
     },
     {
       ...defaultRowConfig,
       field: 'email',
       headerName: 'Email',
       renderCell: ({row}) => `${row.email}`,
+      sortable: false,
+      hideSortIcons: true,
     },
     {
       ...defaultRowConfig,
       field: 'phone',
       headerName: 'Phone',
       renderCell: ({row}) => `${row.phone}`,
+      sortable: false,
+      hideSortIcons: true,
     },
     {
-      ...defaultRowConfig,
+      // ...defaultRowConfig,
       field: 'time_started',
       headerName: 'Time Started',
+      sortable: false,
+      hideSortIcons: true,
+      width: 100,
       renderCell: ({row}) =>
         row.active
           ? `${row.time_started ? format(new Date(row.time_started), 'p') : ''}`
@@ -96,6 +127,9 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'active',
       headerName: 'Active',
+      width: 100,
+      sortable: false,
+      hideSortIcons: true,
       renderCell: ({row}) => (
         <span
           style={{
@@ -113,39 +147,17 @@ export default function ModelList() {
       ),
     },
     {
-      ...defaultRowConfig,
+      // ...defaultRowConfig,
       field: 'current_branch',
       headerName: 'Current Branch',
+      width: 250,
+      sortable: false,
+      hideSortIcons: true,
       renderCell: ({row}) => (
-        <>
-          {row.active ? (
-            <TruncatedText text={branchesMap[row.current_branch] || '--'} />
-          ) : (
-            <>{'-'}</>
-          )}
-        </>
+        <>{row.active ? <>{branchesMap[row.current_branch]}</> : <>{'-'}</>}</>
       ),
     },
-    {
-      ...defaultRowConfig,
-      field: 'deleted',
-      headerName: 'Status',
-      renderCell: ({row}) => (
-        <span
-          style={{
-            background: !row.deleted ? 'green' : 'red',
-            paddingTop: '5px',
-            paddingBottom: '5px',
-            paddingLeft: '10px',
-            paddingRight: '10px',
-            borderRadius: '20px',
-            color: 'white',
-          }}
-        >
-          {row.deleted ? 'deactivate' : 'activate'}
-        </span>
-      ),
-    },
+
     {
       ...defaultRowConfig,
       field: 'id',
@@ -206,6 +218,11 @@ export default function ModelList() {
             data?.users?.map((model) => ({...model, id: model._id}))) ||
           []
         }
+        pagination={pagination}
+        onPaginationChange={(page, pageSize) =>
+          setPagination({pageNumber: page, pageSize})
+        }
+        totalRowCount={data?.count}
         columns={columns}
         loading={localLoading || isLoading || branchesLoading}
         tableSize="tabbed"

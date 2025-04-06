@@ -13,6 +13,7 @@ import {useQuery} from '@tanstack/react-query'
 import {userApi} from 'lib/api/user'
 import {branchApi} from 'lib/api/branch'
 import {get, map} from 'lodash'
+import {Data} from '@react-google-maps/api'
 export default function EmployeesForm({setLoading}) {
   const {
     query: {model_id},
@@ -25,18 +26,6 @@ export default function EmployeesForm({setLoading}) {
     queryFn: () => userApi.getId(model_id.toString()),
     enabled: isEditting,
     queryKey: ['users' + model_id.toString()],
-    select: (data) => {
-      const chosenKeys = [
-        'name.en',
-        'name.ar',
-        'email',
-        'phone',
-        'password',
-        'role',
-      ]
-      chosenKeys.map((key) => handleChange(key, get(data?.user, key)))
-      return data
-    },
   })
 
   const {data: branches, isLoading: isLoadingBranch} = useQuery<any>({
@@ -47,7 +36,12 @@ export default function EmployeesForm({setLoading}) {
   const submitCreate = async () => {
     const payload = {
       ...values,
-      role_type: values.role === 'QC' ? 'QC' : undefined,
+      role_type:
+        values.role === 'QC'
+          ? 'QC'
+          : values.role === '2'
+          ? 'default'
+          : undefined,
       role: values.role === 'QC' ? undefined : values.role,
     }
     try {
@@ -64,7 +58,12 @@ export default function EmployeesForm({setLoading}) {
   const submitUpdate = async () => {
     const payload = {
       ...values,
-      role_type: values.role === 'QC' ? 'QC' : undefined,
+      role_type:
+        values.role === 'QC'
+          ? 'QC'
+          : values.role === '2'
+          ? 'default'
+          : undefined,
       role: values.role === 'QC' ? undefined : values.role,
     }
     try {
@@ -86,6 +85,32 @@ export default function EmployeesForm({setLoading}) {
   })
 
   useEffect(() => {
+    if (isEditting && data) {
+      const chosenKeys = [
+        'name.en',
+        'name.ar',
+        'email',
+        'phone',
+        'password',
+        'branch_access',
+      ]
+      chosenKeys.map((key) => handleChange(key, get(data?.user, key)))
+
+      if (data?.user?.role === 2 && data?.user?.role_type === 'QC') {
+        handleChange('role_type', 'QC')
+        handleChange('role', 'QC')
+      } else if (
+        data?.user?.role === 2 &&
+        data?.user?.role_type === 'default'
+      ) {
+        handleChange('role', '2')
+      } else {
+        handleChange('role', data?.user.role.toString())
+      }
+    }
+  }, [data])
+
+  useEffect(() => {
     setLoading(isLoading)
   }, [isLoading])
 
@@ -103,9 +128,28 @@ export default function EmployeesForm({setLoading}) {
         {isEditting ? 'Edit an existing Employee' : 'Create a new Employee'}
       </CustomLabel>
 
+      {isEditting && data?.user && (
+        <span
+          style={{
+            background: !data?.user?.deleted ? 'green' : 'red',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '85px',
+            padding: '2px',
+            marginBottom: 5,
+            borderRadius: '20px',
+            color: 'white',
+          }}
+        >
+          {data?.user?.deleted ? 'deactivate' : 'activate'}
+        </span>
+      )}
+
       <CustomContainer
         style={{
           overflow: 'hidden',
+          marginTop: '1rem',
         }}
         className="overflow-hidden mb-14"
         radius="medium"
@@ -184,7 +228,7 @@ export default function EmployeesForm({setLoading}) {
           label="Role"
           helperText="Choose Employee Role"
           className="w-full"
-          onChange={({target: {name, value}}) => handleChange('role', value)}
+          onChange={({target: {value}}) => handleChange('role', value)}
           padding={2}
         />
 

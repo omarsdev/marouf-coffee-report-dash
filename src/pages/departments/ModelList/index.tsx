@@ -4,23 +4,38 @@ import DeleteDialog from 'components/DeleteDialog'
 import Table from 'components/Table'
 import TableActionCell from 'components/TableActionCell'
 import router from 'next/router'
-import React from 'react'
+import React, {useEffect} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import {departmentsApi} from 'lib/api/departments'
+import {toSearchQuery} from 'lib/utils'
 
 export default function ModelList() {
   const theme = useTheme()
   const [localLoading, setLocalLoading] = React.useState(false)
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
+  const [pagination, setPagination] = React.useState({
+    pageNumber: 0,
+    pageSize: 10,
+  })
 
   const {data, isLoading, isError, refetch} = useQuery<any>({
-    queryFn: () => departmentsApi.get(),
+    queryFn: () =>
+      departmentsApi.get(
+        toSearchQuery({
+          pageNumber: pagination.pageNumber + 1,
+          pageSize: pagination.pageSize,
+        }),
+      ),
     queryKey: ['departments'],
   })
 
+  useEffect(() => {
+    refetch()
+  }, [JSON.stringify(pagination)])
+
   const defaultRowConfig = {
-    flex: 1,
+    // flex: 1,
     headerAlign: 'left',
     align: 'left',
   } as GridColDef
@@ -31,29 +46,50 @@ export default function ModelList() {
       field: 'department_name.en',
       headerName: 'English Name',
       renderCell: ({row}) => `${row.department_name?.en}`,
+      valueGetter: ({row}) => row.department_name.en,
+      width: 200,
+      sortComparator: (v1, v2, row1, row2) =>
+        (row1.value || '').localeCompare(row2.value || ''),
     },
     {
       ...defaultRowConfig,
       field: 'department_name.ar',
       headerName: 'Arabic Name',
       renderCell: ({row}) => `${row.department_name?.ar}`,
+      valueGetter: ({row}) => row.department_name.ar,
+      sortComparator: (v1, v2, row1, row2) =>
+        (row1.value || '').localeCompare(row2.value || ''),
+      width: 200,
     },
     {
       ...defaultRowConfig,
       field: 'user.name.en',
       headerName: 'User Name',
       renderCell: ({row}) => `${row.user?.name?.en}`,
+      valueGetter: ({row}) => row.user?.name.ar,
+      sortComparator: (v1, v2, row1, row2) =>
+        (row1.value || '').localeCompare(row2.value || ''),
+      width: 200,
     },
     {
       ...defaultRowConfig,
       field: 'ticketCount',
       headerName: 'On Going Tickets',
+      sortable: false,
+      hideSortIcons: true,
+      filterable: false,
       renderCell: ({row}) => `${row.ticketCount}`,
+      width: 200,
     },
     {
       ...defaultRowConfig,
       field: 'ticketsee',
       headerName: 'See Tickets',
+      sortable: false,
+      hideSortIcons: true,
+      filterable: false,
+      width: 200,
+
       renderCell: ({row}) => {
         return (
           <div
@@ -79,6 +115,7 @@ export default function ModelList() {
       hideSortIcons: true,
       hideable: false,
       filterable: false,
+      width: 250,
       renderCell: ({row}) => (
         <TableActionCell
           onEdit={() => {
@@ -120,6 +157,11 @@ export default function ModelList() {
             data?.departments?.map((model) => ({...model, id: model._id}))) ||
           []
         }
+        onPaginationChange={(page, pageSize) =>
+          setPagination({pageNumber: page, pageSize})
+        }
+        pagination={pagination}
+        totalRowCount={data?.count}
         columns={columns}
         loading={isLoading || localLoading}
         tableSize="tabbed"

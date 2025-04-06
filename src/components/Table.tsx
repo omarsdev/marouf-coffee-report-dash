@@ -1,18 +1,21 @@
 import {Box, LinearProgress} from '@mui/material'
 import {DataGrid, GridOverlay} from '@mui/x-data-grid'
+import CustomContainer from 'components/CustomContainer'
+import DownloadCsvButton from 'components/DownloadCsvButton'
 import React from 'react'
-import CustomButton from './CustomButton'
-import CustomContainer from './CustomContainer'
-import {FaDownload} from 'react-icons/fa'
-import DownloadCsvButton from './DownloadCsvButton'
 
 interface Props {
-  columns
-  rows
+  columns: any
+  rows: any
   tableSize?: 'regular' | 'tabbed'
-  loading?
-  headerComponent?
+  loading?: boolean
+  headerComponent?: React.ReactNode
   exportButton?: boolean
+  onPaginationChange?: (page: number, pageSize: number) => void
+  pagination?: {pageNumber: number; pageSize: number}
+  totalRowCount?: number
+  hideFooterPagination?: boolean
+  excelColumns?: any
 }
 
 const tableSizes = {
@@ -22,7 +25,7 @@ const tableSizes = {
   },
   tabbed: {
     tableHeight: 520,
-    rowCount: 6,
+    rowCount: 10,
   },
 }
 
@@ -43,10 +46,33 @@ export default function Table({
   loading,
   headerComponent,
   exportButton,
+  onPaginationChange,
+  totalRowCount,
+  hideFooterPagination = false,
+  pagination,
+  excelColumns,
 }: Props) {
+  const handlePageChange = (newPage: number) => {
+    if (onPaginationChange) {
+      onPaginationChange(
+        newPage,
+        pagination?.pageSize ?? tableSizes[tableSize].rowCount,
+      )
+    }
+  }
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    if (onPaginationChange) {
+      onPaginationChange(0, newPageSize)
+    }
+  }
+
   return (
     <div>
-      <div className="w-full flex items-start justify-between">
+      <Box
+        className="w-full flex items-start justify-end"
+        sx={{paddingY: '10px'}}
+      >
         {/* <div>
                     <CustomLabel
                         size='bigTitle'
@@ -60,7 +86,12 @@ export default function Table({
                         {description}
                     </CustomLabel>
                 </div> */}
-      </div>
+        {exportButton ? (
+          <DownloadCsvButton columns={excelColumns ?? columns} rows={rows} />
+        ) : (
+          <></>
+        )}
+      </Box>
       <CustomContainer
         style={{
           pt: 1,
@@ -106,35 +137,33 @@ export default function Table({
           style={{height: tableSizes[tableSize].tableHeight}}
         >
           <DataGrid
+            rows={rows}
             sx={{
               borderWidth: 0,
             }}
-            rows={rows}
             getRowClassName={() => 'datagridx-row'}
             className="w-full"
             disableExtendRowFullWidth
             columns={columns}
             components={{
               LoadingOverlay: CustomLoadingOverlay,
-              Toolbar: () => (
-                <>
-                  {exportButton ? (
-                    <DownloadCsvButton columns={columns} rows={rows} />
-                  ) : (
-                    []
-                  )}
-                </>
-              ),
             }}
             loading={loading}
-            pageSize={tableSizes[tableSize].rowCount}
+            pageSize={pagination?.pageSize ?? tableSizes[tableSize].rowCount}
             disableSelectionOnClick
-
-            // initialState={{
-            //   pagination: {
-            //     paginationModel: {page: 0, pageSize: 5},
-            //   },
-            // }}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+            onPageSizeChange={handlePageSizeChange}
+            initialState={{
+              pagination: {
+                page: 0,
+                pageSize: 10,
+              },
+            }}
+            onPageChange={handlePageChange}
+            paginationMode="server"
+            rowCount={totalRowCount}
+            pagination
+            hideFooterPagination={hideFooterPagination}
           />
         </div>
       </CustomContainer>

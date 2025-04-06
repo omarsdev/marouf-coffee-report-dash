@@ -35,6 +35,10 @@ export default function ModelList() {
   })
 
   const [localLoading, setLocalLoading] = React.useState(false)
+  const [pagination, setPagination] = React.useState({
+    pageNumber: 0,
+    pageSize: 10,
+  })
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
   const [filter, setFilter] = React.useState({
@@ -76,7 +80,16 @@ export default function ModelList() {
   const {data, isLoading, isError, refetch} = useQuery<any>({
     queryFn: () => {
       return ticketsApi.get(
-        filterOptionsRef.current ? toSearchQuery(filterOptionsRef.current) : '',
+        filterOptionsRef.current
+          ? toSearchQuery({
+              ...filterOptionsRef.current,
+              pageNumber: pagination.pageNumber + 1,
+              pageSize: pagination.pageSize,
+            })
+          : toSearchQuery({
+              pageNumber: pagination.pageNumber + 1,
+              pageSize: pagination.pageSize,
+            }),
       )
     },
     queryKey: ['tickets' + JSON.stringify(filterOptionsRef.current)],
@@ -94,18 +107,40 @@ export default function ModelList() {
     align: 'left',
   } as GridColDef
 
+  useEffect(() => {
+    refetch()
+  }, [JSON.stringify(pagination)])
+
   const columns: GridColDef[] = [
     {
       ...defaultRowConfig,
       field: 'ticket_title',
       headerName: 'Ticket Title',
       renderCell: ({row}) => `${row.ticket_title}`,
+      valueGetter: ({row}) => row.ticket_title,
+      sortComparator: (v1, v2, row1, row2) => {
+        return (row1.value || '').localeCompare(row2.value || '')
+      },
+    },
+    {
+      ...defaultRowConfig,
+      field: 'user.name.en',
+      headerName: 'User',
+      renderCell: ({row}) => `${row.user?.name?.en}`,
+      valueGetter: ({row}) => row.user?.name?.en,
+      sortComparator: (v1, v2, row1, row2) => {
+        return (row1.value || '').localeCompare(row2.value || '')
+      },
     },
     {
       ...defaultRowConfig,
       field: 'branch.name.en',
       headerName: 'Branch',
       renderCell: ({row}) => `${row.branch?.name?.en}`,
+      valueGetter: ({row}) => row.branch?.name?.en,
+      sortComparator: (v1, v2, row1, row2) => {
+        return (row1.value || '').localeCompare(row2.value || '')
+      },
     },
     {
       ...defaultRowConfig,
@@ -117,11 +152,20 @@ export default function ModelList() {
             ? row.area_manager?.name?.en
             : row.department?.department_name?.en
         }`,
+      valueGetter: ({row}) =>
+        row.area_manager?.name?.en
+          ? row.area_manager?.name?.en
+          : row.department?.department_name?.en,
+      sortComparator: (v1, v2, row1, row2) => {
+        return (row1.value || '').localeCompare(row2.value || '')
+      },
     },
     {
       ...defaultRowConfig,
       field: 'status',
       headerName: 'Status',
+      sortable: true,
+      valueGetter: ({row}) => (row.status === 0 ? 'In Progress' : 'Completed'),
       renderCell: ({row}) => (
         <span
           style={{
@@ -145,6 +189,10 @@ export default function ModelList() {
       headerName: 'Date',
       renderCell: ({row}) =>
         `${format(new Date(row.created_at), 'dd/MM/yyyy')}`,
+      valueGetter: ({row}) =>
+        `${format(new Date(row.created_at), 'dd/MM/yyyy')}`,
+      sortComparator: (v1, v2) =>
+        new Date(v1 || 0).getDate() - new Date(v2 || 0).getDate(),
     },
     {
       ...defaultRowConfig,
@@ -155,6 +203,7 @@ export default function ModelList() {
       hideSortIcons: true,
       hideable: false,
       filterable: false,
+      disableExport: true,
       renderCell: ({row}) => (
         <TableActionCell
           onEdit={() => {
@@ -196,11 +245,18 @@ export default function ModelList() {
             data?.tickets?.map((model) => ({...model, id: model._id}))) ||
           []
         }
+        exportButton
         columns={columns}
+        excelColumns={columns.filter((col) => col.field !== 'id')}
         loading={
           localLoading || isLoading || isLoadingBranch || isLoadingDepartments
         }
+        pagination={pagination}
         tableSize="tabbed"
+        onPaginationChange={(page, pageSize) =>
+          setPagination({pageNumber: page, pageSize})
+        }
+        totalRowCount={data?.count}
         headerComponent={
           <Box
             flexDirection="row"
@@ -294,13 +350,13 @@ export default function ModelList() {
                     ...filter,
                     start_date: filter?.start_date
                       ? format(filter?.start_date, 'yyyy/MM/dd') + 'Z'
-                      : undefined,
+                      : null,
                     end_date: filter.end_date
                       ? format(
                           addDays(new Date(filter.end_date), 1),
                           'yyyy/MM/dd',
                         ) + 'Z'
-                      : undefined,
+                      : null,
                   }
                   await refetch()
                 } catch (e) {

@@ -9,17 +9,20 @@ import {redirectGuest} from 'pages/_app'
 import React, {useEffect} from 'react'
 import Layout from '../../../Layout'
 import Error from 'components/Error'
-import {useQuery} from '@tanstack/react-query'
+import {useInfiniteQuery, useQuery} from '@tanstack/react-query'
 import {userApi} from 'lib/api/user'
 import {get, map} from 'lodash'
 import {checklistApi} from 'lib/api/checklist'
 import {branchApi} from 'lib/api/branch'
 import {schedulesApi} from 'lib/api/schedules'
 import {DesktopDatePicker} from '@mui/x-date-pickers'
+import {toSearchQuery} from 'lib/utils'
 export default function SchedulesForm({setLoading}) {
   const {
     query: {model_id},
+    isReady,
   } = useRouter()
+
   const isEditting = model_id.toString() !== 'new'
 
   const [backendError, setBackendError] = React.useState<string>('')
@@ -30,7 +33,7 @@ export default function SchedulesForm({setLoading}) {
   })
 
   const {data: users, isLoading: isLoadingUser} = useQuery<any>({
-    queryFn: () => userApi.get(),
+    queryFn: () => userApi.get(toSearchQuery({pageSize: 100})),
     queryKey: ['users'],
   })
 
@@ -38,6 +41,50 @@ export default function SchedulesForm({setLoading}) {
     queryFn: () => branchApi.get(),
     queryKey: ['branches'],
   })
+
+  const {
+    data: usersData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isLoadingUsers,
+  } = useInfiniteQuery({
+    enabled: isReady,
+    queryFn: async ({pageParam = 1}) => {
+      try {
+        const response: any = await userApi.get(
+          toSearchQuery({pageNumber: pageParam, pageSize: 20}),
+        )
+        return response?.users ? response : {users: [], count: 0}
+      } catch (error) {
+        console.error('API Error:', error)
+        return {users: [], count: 0}
+      }
+    },
+    queryKey: ['users', isReady],
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage || !Array.isArray(lastPage.users)) return undefined
+      const totalFetched = allPages.reduce(
+        (sum, page) => sum + (page?.users?.length || 0),
+        0,
+      )
+      return totalFetched < (lastPage?.count || 0)
+        ? allPages.length + 1
+        : undefined
+    },
+  })
+
+  const userOptions = React.useMemo(() => {
+    return (
+      usersData?.pages.flatMap((page: any) =>
+        page.users.map((user) => ({
+          label: user.name?.en,
+          value: user._id,
+        })),
+      ) || []
+    )
+  }, [usersData])
 
   const {data: schedule, isLoading: isLoadingChecklist} = useQuery<any>({
     queryFn: () => schedulesApi.getId(model_id.toString()),
@@ -129,20 +176,18 @@ export default function SchedulesForm({setLoading}) {
         />
 
         <CustomSelect
-          id="bootstrap"
-          options={users?.users?.map((question) => ({
-            label: question?.name?.en,
-            value: question?._id,
-          }))}
-          inputProps={{
-            default: '1',
-          }}
+          id="user-select"
+          options={userOptions}
           value={values.userId}
           label="User"
           helperText="Choose User"
           className="w-full"
           onChange={({target: {name, value}}) => handleChange('userId', value)}
           padding={2}
+          fetchNextPage={fetchNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          hasNextPage={hasNextPage}
+          isLoading={isLoadingUsers}
         />
 
         <CustomSelect

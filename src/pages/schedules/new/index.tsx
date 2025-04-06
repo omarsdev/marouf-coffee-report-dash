@@ -11,12 +11,12 @@ import CustomLabel from 'components/CustomLabel'
 import CustomSelect from 'components/CustomSelect'
 import FormBottomWidget from 'components/FormBottomWidget'
 import useForm from 'lib/hooks/useForm'
-import router from 'next/router'
+import router, {useRouter} from 'next/router'
 import {redirectGuest} from 'pages/_app'
 import React, {useEffect} from 'react'
 import Layout from '../../../Layout'
 import Error from 'components/Error'
-import {useQuery} from '@tanstack/react-query'
+import {useInfiniteQuery, useQuery} from '@tanstack/react-query'
 import {userApi} from 'lib/api/user'
 import {checklistApi} from 'lib/api/checklist'
 import {branchApi} from 'lib/api/branch'
@@ -26,6 +26,8 @@ import {eachDayOfInterval, format, parseISO} from 'date-fns'
 import DateRangePicker from 'components/DateRangePicker'
 import {DAYS_OF_WEEK} from 'lib/constants'
 import DayToggleButton from 'components/DayToggleButton'
+import {toSearchQuery} from 'lib/utils'
+import CustomAutocomplete from 'components/CustomAutoComplete'
 
 export default function SchedulesForm({setLoading}) {
   const [backendError, setBackendError] = React.useState<string>('')
@@ -43,6 +45,7 @@ export default function SchedulesForm({setLoading}) {
     individueleDate: new Date(),
   })
 
+  const {isReady} = useRouter()
   const selectedDays = React.useMemo(() => {
     const {fromDate, toDate, days, repeat, individueleDate} = calenderData
     const start = new Date(fromDate)
@@ -62,10 +65,49 @@ export default function SchedulesForm({setLoading}) {
     queryKey: ['checklist'],
   })
 
-  const {data: users, isLoading: isLoadingUser} = useQuery<any>({
-    queryFn: () => userApi.get(),
-    queryKey: ['users'],
+  const {
+    data: usersData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isLoadingUsers,
+  } = useInfiniteQuery({
+    enabled: isReady,
+    queryFn: async ({pageParam = 1}) => {
+      try {
+        const response: any = await userApi.get(
+          toSearchQuery({pageNumber: pageParam, pageSize: 20}),
+        )
+        return response?.users ? response : {users: [], count: 0}
+      } catch (error) {
+        console.error('API Error:', error)
+        return {users: [], count: 0}
+      }
+    },
+    queryKey: ['users', isReady],
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage || !Array.isArray(lastPage.users)) return undefined
+      const totalFetched = allPages.reduce(
+        (sum, page) => sum + (page?.users?.length || 0),
+        0,
+      )
+      return totalFetched < (lastPage?.count || 0)
+        ? allPages.length + 1
+        : undefined
+    },
   })
+
+  const userOptions = React.useMemo(() => {
+    return (
+      usersData?.pages.flatMap((page: any) =>
+        page.users.map((user) => ({
+          label: user.name?.en,
+          value: user._id,
+        })),
+      ) || []
+    )
+  }, [usersData])
 
   const {data: branches, isLoading: isLoadingBranch} = useQuery<any>({
     queryFn: () => branchApi.get(),
@@ -102,8 +144,8 @@ export default function SchedulesForm({setLoading}) {
   })
 
   useEffect(() => {
-    setLoading(isLoadingReports || isLoadingUser || isLoadingBranch)
-  }, [isLoadingReports, isLoadingUser, isLoadingBranch])
+    setLoading(isLoadingReports || isLoadingBranch)
+  }, [isLoadingReports, isLoadingBranch])
 
   return (
     <Layout
@@ -148,28 +190,26 @@ export default function SchedulesForm({setLoading}) {
               : [...(value || []), value]
             handleChange('reports', newValue)
           }}
-          padding={2}
+          padding={3}
           multiple={true}
         />
 
         <CustomSelect
-          id="bootstrap"
-          options={users?.users?.map((question) => ({
-            label: question?.name?.en,
-            value: question?._id,
-          }))}
-          inputProps={{
-            default: '1',
-          }}
+          id="user-select"
+          options={userOptions}
           value={values.userId}
           label="User"
           helperText="Choose User"
           className="w-full"
           onChange={({target: {name, value}}) => handleChange('userId', value)}
           padding={2}
+          fetchNextPage={fetchNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          hasNextPage={hasNextPage}
+          isLoading={isLoadingUsers}
         />
 
-        <CustomSelect
+        <CustomAutocomplete
           id="bootstrap"
           options={branches?.branches?.map((branch) => ({
             label: branch?.name?.en,

@@ -6,11 +6,12 @@ import {
 } from '@mui/x-data-grid'
 import Table from 'components/Table'
 import {useRouter} from 'next/router'
-import React from 'react'
+import React, {useEffect} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import {submissionsApi} from 'lib/api/submissions'
 import CustomLabel from 'components/CustomLabel'
 import {format} from 'date-fns'
+import {toSearchQuery} from 'lib/utils'
 
 export default function ModelList() {
   const {query} = useRouter()
@@ -19,8 +20,9 @@ export default function ModelList() {
   const submittedAt = query.submittedAt as string
   const time_start = query.time_start as string
   const time_end = query.time_end as string
+  const areaMangerName = query.areaMangerName
+  const score = query.score
 
-  const theme = useTheme()
   const [localLoading, setLocalLoading] = React.useState(false)
 
   const {data, isLoading, isError, refetch} = useQuery<any>({
@@ -106,13 +108,100 @@ export default function ModelList() {
     },
   ]
 
+  const excelColumns: GridColDef[] = [
+    ...columns,
+    {
+      field: 'Score',
+      headerName: 'Score',
+      renderCell: () => score + '%',
+      valueGetter: () => score + '%',
+    },
+    {
+      field: 'name',
+      headerName: 'area Manger Name',
+      renderCell: () => areaMangerName,
+      valueGetter: () => areaMangerName,
+    },
+
+    {
+      field: 'date',
+      headerName: 'Date',
+      renderCell: () =>
+        submittedAt
+          ? format(new Date(submittedAt), 'yyyy/MM/dd')
+          : 'Invalid time',
+      valueGetter: () => areaMangerName,
+    },
+    {
+      field: 'branch',
+      headerName: 'Branch',
+      renderCell: () => data?.submission?.check?.branch?.name?.en,
+      valueGetter: () => data?.submission?.check?.branch?.name?.en,
+    },
+    {
+      field: 'inside',
+      headerName: ' Inside/Outside Branch:',
+      renderCell: () =>
+        data?.submission?.check?.in_range
+          ? 'Inside locaiton'
+          : 'Outside locaiton',
+      valueGetter: () =>
+        data?.submission?.check?.in_range
+          ? 'Inside locaiton'
+          : 'Outside locaiton',
+    },
+    {
+      field: 'checkIn',
+      headerName: 'checkIn',
+      renderCell: () =>
+        time_start ? format(new Date(time_start), 'p') : 'Invalid Date',
+      valueGetter: () =>
+        time_start ? format(new Date(time_start), 'p') : 'Invalid Date',
+    },
+    {
+      field: 'checkOut',
+      headerName: 'checkOut',
+      renderCell: () =>
+        time_end ? format(new Date(time_end), 'p') : 'Invalid Date',
+      valueGetter: () =>
+        time_end ? format(new Date(time_end), 'p') : 'Invalid Date',
+    },
+    {
+      field: 'checkList',
+      headerName: 'Check List Name',
+      renderCell: () => data?.submission?.reportCopy?.title,
+      valueGetter: () => data?.submission?.reportCopy?.title,
+    },
+  ]
   return (
     <div>
       <div className="-mt-10 mb-6 flex-col gap-y-2">
+        <CustomLabel
+          type="primary"
+          size="normal"
+          className="flex flex-row gap-2"
+        >
+          <CustomLabel type="primary" size="normal">
+            Area Manger Name :
+          </CustomLabel>
+          {areaMangerName}
+        </CustomLabel>
+        <CustomLabel
+          type="primary"
+          size="normal"
+          className="flex flex-row gap-2"
+        >
+          <CustomLabel type="primary" size="normal">
+            Scores :
+          </CustomLabel>
+          {score + '%'}
+        </CustomLabel>
         <CustomLabel type="primary" size="normal">
-          {data?.submission?.reportCopy?.title}{' '}
+          {data?.submission?.reportCopy?.title}
+          {' : '}
           {data?.submission?.reportCopy?._id}
         </CustomLabel>
+
         <CustomLabel
           type="primary"
           size="normal"
@@ -159,7 +248,7 @@ export default function ModelList() {
           <CustomLabel type="primary" size="normal">
             CheckIn/Checkout:
           </CustomLabel>
-          {time_start && typeof time_end ? (
+          {time_start && time_end ? (
             <>
               {format(new Date(time_start), 'p')} /{' '}
               {format(new Date(time_end), 'p')}
@@ -178,6 +267,8 @@ export default function ModelList() {
             }))) ||
           []
         }
+        excelColumns={excelColumns}
+        hideFooterPagination
         exportButton
         columns={columns}
         loading={localLoading || isLoading}

@@ -1,7 +1,7 @@
 import request from '.'
 
 export const departmentsApi = {
-  get: async () => request.get('/departments'),
+  get: async (option?: string) => request.get('/departments' + (option ?? '')),
   create: async (body: any) => request.post('/departments', body),
   getId: async (id: string) => request.get('/departments/' + id),
   edit: async (id: string, body: any) =>
