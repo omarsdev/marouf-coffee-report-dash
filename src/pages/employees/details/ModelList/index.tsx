@@ -1,4 +1,4 @@
-import {Box, TextField, useTheme} from '@mui/material'
+import {Box, Button, TextField, useTheme} from '@mui/material'
 import {GridColDef} from '@mui/x-data-grid'
 import DeleteDialog from 'components/DeleteDialog'
 import Table from 'components/Table'
@@ -16,6 +16,7 @@ import {assignmentsApi} from 'lib/api/assignments'
 import {DesktopDatePicker} from '@mui/x-date-pickers'
 import useForm from 'lib/hooks/useForm'
 import {submissionsApi} from 'lib/api/submissions'
+import {GmailExcelPopup} from 'components/GmailEmailSender'
 
 const getTimeDifference = (startedDate, endedDate) => {
   const diffInMinutes = differenceInMinutes(endedDate, startedDate)
@@ -28,7 +29,13 @@ const getTimeDifference = (startedDate, endedDate) => {
   }
 }
 
-export default function ModelList() {
+interface ModelListProps {
+  areaMangerName: string
+}
+
+export default function ModelList({areaMangerName}: ModelListProps) {
+  const [open, setOpen] = React.useState(false)
+
   const {
     query: {model_id},
   } = useRouter()
@@ -65,7 +72,9 @@ export default function ModelList() {
 
       field: 'reportCopy.title',
       headerName: 'Title',
-      sortable: true, // Enable sorting
+      sortable: true,
+      width: 250,
+
       renderCell: ({row}) => row?.reportCopy?.title,
       valueGetter: ({row}) => row.reportCopy?.title,
       sortComparator: (v1, v2, row1, row2) => {
@@ -76,7 +85,6 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'submittedAt',
       headerName: 'Submitted Date',
-      width: 200,
       renderCell: ({row}) => format(new Date(row?.submittedAt), 'yyyy/MM/dd'),
       valueGetter: ({row}) => row.submittedAt,
       sortComparator: (v1, v2) =>
@@ -118,23 +126,55 @@ export default function ModelList() {
       field: 'timespent',
       headerName: 'Time Spent',
       width: 100,
-      valueGetter: ({row}) =>
-        row?.check?.time_start && row?.check?.time_end
-          ? differenceInMinutes(
-              new Date(row?.check?.time_start),
-              new Date(row?.check?.time_end),
-            )
-          : {},
-      renderCell: ({row}) =>
-        row?.check?.time_start && row?.check?.time_end
-          ? getTimeDifference(
-              new Date(row?.check?.time_start),
-              new Date(row?.check?.time_end),
-            )
-          : '-',
+      valueGetter: ({row}) => {
+        if (row?.check?.time_start && row?.check?.time_end) {
+          const minutes = Math.abs(
+            differenceInMinutes(
+              new Date(row.check.time_start),
+              new Date(row.check.time_end),
+            ),
+          )
+          const hours = Math.floor(minutes / 60)
+          const remainingMinutes = minutes % 60
+
+          return hours > 0
+            ? `${hours}:${remainingMinutes.toString().padStart(2, '0')} hr`
+            : `${remainingMinutes} min`
+        }
+        return '-'
+      },
+      renderCell: ({row}) => {
+        if (row?.check?.time_start && row?.check?.time_end) {
+          const minutes = Math.abs(
+            differenceInMinutes(
+              new Date(row.check.time_start),
+              new Date(row.check.time_end),
+            ),
+          )
+          const hours = Math.floor(minutes / 60)
+          const remainingMinutes = minutes % 60
+
+          return hours > 0
+            ? `${hours}:${remainingMinutes.toString().padStart(2, '0')} hr`
+            : `${remainingMinutes} min`
+        }
+        return '-'
+      },
       sortComparator: (v1, v2) => {
-        return (v1 || 0) - (v2 || 0)
-      }, // Assuming getTimeDifference returns a numeric value
+        const getTotalMinutes = (timeStr) => {
+          if (!timeStr || timeStr === '-') return 0
+          if (timeStr.includes('hr')) {
+            const [hours, minutes] = timeStr
+              .replace(' hr', '')
+              .split(':')
+              .map(Number)
+            return hours * 60 + minutes
+          }
+          return parseInt(timeStr.replace(' min', ''), 10)
+        }
+
+        return getTotalMinutes(v1) - getTotalMinutes(v2)
+      },
     },
     {
       ...defaultRowConfig,
@@ -181,6 +221,8 @@ export default function ModelList() {
                 submittedAt: row.submittedAt,
                 time_start: row.check.time_start,
                 time_end: row.check.time_end,
+                areaMangerName,
+                score: calculateYesPercentage(row.answers),
               },
             })
           }}
@@ -188,6 +230,40 @@ export default function ModelList() {
       ),
     },
   ]
+
+  const excelData = React.useMemo(() => {
+    if (data) {
+      return data?.submissions?.map((i) => ({
+        title: i?.reportCopy?.title,
+        'Submitted Date': format(new Date(i?.submittedAt), 'yyyy/MM/dd'),
+        'Time Started': i?.check?.time_start
+          ? format(new Date(i?.check?.time_start), 'p')
+          : '-',
+        'Time Ended': i?.check?.time_end
+          ? format(new Date(i?.check?.time_end), 'p')
+          : '-',
+        'Time Spent': (() => {
+          if (i?.check?.time_start && i?.check?.time_end) {
+            const minutes = Math.abs(
+              differenceInMinutes(
+                new Date(i.check.time_start),
+                new Date(i.check.time_end),
+              ),
+            )
+            const hours = Math.floor(minutes / 60)
+            const remainingMinutes = minutes % 60
+
+            return hours > 0
+              ? `${hours}:${remainingMinutes.toString().padStart(2, '0')} hr`
+              : `${remainingMinutes} min`
+          }
+          return '-'
+        })(),
+        Branch: i?.check?.branch?.name?.en,
+        Answers: calculateYesPercentage(i.answers) + '%',
+      }))
+    }
+  }, [data])
 
   return (
     <div>
@@ -197,58 +273,80 @@ export default function ModelList() {
             data?.submissions?.map((model) => ({...model, id: model._id}))) ||
           []
         }
+        exportButton
+        hideFooterPagination
         columns={columns}
         loading={localLoading || isLoading}
         tableSize="tabbed"
         headerComponent={
           <Box
-            flexDirection="row"
             display="flex"
-            justifyContent="flex-end"
-            gap="20px"
+            justifyContent="space-between"
             alignItems="center"
           >
-            <DesktopDatePicker
-              label="From"
-              value={values.from}
-              onChange={(value) =>
-                handleChange('from', format(value, 'yyyy/MM/dd'))
-              }
-              renderInput={(props) => <TextField {...props} />}
-            />
-
-            <DesktopDatePicker
-              label="To"
-              value={values.to}
-              onChange={(value) =>
-                handleChange('to', format(value, 'yyyy/MM/dd'))
-              }
-              renderInput={(props) => <TextField {...props} />}
-            />
-
-            <CustomButton
-              onClick={async () => {
-                try {
-                  setLocalLoading(true)
-                  filterOptionsRef.current = {
-                    ...(filterOptionsRef.current && filterOptionsRef.current),
-                    from: values?.from ? values?.from + 'Z' : null,
-                    to: values.to
-                      ? format(addDays(new Date(values.to), 1), 'yyyy/MM/dd') +
-                        'Z'
-                      : null,
-                  }
-                  await refetch()
-                } catch (e) {
-                  console.error(e)
-                } finally {
-                  setLocalLoading(false)
+            <Box
+              flexDirection="row"
+              display="flex"
+              justifyContent="flex-end"
+              gap="20px"
+              alignItems="center"
+            >
+              <DesktopDatePicker
+                label="From"
+                value={values.from}
+                onChange={(value) =>
+                  handleChange('from', format(value, 'yyyy/MM/dd'))
                 }
-              }}
-              startIcon={<CiSearch />}
-              width="10rem"
-              title="Search"
-            />
+                renderInput={(props) => <TextField {...props} />}
+              />
+
+              <DesktopDatePicker
+                label="To"
+                value={values.to}
+                onChange={(value) =>
+                  handleChange('to', format(value, 'yyyy/MM/dd'))
+                }
+                renderInput={(props) => <TextField {...props} />}
+              />
+
+              <CustomButton
+                onClick={async () => {
+                  try {
+                    setLocalLoading(true)
+                    filterOptionsRef.current = {
+                      ...(filterOptionsRef.current && filterOptionsRef.current),
+                      from: values?.from ? values?.from + 'Z' : null,
+                      to: values.to
+                        ? format(
+                            addDays(new Date(values.to), 1),
+                            'yyyy/MM/dd',
+                          ) + 'Z'
+                        : null,
+                    }
+                    await refetch()
+                  } catch (e) {
+                    console.error(e)
+                  } finally {
+                    setLocalLoading(false)
+                  }
+                }}
+                startIcon={<CiSearch />}
+                width="10rem"
+                title="Search"
+              />
+            </Box>
+            <>
+              <CustomButton
+                title="Send Summary via Gmail"
+                onClick={() => setOpen(true)}
+              />
+
+              <GmailExcelPopup
+                open={open}
+                onClose={() => setOpen(false)}
+                data={excelData}
+              />
+            </>
           </Box>
         }
       />

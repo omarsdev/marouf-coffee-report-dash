@@ -124,6 +124,16 @@ export default function ModelList() {
     },
     {
       ...defaultRowConfig,
+      field: 'user.name.en',
+      headerName: 'User',
+      renderCell: ({row}) => `${row.user?.name?.en}`,
+      valueGetter: ({row}) => row.user?.name?.en,
+      sortComparator: (v1, v2, row1, row2) => {
+        return (row1.value || '').localeCompare(row2.value || '')
+      },
+    },
+    {
+      ...defaultRowConfig,
       field: 'branch.name.en',
       headerName: 'Branch',
       renderCell: ({row}) => `${row.branch?.name?.en}`,
@@ -155,6 +165,7 @@ export default function ModelList() {
       field: 'status',
       headerName: 'Status',
       sortable: true,
+      valueGetter: ({row}) => (row.status === 0 ? 'In Progress' : 'Completed'),
       renderCell: ({row}) => (
         <span
           style={{
@@ -178,7 +189,8 @@ export default function ModelList() {
       headerName: 'Date',
       renderCell: ({row}) =>
         `${format(new Date(row.created_at), 'dd/MM/yyyy')}`,
-      valueGetter: ({row}) => row.created_at,
+      valueGetter: ({row}) =>
+        `${format(new Date(row.created_at), 'dd/MM/yyyy')}`,
       sortComparator: (v1, v2) =>
         new Date(v1 || 0).getDate() - new Date(v2 || 0).getDate(),
     },
@@ -191,6 +203,7 @@ export default function ModelList() {
       hideSortIcons: true,
       hideable: false,
       filterable: false,
+      disableExport: true,
       renderCell: ({row}) => (
         <TableActionCell
           onEdit={() => {
@@ -232,10 +245,13 @@ export default function ModelList() {
             data?.tickets?.map((model) => ({...model, id: model._id}))) ||
           []
         }
+        exportButton
         columns={columns}
+        excelColumns={columns.filter((col) => col.field !== 'id')}
         loading={
           localLoading || isLoading || isLoadingBranch || isLoadingDepartments
         }
+        pagination={pagination}
         tableSize="tabbed"
         onPaginationChange={(page, pageSize) =>
           setPagination({pageNumber: page, pageSize})

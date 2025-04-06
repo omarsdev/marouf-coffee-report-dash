@@ -14,17 +14,11 @@ export default function ModelList() {
 
   const theme = useTheme()
   const [localLoading, setLocalLoading] = React.useState(false)
-  const [pagination, setPagination] = React.useState({
-    pageNumber: 0,
-    pageSize: 10,
-  })
 
   const {data, isLoading, isError, refetch} = useQuery<any>({
     queryFn: () =>
       submissionsApi.getAssignmentSubmission(
         toSearchQuery({
-          pageNumber: pagination.pageNumber + 1,
-          pageSize: pagination.pageSize,
           assignmentId: model_id,
         }),
       ),
@@ -33,22 +27,16 @@ export default function ModelList() {
       return data
     },
   })
+  console.log({data})
 
   const getNoteValue = (props) => {
     if (props === 'Empty') {
-      return {note: '', image: ''}
+      return {note: '', image: []}
     } else {
-      try {
-        const data = JSON.parse(props)
-        return {note: data?.note ?? '', image: data?.image ?? ''}
-      } catch (error) {
-        return {note: '', image: ''}
-      }
+      const data = JSON.parse(props)
+      return {note: data?.note ?? '', image: data?.image ?? []}
     }
   }
-  useEffect(() => {
-    refetch()
-  }, [JSON.stringify(pagination)])
 
   const defaultRowConfig = {
     flex: 1,
@@ -94,23 +82,25 @@ export default function ModelList() {
       sortable: false,
       hideSortIcons: true,
       renderCell: ({row}) => {
-        return getNoteValue(row.note).image ? (
+        return getNoteValue(row.note).image.length > 0 ? (
           <div
-            className="h-full w-full flex justify-start"
-            onClick={() => {
-              window.open(
-                getNoteValue(row.note).image,
-                '_blank',
-                'noopener,noreferrer',
-              )
-            }}
+            className="h-full w-full flex justify-start "
+            style={{gap: '10px'}}
           >
-            <img
-              style={{
-                objectFit: 'contain',
-              }}
-              src={getNoteValue(row.note).image}
-            />
+            {getNoteValue(row.note).image?.map((image) => (
+              <div
+                onClick={() => {
+                  window.open(image, '_blank', 'noopener,noreferrer')
+                }}
+              >
+                <img
+                  // style={{
+                  //   objectFit: 'contain',
+                  // }}
+                  src={image}
+                />
+              </div>
+            ))}
           </div>
         ) : (
           <div>N/A</div>
@@ -130,11 +120,8 @@ export default function ModelList() {
             }))) ||
           []
         }
-        onPaginationChange={(page, pageSize) =>
-          setPagination({pageNumber: page, pageSize})
-        }
-        totalRowCount={data?.count}
         columns={columns}
+        hideFooterPagination
         loading={localLoading || isLoading}
         tableSize="tabbed"
       />

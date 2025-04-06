@@ -124,6 +124,7 @@ export default function ModelList() {
             data?.branches?.map((model) => ({...model, id: model._id}))) ||
           []
         }
+        pagination={pagination}
         onPaginationChange={(page, pageSize) =>
           setPagination({pageNumber: page, pageSize})
         }
