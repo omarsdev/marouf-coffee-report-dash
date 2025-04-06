@@ -27,17 +27,14 @@ export default function ModelList() {
       return data
     },
   })
+  console.log({data})
 
   const getNoteValue = (props) => {
     if (props === 'Empty') {
-      return {note: '', image: ''}
+      return {note: '', image: []}
     } else {
-      try {
-        const data = JSON.parse(props)
-        return {note: data?.note ?? '', image: data?.image ?? ''}
-      } catch (error) {
-        return {note: '', image: ''}
-      }
+      const data = JSON.parse(props)
+      return {note: data?.note ?? '', image: data?.image ?? []}
     }
   }
 
@@ -85,23 +82,25 @@ export default function ModelList() {
       sortable: false,
       hideSortIcons: true,
       renderCell: ({row}) => {
-        return getNoteValue(row.note).image ? (
+        return getNoteValue(row.note).image.length > 0 ? (
           <div
-            className="h-full w-full flex justify-start"
-            onClick={() => {
-              window.open(
-                getNoteValue(row.note).image,
-                '_blank',
-                'noopener,noreferrer',
-              )
-            }}
+            className="h-full w-full flex justify-start "
+            style={{gap: '10px'}}
           >
-            <img
-              style={{
-                objectFit: 'contain',
-              }}
-              src={getNoteValue(row.note).image}
-            />
+            {getNoteValue(row.note).image?.map((image) => (
+              <div
+                onClick={() => {
+                  window.open(image, '_blank', 'noopener,noreferrer')
+                }}
+              >
+                <img
+                  // style={{
+                  //   objectFit: 'contain',
+                  // }}
+                  src={image}
+                />
+              </div>
+            ))}
           </div>
         ) : (
           <div>N/A</div>
