@@ -181,10 +181,17 @@ export default function CheckListForm({setLoading}) {
         {values.questions && (
           <CustomAutocomplete
             id="bootstrap"
-            options={questions?.questions?.map((question) => ({
-              label: question?.text,
-              value: question?._id,
-            }))}
+            options={questions?.questions
+              ?.map((question) => ({
+                label: question?.text,
+                value: question?._id,
+              }))
+              .filter(
+                (q) =>
+                  !values.questions.some(
+                    (selected) => selected.value === q.value,
+                  ),
+              )}
             inputProps={{
               default: '1',
             }}
