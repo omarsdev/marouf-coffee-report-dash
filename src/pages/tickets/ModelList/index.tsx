@@ -20,6 +20,8 @@ import {CiSearch} from 'react-icons/ci'
 import {toSearchQuery} from 'lib/utils'
 import useStore from 'lib/store/store'
 import {userApi} from 'lib/api/user'
+import TransferDialog from './components/TransferDialog'
+import CompleteDialog from './components/CompleteDialog'
 
 export default function ModelList() {
   const {
@@ -41,6 +43,9 @@ export default function ModelList() {
   })
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
+  const [transferDialogOpen, setTransferDialogOpen] = React.useState(null)
+  const [completeDialogOpen, setCompleteDialogOpen] = React.useState(null)
+
   const [filter, setFilter] = React.useState({
     start_date: null,
     end_date: null,
@@ -202,6 +207,12 @@ export default function ModelList() {
           onDelete={() => {
             setDeleteDialogOpen(row.id)
           }}
+          onTransfer={() => {
+            setTransferDialogOpen(row.id)
+          }}
+          onComplete={() => {
+            setCompleteDialogOpen(row.id)
+          }}
         />
       ),
     },
@@ -225,6 +236,19 @@ export default function ModelList() {
             setLocalLoading(false)
           }
         }}
+      />
+      <TransferDialog
+        isOpen={!!transferDialogOpen}
+        handleClose={() => setTransferDialogOpen(null)}
+        departments={departments}
+        id={transferDialogOpen}
+        refetch={refetch}
+      />
+      <CompleteDialog
+        isOpen={!!completeDialogOpen}
+        handleClose={() => setCompleteDialogOpen(null)}
+        id={completeDialogOpen}
+        refetch={refetch}
       />
       <Table
         rows={
