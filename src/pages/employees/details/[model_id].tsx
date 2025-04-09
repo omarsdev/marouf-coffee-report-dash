@@ -34,7 +34,7 @@ export default function Employees({setLoading}) {
           {
             title: `${data?.user?.name?.en} Submissions`,
             description: `Get Submissions here info of ${data?.user?.name?.en} here`,
-            component: <ModelList />,
+            component: <ModelList areaMangerName={data?.user?.name?.en} />,
             button: (
               <CustomButton
                 onClick={() => {

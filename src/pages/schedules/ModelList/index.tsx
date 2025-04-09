@@ -3,7 +3,7 @@ import {GridColDef} from '@mui/x-data-grid'
 import DeleteDialog from 'components/DeleteDialog'
 import Table from 'components/Table'
 import TableActionCell from 'components/TableActionCell'
-import router from 'next/router'
+import router, {useRouter} from 'next/router'
 import React, {useEffect, useRef} from 'react'
 import {branchApi} from 'lib/api/branch'
 import {useInfiniteQuery, useQuery} from '@tanstack/react-query'
@@ -15,11 +15,14 @@ import {CiSearch} from 'react-icons/ci'
 import {calculateYesPercentage, toSearchQuery} from 'lib/utils'
 import CustomSelect from 'components/CustomSelect'
 import {userApi} from 'lib/api/user'
+import CustomAutocomplete from 'components/CustomAutoComplete'
 
 export default function ModelList() {
   const theme = useTheme()
   const isSearchingRef = useRef(false)
   const filterOptionsRef = useRef({})
+  const router = useRouter()
+  const isReady = router.isReady
 
   const [localLoading, setLocalLoading] = React.useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
@@ -29,10 +32,15 @@ export default function ModelList() {
   })
 
   const [filter, setFilter] = React.useState({
-    date: null,
-    userId: null,
-    branch: '',
+    date: (router.query.date as any) ?? null,
+    branch: (router.query.branch as any) ?? null,
+    userId: router.query.userId || '',
   })
+
+  useEffect(() => {
+    isSearchingRef.current = true
+    filterOptionsRef.current = filter
+  }, [router.query])
 
   const {data, isLoading, isError, refetch} = useQuery<any>({
     queryFn: () =>
@@ -60,24 +68,32 @@ export default function ModelList() {
     data: usersData,
     fetchNextPage,
     hasNextPage,
-    isFetching: isLoadingUsers,
     isFetchingNextPage,
+    isLoading: isLoadingUsers,
   } = useInfiniteQuery({
-    queryKey: ['users'],
+    enabled: isReady,
     queryFn: async ({pageParam = 1}) => {
-      return await userApi.get(
-        toSearchQuery({pageNumber: pageParam, pageSize: 20}),
-      )
+      try {
+        const response: any = await userApi.get(
+          toSearchQuery({pageNumber: pageParam, pageSize: 20}),
+        )
+        return response?.users ? response : {users: [], count: 0}
+      } catch (error) {
+        console.error('API Error:', error)
+        return {users: [], count: 0}
+      }
     },
+    queryKey: ['users', isReady],
     initialPageParam: 1,
-    getNextPageParam: (lastPage: any, allPages) => {
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage || !Array.isArray(lastPage.users)) return undefined
       const totalFetched = allPages.reduce(
-        (sum, page) => sum + page?.users?.length,
+        (sum, page) => sum + (page?.users?.length || 0),
         0,
       )
-      const totalAvailable = lastPage.count // count comes from your API
-      // If totalFetched is less than totalAvailable, return the next page number
-      return totalFetched < totalAvailable ? allPages?.length + 1 : undefined
+      return totalFetched < (lastPage?.count || 0)
+        ? allPages.length + 1
+        : undefined
     },
   })
 
@@ -95,6 +111,42 @@ export default function ModelList() {
   useEffect(() => {
     refetch()
   }, [JSON.stringify(pagination)])
+
+  const handleSearch = async () => {
+    try {
+      setLocalLoading(true)
+      isSearchingRef.current = true
+
+      const newQuery = {
+        date: filter.date
+          ? format(new Date(filter.date), 'yyyy/MM/dd')
+          : undefined,
+        branch: filter.branch || undefined,
+        userId: filter.userId || undefined,
+      }
+
+      router.push(
+        {
+          pathname: router.pathname,
+          query: newQuery,
+        },
+        undefined,
+        {shallow: true},
+      )
+
+      // Store filters in ref and refetch data
+      filterOptionsRef.current = {
+        ...(filterOptionsRef.current || {}),
+        ...filter,
+      }
+
+      await refetch()
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setLocalLoading(false)
+    }
+  }
 
   const defaultRowConfig = {
     flex: 1,
@@ -241,6 +293,7 @@ export default function ModelList() {
         }
         columns={columns}
         loading={localLoading || isLoading || isLoadingBranch}
+        pagination={pagination}
         onPaginationChange={(page, pageSize) =>
           setPagination({pageNumber: page, pageSize})
         }
@@ -265,7 +318,7 @@ export default function ModelList() {
               }}
               renderInput={(props) => <TextField {...props} />}
             />
-            <CustomSelect
+            <CustomAutocomplete
               id="bootstrap"
               options={branches?.branches?.map((branch) => ({
                 label: branch?.name?.en,
@@ -279,7 +332,7 @@ export default function ModelList() {
               placeholder="Branch"
               className="w-full"
               value={filter.branch}
-              onChange={({target: {name, value}}) =>
+              onChange={({target: {value}}) =>
                 setFilter((old) => ({...old, branch: value}))
               }
               padding={2}
@@ -288,7 +341,7 @@ export default function ModelList() {
               id="user-select"
               options={userOptions}
               label="User"
-              className="w-full"
+              className="w-[2rem]"
               onChange={({target: {value}}) =>
                 setFilter((old) => ({...old, userId: value}))
               }
@@ -302,21 +355,7 @@ export default function ModelList() {
               hasEmpty={true}
             />
             <CustomButton
-              onClick={async () => {
-                try {
-                  setLocalLoading(true)
-                  isSearchingRef.current = true
-                  filterOptionsRef.current = {
-                    ...(filterOptionsRef.current && filterOptionsRef.current),
-                    ...filter,
-                  }
-                  await refetch()
-                } catch (e) {
-                  console.error(e)
-                } finally {
-                  setLocalLoading(false)
-                }
-              }}
+              onClick={handleSearch}
               startIcon={<CiSearch />}
               width="10rem"
               title="Search"
