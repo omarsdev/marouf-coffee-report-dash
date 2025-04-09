@@ -12,6 +12,7 @@ import router from 'next/router'
 import Error from 'components/Error'
 import {useCookies, Cookies} from 'react-cookie'
 import useStore from 'lib/store/store'
+import clsx from 'clsx'
 
 export default function Entry() {
   const theme = useTheme()
@@ -78,7 +79,7 @@ export default function Entry() {
       </Head>
       <CustomContainer
         type="primary"
-        className="h-screen unselectable w-screen flex justify-center items-center"
+        className="h-screen unselectable w-screen flex justify-center items-center "
       >
         <div
           style={{paddingRight: '1rem'}}
@@ -89,9 +90,16 @@ export default function Entry() {
         <CustomContainer
           radius="medium"
           type="secondary"
-          className="h-1/2 flex overflow-hidden login_box"
+          className="h-[70%] w-![70%]  md:h-1/2 flex overflow-hidden login_box flex-col-reverse  md:flex-row"
         >
-          <div key={'wow'} className="w-1/2 p-12 flex flex-col justify-center">
+          <div
+            key={'wow'}
+            className={clsx(
+              'w-full  p-12 flex flex-col justify-center',
+              ' sm:p-8',
+              'lg:w-[75%] lg:p-12',
+            )}
+          >
             <div className="text-2xl mb-4">Login</div>
             <TextInput
               padding={2}
@@ -104,13 +112,13 @@ export default function Entry() {
               name="password_2"
               onChange={handleChange}
               value={values.password_2}
-              label="password"
+              label="Password"
               secureEntry={true}
               placeholder="********"
             />
             <Error backendError={backendError} />
 
-            <div className="flex-row  justify-between flex items-center">
+            <div className="flex-row justify-between flex items-center">
               <div className="flex items-center">
                 <Checkbox
                   sx={{color: 'text.primary', p: 0, m: 0, pr: 1}}
@@ -132,7 +140,12 @@ export default function Entry() {
               </Button>
             </div>
           </div>
-          <div className="w-1/2 h-full relative flex flex-col justify-center items-center">
+          <div
+            className={clsx(
+              'w-full md:1/2 h-full relative flex flex-col justify-center items-center',
+              'sm:w-full sm:h-auto sm:mb-4 sm:py-8', // Adjustments for smaller screens
+            )}
+          >
             <CustomLabel className="z-50 text-center">
               <div className="text-primary-500 z-50 text-xl mb-1">Visit us</div>
               <div

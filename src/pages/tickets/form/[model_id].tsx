@@ -17,6 +17,8 @@ import {departmentsApi} from 'lib/api/departments'
 import {ticketsApi} from 'lib/api/tickets'
 import CustomImage from 'components/CustomImage'
 import {Box} from '@mui/material'
+import * as Yup from 'yup'
+
 export default function TicketsForm({setLoading}) {
   const {
     query: {model_id},
@@ -74,12 +76,19 @@ export default function TicketsForm({setLoading}) {
     }
   }
 
+  const validationSchema = Yup.object().shape({
+    ...(isEditting && {
+      transfer_note: Yup.string().trim().required('Transfer note is required'),
+    }),
+  })
+
   const {values, errors, handleChange, handleSubmit, clearErrors} = useForm({
     initial: {},
-    // validationSchema:
+    validationSchema: validationSchema,
     onSubmit: isEditting ? submitUpdate : submitCreate,
   })
 
+  console.log({errors})
   useEffect(() => {
     setLoading(isLoading || isLoadingBranch || isLoadingDepartments)
   }, [isLoading, isLoadingBranch, isLoadingDepartments])
@@ -95,9 +104,10 @@ export default function TicketsForm({setLoading}) {
       'user',
       'ticket_title',
       'ticket_description',
-      'department',
-      'progress_note',
-      'transfer_note',
+      ...(data?.ticket?.department ? ['department'] : []),
+      ...(data?.ticket?.progress_note ? ['progress_note'] : []),
+      ...(data?.ticket?.transfer_note ? ['transfer_note'] : []),
+      ,
     ]
     chosenKeys.map((key) => handleChange(key, String(get(data.ticket, key))))
   }, [data, isEditting])
@@ -267,10 +277,11 @@ export default function TicketsForm({setLoading}) {
             name="transfer_note"
             onChange={handleChange}
             padding={1}
+            required
           />
         )}
 
-        <Error backendError={backendError} />
+        <Error backendError={backendError || errors?.transfer_note} />
 
         <FormBottomWidget
           isEdit={isEditting}

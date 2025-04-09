@@ -20,7 +20,9 @@ import {toSearchQuery} from 'lib/utils'
 export default function SchedulesForm({setLoading}) {
   const {
     query: {model_id},
+    isReady,
   } = useRouter()
+
   const isEditting = model_id.toString() !== 'new'
 
   const [backendError, setBackendError] = React.useState<string>('')
@@ -44,24 +46,32 @@ export default function SchedulesForm({setLoading}) {
     data: usersData,
     fetchNextPage,
     hasNextPage,
-    isFetching: isLoadingUsers,
     isFetchingNextPage,
+    isLoading: isLoadingUsers,
   } = useInfiniteQuery({
-    queryKey: ['users'],
+    enabled: isReady,
     queryFn: async ({pageParam = 1}) => {
-      return await userApi.get(
-        toSearchQuery({pageNumber: pageParam, pageSize: 20}),
-      )
+      try {
+        const response: any = await userApi.get(
+          toSearchQuery({pageNumber: pageParam, pageSize: 20}),
+        )
+        return response?.users ? response : {users: [], count: 0}
+      } catch (error) {
+        console.error('API Error:', error)
+        return {users: [], count: 0}
+      }
     },
+    queryKey: ['users', isReady],
     initialPageParam: 1,
-    getNextPageParam: (lastPage: any, allPages) => {
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage || !Array.isArray(lastPage.users)) return undefined
       const totalFetched = allPages.reduce(
-        (sum, page) => sum + page?.users?.length,
+        (sum, page) => sum + (page?.users?.length || 0),
         0,
       )
-      const totalAvailable = lastPage.count // count comes from your API
-      // If totalFetched is less than totalAvailable, return the next page number
-      return totalFetched < totalAvailable ? allPages?.length + 1 : undefined
+      return totalFetched < (lastPage?.count || 0)
+        ? allPages.length + 1
+        : undefined
     },
   })
 
@@ -168,9 +178,6 @@ export default function SchedulesForm({setLoading}) {
         <CustomSelect
           id="user-select"
           options={userOptions}
-          // inputProps={{
-          //   default: '1',
-          // }}
           value={values.userId}
           label="User"
           helperText="Choose User"

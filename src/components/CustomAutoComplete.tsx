@@ -1,4 +1,4 @@
-import {Autocomplete, InputLabel, TextField} from '@mui/material'
+import {Autocomplete, InputLabel, Paper, TextField} from '@mui/material'
 import React, {useEffect, useState} from 'react'
 
 interface Option {
@@ -48,6 +48,9 @@ export default function CustomAutocomplete({
   //     setSelectedValues([])
   //   }
   // }, [value])
+  const CustomPaper = (props: any) => (
+    <Paper {...props} style={{minWidth: '250px', padding: '5px'}} />
+  )
 
   const handleChange = (_event: any, newValue: Option[] | null) => {
     const updatedValue = newValue ? newValue : []
@@ -68,6 +71,7 @@ export default function CustomAutocomplete({
         getOptionLabel={(option) => option.label || ''}
         value={value}
         onChange={handleChange}
+        PaperComponent={CustomPaper}
         renderInput={(params) => (
           <TextField
             {...params}

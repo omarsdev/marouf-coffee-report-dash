@@ -1,4 +1,4 @@
-import {LinearProgress} from '@mui/material'
+import {Box, LinearProgress} from '@mui/material'
 import {DataGrid, GridOverlay} from '@mui/x-data-grid'
 import CustomContainer from 'components/CustomContainer'
 import DownloadCsvButton from 'components/DownloadCsvButton'
@@ -12,8 +12,10 @@ interface Props {
   headerComponent?: React.ReactNode
   exportButton?: boolean
   onPaginationChange?: (page: number, pageSize: number) => void
+  pagination?: {pageNumber: number; pageSize: number}
   totalRowCount?: number
   hideFooterPagination?: boolean
+  excelColumns?: any
 }
 
 const tableSizes = {
@@ -47,10 +49,15 @@ export default function Table({
   onPaginationChange,
   totalRowCount,
   hideFooterPagination = false,
+  pagination,
+  excelColumns,
 }: Props) {
   const handlePageChange = (newPage: number) => {
     if (onPaginationChange) {
-      onPaginationChange(newPage, tableSizes[tableSize].rowCount)
+      onPaginationChange(
+        newPage,
+        pagination?.pageSize ?? tableSizes[tableSize].rowCount,
+      )
     }
   }
 
@@ -62,7 +69,10 @@ export default function Table({
 
   return (
     <div>
-      <div className="w-full flex items-start justify-between">
+      <Box
+        className="w-full flex items-start justify-end"
+        sx={{paddingY: '10px'}}
+      >
         {/* <div>
                     <CustomLabel
                         size='bigTitle'
@@ -76,7 +86,12 @@ export default function Table({
                         {description}
                     </CustomLabel>
                 </div> */}
-      </div>
+        {exportButton ? (
+          <DownloadCsvButton columns={excelColumns ?? columns} rows={rows} />
+        ) : (
+          <></>
+        )}
+      </Box>
       <CustomContainer
         style={{
           pt: 1,
@@ -122,37 +137,29 @@ export default function Table({
           style={{height: tableSizes[tableSize].tableHeight}}
         >
           <DataGrid
+            rows={rows}
             sx={{
               borderWidth: 0,
             }}
-            rows={rows}
             getRowClassName={() => 'datagridx-row'}
             className="w-full"
             disableExtendRowFullWidth
             columns={columns}
             components={{
               LoadingOverlay: CustomLoadingOverlay,
-              Toolbar: () => (
-                <>
-                  {exportButton ? (
-                    <DownloadCsvButton columns={columns} rows={rows} />
-                  ) : (
-                    []
-                  )}
-                </>
-              ),
             }}
             loading={loading}
-            pageSize={tableSizes[tableSize].rowCount}
+            pageSize={pagination?.pageSize ?? tableSizes[tableSize].rowCount}
             disableSelectionOnClick
+            rowsPerPageOptions={[10, 25, 50, 100]}
+            onPageSizeChange={handlePageSizeChange}
             initialState={{
               pagination: {
                 page: 0,
-                pageSize: tableSizes[tableSize].rowCount,
+                pageSize: 10,
               },
             }}
             onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
             paginationMode="server"
             rowCount={totalRowCount}
             pagination
