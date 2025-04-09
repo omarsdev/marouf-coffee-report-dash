@@ -1,4 +1,4 @@
-import React, {FunctionComponent, ReactNode} from 'react'
+import React, {FunctionComponent, ReactNode, useEffect} from 'react'
 import {NextSeo} from 'next-seo'
 import Header from './Header'
 import SideBar from './Sidebar'
@@ -14,6 +14,7 @@ type LayoutProps = {
 const DefaultLayout: FunctionComponent<LayoutProps> = ({
   children,
   meta,
+  cookies
 }: any) => {
   const {
     title,

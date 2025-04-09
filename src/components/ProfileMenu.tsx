@@ -8,6 +8,7 @@ import {RiAliensFill, RiLogoutCircleLine} from 'react-icons/ri'
 import UserUser from 'lib/hooks/useUser'
 import request from 'lib/api'
 import router from 'next/router'
+import cookie from "cookie-cutter"
 import {useCookies} from 'react-cookie'
 import shallow from 'zustand/shallow'
 import useStore from 'lib/store/store'
