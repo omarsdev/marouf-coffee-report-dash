@@ -168,7 +168,7 @@ export default function TicketsForm({setLoading}) {
               value: '1',
             },
             {
-              label: 'Hight',
+              label: 'High',
               value: '3',
             },
           ]}
