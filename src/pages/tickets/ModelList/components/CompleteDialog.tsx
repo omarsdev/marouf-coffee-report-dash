@@ -30,7 +30,7 @@ const CompleteDialog = ({
   const onSubmit = async () => {
     try {
       setLoading(true)
-      await ticketsApi.edit(id.toString(), {
+      await ticketsApi.update(id.toString(), {
         ...values,
         resolve: true,
       })
