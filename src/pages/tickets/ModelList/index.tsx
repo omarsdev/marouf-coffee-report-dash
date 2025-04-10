@@ -192,6 +192,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'created_at',
       headerName: 'Date',
+      width: 100,
       renderCell: ({row}) =>
         `${format(new Date(row.created_at), 'dd/MM/yyyy')}`,
       valueGetter: ({row}) =>
@@ -209,6 +210,7 @@ export default function ModelList() {
       hideable: false,
       filterable: false,
       disableExport: true,
+      width: 250,
       renderCell: ({row}) => (
         <TableActionCell
           onEdit={() => {
