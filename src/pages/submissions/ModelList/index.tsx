@@ -59,7 +59,6 @@ export default function ModelList() {
       headerName: 'Title',
       valueGetter: (params) => params.row.questionId?.text || '',
       renderCell: ({row}) => {
-        console.log({row})
         return row?.questionId?.text
       },
     },

@@ -32,7 +32,7 @@ const TransferDialog = ({
   const onSubmit = async () => {
     try {
       setLoading(true)
-      await ticketsApi.edit(id.toString(), {
+      await ticketsApi.update(id.toString(), {
         ...values,
         transfer_to_department: true,
       })
