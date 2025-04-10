@@ -132,7 +132,10 @@ export default function ModelList() {
         submittedAt
           ? format(new Date(submittedAt), 'yyyy/MM/dd')
           : 'Invalid time',
-      valueGetter: () => areaMangerName,
+      valueGetter: () =>
+        submittedAt
+          ? format(new Date(submittedAt), 'yyyy/MM/dd')
+          : 'Invalid time',
     },
     {
       field: 'branch',
