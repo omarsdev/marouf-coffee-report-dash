@@ -2,7 +2,7 @@ name: Build, Push Docker Image, and Trigger DigitalOcean Deploy
 
 on:
   push:
-    branches: [develop] # or main, or both
+    branches: [develop]
 
 jobs:
   build-and-deploy:
@@ -25,8 +25,10 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/marouf-ticket-system:latest
 
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_API_TOKEN }}
+
       - name: Trigger redeploy on DigitalOcean App Platform
-        run: |
-          curl -X POST "https://api.digitalocean.com/v2/apps/${{ secrets.DO_APP_ID }}/deployments" \
-          -H "Authorization: Bearer ${{ secrets.DO_API_TOKEN }}" \
-          -H "Content-Type: application/json"
+        run: doctl apps create-deployment ${{ secrets.DO_APP_ID }}
