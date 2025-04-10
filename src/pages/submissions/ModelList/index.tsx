@@ -177,7 +177,6 @@ export default function ModelList() {
     },
   ]
 
-  console.log('data?.submission', data)
   return (
     <div>
       <div className="-mt-10 mb-6 flex-col gap-y-2">
