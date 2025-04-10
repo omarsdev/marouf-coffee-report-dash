@@ -58,7 +58,10 @@ export default function ModelList() {
       field: 'questionId.text',
       headerName: 'Title',
       valueGetter: (params) => params.row.questionId?.text || '',
-      renderCell: ({row}) => `${row?.questionId?.text}`,
+      renderCell: ({row}) => {
+        console.log({row})
+        return row?.questionId?.text
+      },
     },
     {
       ...defaultRowConfig,
@@ -173,6 +176,8 @@ export default function ModelList() {
       valueGetter: () => data?.submission?.reportCopy?.title,
     },
   ]
+
+  console.log('data?.submission', data)
   return (
     <div>
       <div className="-mt-10 mb-6 flex-col gap-y-2">
@@ -261,9 +266,11 @@ export default function ModelList() {
       <Table
         rows={
           (data?.submission?.answers &&
-            data?.submission?.answers?.map((model) => ({
+            data?.submission?.answers?.map((model, index) => ({
               ...model,
               id: model._id,
+              questionId:
+                data?.submission?.reportCopy?.questions[index] ?? null,
             }))) ||
           []
         }
