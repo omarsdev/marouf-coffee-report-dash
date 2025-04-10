@@ -1,11 +1,11 @@
-name: Build and Push Docker Image
+name: Build, Push Docker Image, and Trigger DigitalOcean Deploy
 
 on:
   push:
     branches: [develop] # or main, or both
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,3 +24,9 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/marouf-ticket-system:latest
+
+      - name: Trigger redeploy on DigitalOcean App Platform
+        run: |
+          curl -X POST "https://api.digitalocean.com/v2/apps/${{ secrets.DO_APP_ID }}/deployments" \
+          -H "Authorization: Bearer ${{ secrets.DO_API_TOKEN }}" \
+          -H "Content-Type: application/json"
