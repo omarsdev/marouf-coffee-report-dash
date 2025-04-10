@@ -121,6 +121,7 @@ export default function SchedulesForm({setLoading}) {
     // validationSchema:
     onSubmit: submitUpdate,
   })
+  console.log({values})
 
   useEffect(() => {
     if (isEditting) {

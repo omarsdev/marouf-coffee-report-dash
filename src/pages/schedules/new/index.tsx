@@ -120,6 +120,7 @@ export default function SchedulesForm({setLoading}) {
       assignmentDates: selectedDays,
       from: undefined,
       to: undefined,
+      branches: values?.branches?.map((i) => i.value),
     }
     try {
       setLoading(true)
