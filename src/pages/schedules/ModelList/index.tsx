@@ -48,8 +48,7 @@ export default function ModelList() {
         isSearchingRef.current
           ? toSearchQuery({
               ...filterOptionsRef.current,
-              branch:
-                (filterOptionsRef.current as any)?.branch?.value ?? undefined,
+              branch: (filterOptionsRef.current as any)?.branch?.value ?? null,
               pageNumber: pagination.pageNumber + 1,
               pageSize: pagination.pageSize,
             })
