@@ -89,7 +89,7 @@ export default function SideBar() {
   return (
     <motion.div
       style={{
-        zIndex: 1500,
+        zIndex: 1000,
         width: '7rem',
       }}
       animate={{

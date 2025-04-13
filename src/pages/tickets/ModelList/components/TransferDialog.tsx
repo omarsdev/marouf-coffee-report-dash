@@ -63,9 +63,14 @@ const TransferDialog = ({
       }}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
+      PaperProps={{
+        sx: {
+          zIndex: 1600,
+        },
+      }}
     >
       <DialogTitle id="alert-dialog-title">{'Transfer Ticket'}</DialogTitle>
-      <DialogContent sx={{width: '400px'}}>
+      <DialogContent sx={{width: {xs: '300px', md: '400px'}}}>
         <CustomSelect
           id="bootstrap"
           options={departments?.departments?.map((department) => ({

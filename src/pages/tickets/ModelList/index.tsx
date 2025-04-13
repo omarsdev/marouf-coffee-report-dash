@@ -107,7 +107,6 @@ export default function ModelList() {
   })
 
   const defaultRowConfig = {
-    flex: 1,
     headerAlign: 'left',
     align: 'left',
   } as GridColDef
@@ -121,6 +120,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'ticket_title',
       headerName: 'Ticket Title',
+      width: 150,
       renderCell: ({row}) => `${row.ticket_title}`,
       valueGetter: ({row}) => row.ticket_title,
       sortComparator: (v1, v2, row1, row2) => {
@@ -131,6 +131,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'user.name.en',
       headerName: 'User',
+      width: 150,
       renderCell: ({row}) => `${row.user?.name?.en}`,
       valueGetter: ({row}) => row.user?.name?.en,
       sortComparator: (v1, v2, row1, row2) => {
@@ -141,6 +142,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'branch.name.en',
       headerName: 'Branch',
+      width: 150,
       renderCell: ({row}) => `${row.branch?.name?.en}`,
       valueGetter: ({row}) => row.branch?.name?.en,
       sortComparator: (v1, v2, row1, row2) => {
@@ -151,6 +153,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'department.department_name.en',
       headerName: 'Department',
+      width: 150,
       renderCell: ({row}) =>
         `${
           row.area_manager?.name?.en
@@ -170,6 +173,8 @@ export default function ModelList() {
       field: 'status',
       headerName: 'Status',
       sortable: true,
+
+      width: 150,
       valueGetter: ({row}) => (row.status === 0 ? 'In Progress' : 'Completed'),
       renderCell: ({row}) => (
         <span
@@ -287,38 +292,49 @@ export default function ModelList() {
           <Box
             flexDirection="row"
             display="flex"
-            justifyContent="flex-end"
+            justifyContent={{xs: 'center', md: 'flex-end'}}
             gap="20px"
             alignItems="center"
+            flexWrap={'wrap'}
           >
-            <DesktopDatePicker
-              label="From"
-              value={filter.start_date}
-              onChange={(value) => setFilter({...filter, start_date: value})}
-              renderInput={(props) => <TextField {...props} />}
-            />
-            <DesktopDatePicker
-              label="To"
-              value={filter.end_date}
-              onChange={(value) => setFilter({...filter, end_date: value})}
-              renderInput={(props) => <TextField {...props} />}
-            />
-            <CustomSelect
-              id="bootstrap"
-              options={usersData?.users?.map((user) => ({
-                label: user?.name?.en,
-                value: user._id,
-              }))}
-              hasEmpty
-              label="User"
-              placeholder="User Name"
-              className="w-full"
-              value={filter.user}
-              onChange={({target: {name, value}}) =>
-                setFilter({...filter, user: value})
-              }
-              padding={2}
-            />
+            <Box
+              flexDirection="row"
+              display="flex"
+              justifyContent={{xs: 'center', md: 'flex-end'}}
+              gap="20px"
+              alignItems="center"
+            >
+              <DesktopDatePicker
+                label="From"
+                value={filter.start_date}
+                onChange={(value) => setFilter({...filter, start_date: value})}
+                renderInput={(props) => <TextField {...props} />}
+              />
+              <DesktopDatePicker
+                label="To"
+                value={filter.end_date}
+                onChange={(value) => setFilter({...filter, end_date: value})}
+                renderInput={(props) => <TextField {...props} />}
+              />
+            </Box>
+            {user?.role === 0 && (
+              <CustomSelect
+                id="bootstrap"
+                options={usersData?.users?.map((user) => ({
+                  label: user?.name?.en,
+                  value: user._id,
+                }))}
+                hasEmpty
+                label="User"
+                placeholder="User Name"
+                className="w-full"
+                value={filter.user}
+                onChange={({target: {name, value}}) =>
+                  setFilter({...filter, user: value})
+                }
+                padding={2}
+              />
+            )}
             {user?.role === 0 && (
               <CustomSelect
                 id="bootstrap"
