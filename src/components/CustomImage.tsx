@@ -20,7 +20,6 @@ const CustomImage: React.FC<CustomImageProps> = ({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        maxWidth: '40%',
         width,
         borderRadius: '8px',
         overflow: 'hidden',

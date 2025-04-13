@@ -8,7 +8,7 @@ import {RiAliensFill, RiLogoutCircleLine} from 'react-icons/ri'
 import UserUser from 'lib/hooks/useUser'
 import request from 'lib/api'
 import router from 'next/router'
-import cookie from "cookie-cutter"
+import cookie from 'cookie-cutter'
 import {useCookies} from 'react-cookie'
 import shallow from 'zustand/shallow'
 import useStore from 'lib/store/store'
@@ -18,6 +18,8 @@ import {red} from '@mui/material/colors'
 export default function ProfileMenu() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
+  const {token, user, rehydrateUser, reset} = useStore()
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -59,6 +61,8 @@ export default function ProfileMenu() {
         <MenuItem
           onClick={() => {
             // Perform logout logic
+            reset()
+            setCookies('token', '')
             window.location.replace('/')
           }}
           className="flex items-center"

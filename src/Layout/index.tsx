@@ -5,6 +5,7 @@ import SideBar from './Sidebar'
 import {Box, Container} from '@mui/material'
 import moment from 'moment'
 import clsx from 'clsx'
+import useStore from 'lib/store/store'
 
 type LayoutProps = {
   meta?: any
@@ -14,7 +15,7 @@ type LayoutProps = {
 const DefaultLayout: FunctionComponent<LayoutProps> = ({
   children,
   meta,
-  cookies
+  cookies,
 }: any) => {
   const {
     title,
@@ -23,6 +24,7 @@ const DefaultLayout: FunctionComponent<LayoutProps> = ({
     url,
     ogImage,
   } = meta || {}
+  const {user} = useStore()
   return (
     <>
       <NextSeo
@@ -45,12 +47,16 @@ const DefaultLayout: FunctionComponent<LayoutProps> = ({
         }}
         className="h-screen flex w-screen"
       >
-        <SideBar />
+        <Box
+          sx={{display: {xs: user?.role === 1 ? 'none' : 'block', md: 'block'}}}
+        >
+          <SideBar />
+        </Box>
         <div className="w-full h-full">
           <Header />
-          <div
-            style={{
-              marginLeft: '7rem',
+          <Box
+            sx={{
+              marginLeft: {xs: user?.role === 1 ? '0' : '7rem', md: '7rem'},
               height: '100%',
             }}
             className={clsx(
@@ -75,7 +81,7 @@ const DefaultLayout: FunctionComponent<LayoutProps> = ({
                 {children}
               </Container>
             </div>
-          </div>
+          </Box>
         </div>
       </Box>
     </>
