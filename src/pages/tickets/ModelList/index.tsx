@@ -51,7 +51,7 @@ export default function ModelList() {
     end_date: null,
     department: departmentId || '',
     user: userId || '',
-    branch: '',
+    branches: '',
     ticket_title: '',
   })
 
@@ -88,6 +88,7 @@ export default function ModelList() {
         filterOptionsRef.current
           ? toSearchQuery({
               ...filterOptionsRef.current,
+
               pageNumber: pagination.pageNumber + 1,
               pageSize: pagination.pageSize,
             })
@@ -295,7 +296,7 @@ export default function ModelList() {
             justifyContent={{xs: 'center', md: 'flex-end'}}
             gap="20px"
             alignItems="center"
-            flexWrap={'wrap'}
+            flexWrap={{xs: 'wrap', md: 'nowrap'}}
           >
             <Box
               flexDirection="row"
@@ -366,10 +367,9 @@ export default function ModelList() {
                 hasEmpty
                 label="Branch"
                 placeholder="Branch"
-                className="w-full"
-                value={filter.branch}
+                value={filter.branches}
                 onChange={({target: {name, value}}) =>
-                  setFilter({...filter, branch: value})
+                  setFilter({...filter, branches: value})
                 }
                 padding={2}
               />
