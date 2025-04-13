@@ -48,6 +48,8 @@ export default function ModelList() {
         isSearchingRef.current
           ? toSearchQuery({
               ...filterOptionsRef.current,
+              branch:
+                (filterOptionsRef.current as any)?.branch?.value ?? undefined,
               pageNumber: pagination.pageNumber + 1,
               pageSize: pagination.pageSize,
             })
@@ -332,9 +334,9 @@ export default function ModelList() {
               placeholder="Branch"
               className="w-full"
               value={filter.branch}
-              onChange={({target: {value}}) =>
+              onChange={({target: {value}}) => {
                 setFilter((old) => ({...old, branch: value}))
-              }
+              }}
               padding={2}
             />
             <CustomSelect
