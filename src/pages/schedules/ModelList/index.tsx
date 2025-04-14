@@ -93,7 +93,7 @@ export default function ModelList() {
         0,
       )
       return totalFetched < (lastPage?.count || 0)
-        ? allPages.length + 1
+        ? allPages?.length + 1
         : undefined
     },
   })

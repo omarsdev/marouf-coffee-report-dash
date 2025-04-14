@@ -76,7 +76,7 @@ export default function SchedulesForm({setLoading}) {
     queryFn: async ({pageParam = 1}) => {
       try {
         const response: any = await userApi.get(
-          toSearchQuery({pageNumber: pageParam, pageSize: 20}),
+          toSearchQuery({pageNumber: pageParam, pageSize: 50}),
         )
         return response?.users ? response : {users: [], count: 0}
       } catch (error) {
@@ -195,14 +195,14 @@ export default function SchedulesForm({setLoading}) {
           multiple={true}
         />
 
-        <CustomSelect
+        <CustomAutocomplete
           id="user-select"
           options={userOptions}
           value={values.userId}
           label="User"
           helperText="Choose User"
           className="w-full"
-          onChange={({target: {name, value}}) => handleChange('userId', value)}
+          onChange={({target: {value}}) => handleChange('userId', value)}
           padding={2}
           fetchNextPage={fetchNextPage}
           isFetchingNextPage={isFetchingNextPage}
