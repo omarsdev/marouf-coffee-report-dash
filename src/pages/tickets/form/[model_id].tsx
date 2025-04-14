@@ -147,6 +147,8 @@ export default function TicketsForm({setLoading}) {
                 alignItems: 'center',
                 justifyContent:
                   data?.ticket?.ticket_images?.length > 2 ? 'center' : 'start',
+                paddingBottom: '1rem',
+                overflow: 'auto',
               }}
             >
               {data?.ticket?.ticket_images?.map((image) => (
