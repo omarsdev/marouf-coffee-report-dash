@@ -33,7 +33,7 @@ export default function ModelList() {
 
   const [filter, setFilter] = React.useState({
     date: (router.query.date as any) ?? null,
-    branches: (router.query.branches as any) ?? null,
+    branch: (router.query.branch as any) ?? null,
     userId: router.query.userId || '',
   })
 
@@ -48,7 +48,7 @@ export default function ModelList() {
         isSearchingRef.current
           ? toSearchQuery({
               ...filterOptionsRef.current,
-              branch: (filterOptionsRef.current as any)?.branch?.value ?? null,
+              branch: (filterOptionsRef.current as any)?.branch ?? null,
               pageNumber: pagination.pageNumber + 1,
               pageSize: pagination.pageSize,
             })
@@ -122,7 +122,7 @@ export default function ModelList() {
         date: filter.date
           ? format(new Date(filter.date), 'yyyy/MM/dd')
           : undefined,
-        branches: filter.branches || undefined,
+        branch: filter.branch || undefined,
         userId: filter.userId || undefined,
       }
 
@@ -332,9 +332,9 @@ export default function ModelList() {
               label="Branch"
               placeholder="Branch"
               className="w-full"
-              value={filter.branches}
+              value={filter.branch}
               onChange={({target: {value}}) => {
-                setFilter((old) => ({...old, branches: value}))
+                setFilter((old) => ({...old, branch: value}))
               }}
               padding={2}
             />
