@@ -115,12 +115,13 @@ export default function SchedulesForm({setLoading}) {
   })
 
   const submitCreate = async () => {
+    console.log({values: values?.branches})
     const payload = {
       ...values,
       assignmentDates: selectedDays,
       from: undefined,
       to: undefined,
-      branches: values?.branches?.map((i) => i.value),
+      branches: values?.branches,
     }
     try {
       setLoading(true)
