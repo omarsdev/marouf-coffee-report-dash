@@ -176,11 +176,21 @@ export default function ModelList() {
       sortable: true,
 
       width: 150,
-      valueGetter: ({row}) => (row.status === 0 ? 'In Progress' : 'Completed'),
+      valueGetter: ({row}) =>
+        row.status === 0
+          ? 'In Progress'
+          : row.status === 2
+          ? 'Transfer'
+          : 'Completed',
       renderCell: ({row}) => (
         <span
           style={{
-            backgroundColor: row.status === 0 ? '#5F6EB9' : '#00BF29',
+            backgroundColor:
+              row.status === 0
+                ? '#5F6EB9'
+                : row.status === 2
+                ? '#FFA500'
+                : '#00BF29',
             paddingTop: '5px',
             paddingBottom: '5px',
             paddingLeft: '10px',
@@ -189,7 +199,11 @@ export default function ModelList() {
             color: 'white',
           }}
         >
-          {row.status === 0 ? 'In Progress' : 'Completed'}
+          {row.status === 0
+            ? 'In Progress'
+            : row.status === 2
+            ? 'Transfered'
+            : 'Completed'}
         </span>
       ),
     },
