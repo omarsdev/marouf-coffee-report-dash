@@ -33,7 +33,7 @@ export default function ModelList() {
 
   const [filter, setFilter] = React.useState({
     date: (router.query.date as any) ?? null,
-    branch: (router.query.branch as any) ?? null,
+    branches: (router.query.branches as any) ?? null,
     userId: router.query.userId || '',
   })
 
@@ -122,7 +122,7 @@ export default function ModelList() {
         date: filter.date
           ? format(new Date(filter.date), 'yyyy/MM/dd')
           : undefined,
-        branch: filter.branch || undefined,
+        branches: filter.branches || undefined,
         userId: filter.userId || undefined,
       }
 
@@ -332,9 +332,9 @@ export default function ModelList() {
               label="Branch"
               placeholder="Branch"
               className="w-full"
-              value={filter.branch}
+              value={filter.branches}
               onChange={({target: {value}}) => {
-                setFilter((old) => ({...old, branch: value}))
+                setFilter((old) => ({...old, branches: value}))
               }}
               padding={2}
             />

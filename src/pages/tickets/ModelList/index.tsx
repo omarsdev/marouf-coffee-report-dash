@@ -8,7 +8,7 @@ import router, {useRouter} from 'next/router'
 
 import React, {useEffect, useRef} from 'react'
 import {branchApi} from 'lib/api/branch'
-import {useQuery} from '@tanstack/react-query'
+import {useInfiniteQuery, useQuery} from '@tanstack/react-query'
 import {ticketsApi} from 'lib/api/tickets'
 import {addDays, format} from 'date-fns'
 import CustomButton from 'components/CustomButton'
@@ -26,6 +26,7 @@ import CompleteDialog from './components/CompleteDialog'
 export default function ModelList() {
   const {
     query: {departmentId, userId},
+    isReady,
   } = useRouter()
 
   const theme = useTheme()
@@ -55,9 +56,37 @@ export default function ModelList() {
     ticket_title: '',
   })
 
-  const {data: usersData, isLoading: isLoadingUser} = useQuery<any>({
-    queryFn: () => userApi.get(),
-    queryKey: ['users'],
+  const {
+    data: usersData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isLoadingUsers,
+  } = useInfiniteQuery({
+    enabled: isReady,
+    queryFn: async ({pageParam = 1}) => {
+      try {
+        const response: any = await userApi.get(
+          toSearchQuery({pageNumber: pageParam, pageSize: 20}),
+        )
+        return response?.users ? response : {users: [], count: 0}
+      } catch (error) {
+        console.error('API Error:', error)
+        return {users: [], count: 0}
+      }
+    },
+    queryKey: ['users', isReady],
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage || !Array.isArray(lastPage.users)) return undefined
+      const totalFetched = allPages.reduce(
+        (sum, page) => sum + (page?.users?.length || 0),
+        0,
+      )
+      return totalFetched < (lastPage?.count || 0)
+        ? allPages?.length + 1
+        : undefined
+    },
   })
 
   const {data: branches, isLoading: isLoadingBranch} = useQuery<any>({
@@ -88,7 +117,6 @@ export default function ModelList() {
         filterOptionsRef.current
           ? toSearchQuery({
               ...filterOptionsRef.current,
-
               pageNumber: pagination.pageNumber + 1,
               pageSize: pagination.pageSize,
             })
@@ -252,6 +280,16 @@ export default function ModelList() {
       ),
     },
   ]
+  const userOptions = React.useMemo(() => {
+    return (
+      usersData?.pages.flatMap((page: any) =>
+        page.users.map((user) => ({
+          label: user.name?.en,
+          value: user._id,
+        })),
+      ) || []
+    )
+  }, [usersData])
 
   return (
     <div>
@@ -334,11 +372,8 @@ export default function ModelList() {
             </Box>
             {user?.role === 0 && (
               <CustomSelect
-                id="bootstrap"
-                options={usersData?.users?.map((user) => ({
-                  label: user?.name?.en,
-                  value: user._id,
-                }))}
+                id="user-select"
+                options={userOptions}
                 hasEmpty
                 label="User"
                 placeholder="User Name"
@@ -348,6 +383,11 @@ export default function ModelList() {
                   setFilter({...filter, user: value})
                 }
                 padding={2}
+                multiple={false}
+                fetchNextPage={fetchNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                hasNextPage={hasNextPage}
+                isLoading={isLoadingUsers}
               />
             )}
             {user?.role === 0 && (

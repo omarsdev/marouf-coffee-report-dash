@@ -188,12 +188,8 @@ export default function TicketsForm({setLoading}) {
               value: '1',
             },
             {
-              label: 'Urgent',
-              value: '2',
-            },
-            {
               label: 'High',
-              value: '3',
+              value: '2',
             },
           ]}
           inputProps={{
