@@ -5,7 +5,7 @@ import TextInput from 'components/TextInput'
 import useForm from 'lib/hooks/useForm'
 import router, {useRouter} from 'next/router'
 import {redirectGuest} from 'pages/_app'
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import Layout from '../../../Layout'
 import Error from 'components/Error'
 import {useQuery} from '@tanstack/react-query'
@@ -13,21 +13,21 @@ import {get} from 'lodash'
 import {checklistApi} from 'lib/api/checklist'
 import {questionsApi} from 'lib/api/questions'
 import CustomAutocomplete from 'components/CustomAutoComplete'
-import {Button} from '@mui/material'
 import CustomButton from 'components/CustomButton'
+
 export default function CheckListForm({setLoading}) {
   const {
     query: {model_id},
   } = useRouter()
-  const isEditting = model_id.toString() !== 'new'
 
-  const [backendError, setBackendError] = React.useState<string>('')
+  const isEditting = model_id.toString() !== 'new'
+  const [backendError, setBackendError] = useState<string>('')
   const [question, setQuestion] = useState<string | null>(null)
 
   const {
     data: questions,
     isLoading,
-    refetch: refetechQuestions,
+    refetch: refetchQuestions,
   } = useQuery<any>({
     queryFn: () => questionsApi.get(),
     queryKey: ['questions'],
@@ -41,16 +41,18 @@ export default function CheckListForm({setLoading}) {
     queryFn: () => checklistApi.getId(model_id.toString()),
     enabled: isEditting,
     queryKey: ['checklist' + model_id.toString()],
-    select: (data) => {
-      return data
-    },
+    select: (data) => data,
   })
+
+  console.log({checkListData})
 
   const submitCreate = async () => {
     try {
       setLoading(true)
-      const payload = values
-      payload.questions = payload?.questions?.map((e) => e?.value)
+      const payload = {
+        ...values,
+        questions: values.questions,
+      }
       await checklistApi.create(payload)
       await refetch()
       router.back()
@@ -61,11 +63,14 @@ export default function CheckListForm({setLoading}) {
       setLoading(false)
     }
   }
+
   const submitUpdate = async () => {
     try {
       setLoading(true)
-      const payload = values
-      payload.questions = payload?.questions?.map((e) => e?.value)
+      const payload = {
+        ...values,
+        questions: values.questions,
+      }
       await checklistApi.update(model_id.toString(), payload)
       await refetch()
       router.back()
@@ -76,6 +81,7 @@ export default function CheckListForm({setLoading}) {
       setLoading(false)
     }
   }
+
   const submitCreateQuestion = async () => {
     try {
       setLoading(true)
@@ -91,7 +97,7 @@ export default function CheckListForm({setLoading}) {
     } finally {
       setQuestion('')
       setLoading(false)
-      refetechQuestions()
+      refetchQuestions()
     }
   }
 
@@ -99,7 +105,6 @@ export default function CheckListForm({setLoading}) {
     initial: {
       questions: isEditting ? undefined : [],
     },
-    // validationSchema:
     onSubmit: isEditting ? submitUpdate : submitCreate,
   })
 
@@ -112,16 +117,29 @@ export default function CheckListForm({setLoading}) {
       const chosenKeys = ['title', 'description']
       handleChange(
         'questions',
-        checkListData?.report.questions?.map((e) => ({
-          label: e.text,
-          value: e._id,
-        })),
+        checkListData?.report.questions?.map((e) => e._id),
       )
-      chosenKeys.map((key) =>
+      chosenKeys.forEach((key) =>
         handleChange(key, get(checkListData?.report, key)),
       )
     }
   }, [checkListData])
+
+  const availableQuestionOptions = useMemo(() => {
+    if (questions?.questions) {
+      return questions?.questions
+        ?.map((q) => ({
+          label: q.text,
+          value: q._id,
+        }))
+        .filter(
+          (q) =>
+            !values.questions?.some((selected) => selected?.value === q?.value),
+        )
+    } else {
+      return []
+    }
+  }, [questions, values.questions])
 
   return (
     <Layout
@@ -138,9 +156,7 @@ export default function CheckListForm({setLoading}) {
       </CustomLabel>
 
       <CustomContainer
-        style={{
-          overflow: 'hidden',
-        }}
+        style={{overflow: 'hidden'}}
         className="overflow-hidden mb-14"
         radius="medium"
         type="secondary"
@@ -162,6 +178,7 @@ export default function CheckListForm({setLoading}) {
           onChange={handleChange}
           padding={1}
         />
+
         <div className="w-full flex gap-5 items-center">
           <TextInput
             label="New Question"
@@ -181,34 +198,13 @@ export default function CheckListForm({setLoading}) {
         {values.questions && (
           <CustomAutocomplete
             id="bootstrap"
-            options={questions?.questions
-              ?.map((question) => ({
-                label: question?.text,
-                value: question?._id,
-              }))
-              .filter(
-                (q) =>
-                  !values.questions.some(
-                    (selected) => selected.value === q.value,
-                  ),
-              )}
-            inputProps={{
-              default: '1',
-            }}
-            // hasEmpty
-            // variant='outlined'
+            options={availableQuestionOptions}
             value={values.questions}
             label="Questions"
             helperText="Choose Questions"
             className="w-full"
-            // onChange={({target: {name, value}}) =>
-            //   handleChange('questions', [...values.questions, value])
-            // }
             onChange={({target: {value}}) => {
-              const newValue = Array.isArray(value)
-                ? value
-                : [...(value || []), value]
-              handleChange('questions', newValue)
+              handleChange('questions', value)
             }}
             padding={2}
             multiple={true}
@@ -217,12 +213,7 @@ export default function CheckListForm({setLoading}) {
 
         <Error backendError={backendError} />
 
-        <FormBottomWidget
-          isEdit={isEditting}
-          onSubmit={() => {
-            handleSubmit()
-          }}
-        />
+        <FormBottomWidget isEdit={isEditting} onSubmit={() => handleSubmit()} />
       </CustomContainer>
     </Layout>
   )
