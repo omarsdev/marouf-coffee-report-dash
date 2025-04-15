@@ -188,6 +188,10 @@ export default function TicketsForm({setLoading}) {
               value: '1',
             },
             {
+              label: 'Urgent',
+              value: '2',
+            },
+            {
               label: 'High',
               value: '3',
             },
@@ -226,6 +230,10 @@ export default function TicketsForm({setLoading}) {
             {
               label: 'Completed',
               value: '1',
+            },
+            {
+              label: 'Transfered',
+              value: '2',
             },
           ]}
           inputProps={{
