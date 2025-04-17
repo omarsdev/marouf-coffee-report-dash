@@ -27,10 +27,9 @@ export default function ModelList() {
       return data
     },
   })
-  console.log({data})
 
   const getNoteValue = (props) => {
-    if (props === 'Empty') {
+    if (props === 'Empty' || !props) {
       return {note: '', image: []}
     } else {
       const data = JSON.parse(props)

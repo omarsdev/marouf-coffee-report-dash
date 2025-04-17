@@ -230,11 +230,13 @@ export default function ModelList() {
       sortComparator: (v1, v2, row1, row2) => {
         return (v1 || 0) - (v2 || 0)
       },
-      renderCell: ({row}) => (
-        <div>
-          {calculateYesPercentage(row?.submission?.answers ?? undefined)} %
-        </div>
-      ),
+      renderCell: ({row}) => {
+        return (
+          <div>
+            {calculateYesPercentage(row?.submission?.answers ?? undefined)} %
+          </div>
+        )
+      },
     },
     {
       ...defaultRowConfig,

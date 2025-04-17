@@ -9,10 +9,15 @@ export const toSearchQuery = (params) => {
 
   return searchQuery ? `?${searchQuery}` : ''
 }
-export function calculateYesPercentage(answers) {
+export const calculateYesPercentage = (answers) => {
   if (!answers?.length) return 0
 
+  console.log({answers})
+
   const totalAnswers = answers.length
-  const yesAnswers = answers?.filter((a) => a.answer === 'Yes').length
+  const yesAnswers = answers?.filter(
+    (a) => a.answer === 'YES' || a.answer === 'NA',
+  ).length
+  console.log({yesAnswers, totalAnswers})
   return ((yesAnswers / totalAnswers) * 100).toFixed(2)
 }
