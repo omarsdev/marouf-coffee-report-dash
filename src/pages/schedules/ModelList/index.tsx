@@ -203,9 +203,9 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'completed',
       headerName: 'Status',
-      sortable: false,
-      hideSortIcons: true,
-      renderCell: ({row}) => (
+      sortable: true,
+      valueGetter: ({ row }) => (row.completed ? 'Completed' : 'In Progress'),
+      renderCell: ({ row }) => (
         <span
           style={{
             backgroundColor: !row.completed ? '#5F6EB9' : '#00BF29',
