@@ -27,6 +27,7 @@ import DateRangePicker from 'components/DateRangePicker'
 import {DAYS_OF_WEEK} from 'lib/constants'
 import DayToggleButton from 'components/DayToggleButton'
 import {toSearchQuery} from 'lib/utils'
+import CustomAutocomplete from 'components/CustomAutoComplete'
 
 export default function SchedulesForm({setLoading}) {
   const [backendError, setBackendError] = React.useState<string>('')
@@ -208,7 +209,7 @@ export default function SchedulesForm({setLoading}) {
           isLoading={isLoadingUsers}
         />
 
-        <CustomSelect
+        <CustomAutocomplete
           id="bootstrap"
           options={branches?.branches?.map((branch) => ({
             label: branch?.name?.en,

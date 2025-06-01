@@ -35,7 +35,7 @@ export default function ModelList() {
   }, [JSON.stringify(pagination)])
 
   const defaultRowConfig = {
-    flex: 1,
+    // flex: 1,
     headerAlign: 'left',
     align: 'left',
   } as GridColDef
@@ -47,6 +47,7 @@ export default function ModelList() {
       headerName: 'English Name',
       renderCell: ({row}) => `${row.department_name?.en}`,
       valueGetter: ({row}) => row.department_name.en,
+      width: 200,
       sortComparator: (v1, v2, row1, row2) =>
         (row1.value || '').localeCompare(row2.value || ''),
     },
@@ -58,6 +59,7 @@ export default function ModelList() {
       valueGetter: ({row}) => row.department_name.ar,
       sortComparator: (v1, v2, row1, row2) =>
         (row1.value || '').localeCompare(row2.value || ''),
+      width: 200,
     },
     {
       ...defaultRowConfig,
@@ -67,6 +69,7 @@ export default function ModelList() {
       valueGetter: ({row}) => row.user?.name.ar,
       sortComparator: (v1, v2, row1, row2) =>
         (row1.value || '').localeCompare(row2.value || ''),
+      width: 200,
     },
     {
       ...defaultRowConfig,
@@ -76,6 +79,7 @@ export default function ModelList() {
       hideSortIcons: true,
       filterable: false,
       renderCell: ({row}) => `${row.ticketCount}`,
+      width: 200,
     },
     {
       ...defaultRowConfig,
@@ -84,6 +88,7 @@ export default function ModelList() {
       sortable: false,
       hideSortIcons: true,
       filterable: false,
+      width: 200,
 
       renderCell: ({row}) => {
         return (
@@ -110,6 +115,7 @@ export default function ModelList() {
       hideSortIcons: true,
       hideable: false,
       filterable: false,
+      width: 250,
       renderCell: ({row}) => (
         <TableActionCell
           onEdit={() => {

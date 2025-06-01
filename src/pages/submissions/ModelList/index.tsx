@@ -21,11 +21,8 @@ export default function ModelList() {
   const time_start = query.time_start as string
   const time_end = query.time_end as string
   const areaMangerName = query.areaMangerName
-  const answers = query.answers
+  const score = query.score
 
-  console.log({areaMangerName, answers})
-
-  const theme = useTheme()
   const [localLoading, setLocalLoading] = React.useState(false)
 
   const {data, isLoading, isError, refetch} = useQuery<any>({
@@ -61,7 +58,10 @@ export default function ModelList() {
       field: 'questionId.text',
       headerName: 'Title',
       valueGetter: (params) => params.row.questionId?.text || '',
-      renderCell: ({row}) => `${row?.questionId?.text}`,
+      renderCell: ({row}) => {
+        console.log({row})
+        return row?.questionId?.text
+      },
     },
     {
       ...defaultRowConfig,
@@ -114,10 +114,10 @@ export default function ModelList() {
   const excelColumns: GridColDef[] = [
     ...columns,
     {
-      field: 'answers',
-      headerName: 'answers percentage',
-      renderCell: () => answers + '%',
-      valueGetter: () => answers + '%',
+      field: 'Score',
+      headerName: 'Score',
+      renderCell: () => score + '%',
+      valueGetter: () => score + '%',
     },
     {
       field: 'name',
@@ -169,6 +169,12 @@ export default function ModelList() {
       valueGetter: () =>
         time_end ? format(new Date(time_end), 'p') : 'Invalid Date',
     },
+    {
+      field: 'checkList',
+      headerName: 'Check List Name',
+      renderCell: () => data?.submission?.reportCopy?.title,
+      valueGetter: () => data?.submission?.reportCopy?.title,
+    },
   ]
 
   return (
@@ -190,9 +196,9 @@ export default function ModelList() {
           className="flex flex-row gap-2"
         >
           <CustomLabel type="primary" size="normal">
-            Answers :
+            Scores :
           </CustomLabel>
-          {answers + '%'}
+          {score + '%'}
         </CustomLabel>
         <CustomLabel type="primary" size="normal">
           {data?.submission?.reportCopy?.title}
@@ -259,9 +265,11 @@ export default function ModelList() {
       <Table
         rows={
           (data?.submission?.answers &&
-            data?.submission?.answers?.map((model) => ({
+            data?.submission?.answers?.map((model, index) => ({
               ...model,
               id: model._id,
+              questionId:
+                data?.submission?.reportCopy?.questions[index] ?? null,
             }))) ||
           []
         }

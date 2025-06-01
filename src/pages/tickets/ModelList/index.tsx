@@ -20,6 +20,8 @@ import {CiSearch} from 'react-icons/ci'
 import {toSearchQuery} from 'lib/utils'
 import useStore from 'lib/store/store'
 import {userApi} from 'lib/api/user'
+import TransferDialog from './components/TransferDialog'
+import CompleteDialog from './components/CompleteDialog'
 
 export default function ModelList() {
   const {
@@ -41,6 +43,9 @@ export default function ModelList() {
   })
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(null)
+  const [transferDialogOpen, setTransferDialogOpen] = React.useState(null)
+  const [completeDialogOpen, setCompleteDialogOpen] = React.useState(null)
+
   const [filter, setFilter] = React.useState({
     start_date: null,
     end_date: null,
@@ -124,6 +129,16 @@ export default function ModelList() {
     },
     {
       ...defaultRowConfig,
+      field: 'user.name.en',
+      headerName: 'User',
+      renderCell: ({row}) => `${row.user?.name?.en}`,
+      valueGetter: ({row}) => row.user?.name?.en,
+      sortComparator: (v1, v2, row1, row2) => {
+        return (row1.value || '').localeCompare(row2.value || '')
+      },
+    },
+    {
+      ...defaultRowConfig,
       field: 'branch.name.en',
       headerName: 'Branch',
       renderCell: ({row}) => `${row.branch?.name?.en}`,
@@ -155,6 +170,7 @@ export default function ModelList() {
       field: 'status',
       headerName: 'Status',
       sortable: true,
+      valueGetter: ({row}) => (row.status === 0 ? 'In Progress' : 'Completed'),
       renderCell: ({row}) => (
         <span
           style={{
@@ -176,9 +192,11 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'created_at',
       headerName: 'Date',
+      width: 100,
       renderCell: ({row}) =>
         `${format(new Date(row.created_at), 'dd/MM/yyyy')}`,
-      valueGetter: ({row}) => row.created_at,
+      valueGetter: ({row}) =>
+        `${format(new Date(row.created_at), 'dd/MM/yyyy')}`,
       sortComparator: (v1, v2) =>
         new Date(v1 || 0).getDate() - new Date(v2 || 0).getDate(),
     },
@@ -191,6 +209,8 @@ export default function ModelList() {
       hideSortIcons: true,
       hideable: false,
       filterable: false,
+      disableExport: true,
+      width: 250,
       renderCell: ({row}) => (
         <TableActionCell
           onEdit={() => {
@@ -201,6 +221,12 @@ export default function ModelList() {
           }}
           onDelete={() => {
             setDeleteDialogOpen(row.id)
+          }}
+          onTransfer={() => {
+            setTransferDialogOpen(row.id)
+          }}
+          onComplete={() => {
+            setCompleteDialogOpen(row.id)
           }}
         />
       ),
@@ -226,13 +252,28 @@ export default function ModelList() {
           }
         }}
       />
+      <TransferDialog
+        isOpen={!!transferDialogOpen}
+        handleClose={() => setTransferDialogOpen(null)}
+        departments={departments}
+        id={transferDialogOpen}
+        refetch={refetch}
+      />
+      <CompleteDialog
+        isOpen={!!completeDialogOpen}
+        handleClose={() => setCompleteDialogOpen(null)}
+        id={completeDialogOpen}
+        refetch={refetch}
+      />
       <Table
         rows={
           (data?.tickets &&
             data?.tickets?.map((model) => ({...model, id: model._id}))) ||
           []
         }
+        exportButton
         columns={columns}
+        excelColumns={columns.filter((col) => col.field !== 'id')}
         loading={
           localLoading || isLoading || isLoadingBranch || isLoadingDepartments
         }
