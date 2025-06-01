@@ -8,7 +8,7 @@ import router, {useRouter} from 'next/router'
 
 import React, {useEffect, useRef} from 'react'
 import {branchApi} from 'lib/api/branch'
-import {useQuery} from '@tanstack/react-query'
+import {useInfiniteQuery, useQuery} from '@tanstack/react-query'
 import {ticketsApi} from 'lib/api/tickets'
 import {addDays, format} from 'date-fns'
 import CustomButton from 'components/CustomButton'
@@ -26,6 +26,7 @@ import CompleteDialog from './components/CompleteDialog'
 export default function ModelList() {
   const {
     query: {departmentId, userId},
+    isReady,
   } = useRouter()
 
   const theme = useTheme()
@@ -51,13 +52,41 @@ export default function ModelList() {
     end_date: null,
     department: departmentId || '',
     user: userId || '',
-    branch: '',
+    branches: '',
     ticket_title: '',
   })
 
-  const {data: usersData, isLoading: isLoadingUser} = useQuery<any>({
-    queryFn: () => userApi.get(),
-    queryKey: ['users'],
+  const {
+    data: usersData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isLoadingUsers,
+  } = useInfiniteQuery({
+    enabled: isReady,
+    queryFn: async ({pageParam = 1}) => {
+      try {
+        const response: any = await userApi.get(
+          toSearchQuery({pageNumber: pageParam, pageSize: 20}),
+        )
+        return response?.users ? response : {users: [], count: 0}
+      } catch (error) {
+        console.error('API Error:', error)
+        return {users: [], count: 0}
+      }
+    },
+    queryKey: ['users', isReady],
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage || !Array.isArray(lastPage.users)) return undefined
+      const totalFetched = allPages.reduce(
+        (sum, page) => sum + (page?.users?.length || 0),
+        0,
+      )
+      return totalFetched < (lastPage?.count || 0)
+        ? allPages?.length + 1
+        : undefined
+    },
   })
 
   const {data: branches, isLoading: isLoadingBranch} = useQuery<any>({
@@ -107,7 +136,6 @@ export default function ModelList() {
   })
 
   const defaultRowConfig = {
-    flex: 1,
     headerAlign: 'left',
     align: 'left',
   } as GridColDef
@@ -121,6 +149,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'ticket_title',
       headerName: 'Ticket Title',
+      width: 150,
       renderCell: ({row}) => `${row.ticket_title}`,
       valueGetter: ({row}) => row.ticket_title,
       sortComparator: (v1, v2, row1, row2) => {
@@ -131,6 +160,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'user.name.en',
       headerName: 'User',
+      width: 150,
       renderCell: ({row}) => `${row.user?.name?.en}`,
       valueGetter: ({row}) => row.user?.name?.en,
       sortComparator: (v1, v2, row1, row2) => {
@@ -141,6 +171,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'branch.name.en',
       headerName: 'Branch',
+      width: 150,
       renderCell: ({row}) => `${row.branch?.name?.en}`,
       valueGetter: ({row}) => row.branch?.name?.en,
       sortComparator: (v1, v2, row1, row2) => {
@@ -151,6 +182,7 @@ export default function ModelList() {
       ...defaultRowConfig,
       field: 'department.department_name.en',
       headerName: 'Department',
+      width: 150,
       renderCell: ({row}) =>
         `${
           row.area_manager?.name?.en
@@ -170,11 +202,23 @@ export default function ModelList() {
       field: 'status',
       headerName: 'Status',
       sortable: true,
-      valueGetter: ({row}) => (row.status === 0 ? 'In Progress' : 'Completed'),
+
+      width: 150,
+      valueGetter: ({row}) =>
+        row.status === 0
+          ? 'In Progress'
+          : row.status === 2
+          ? 'Transfer'
+          : 'Completed',
       renderCell: ({row}) => (
         <span
           style={{
-            backgroundColor: row.status === 0 ? '#5F6EB9' : '#00BF29',
+            backgroundColor:
+              row.status === 0
+                ? '#5F6EB9'
+                : row.status === 2
+                ? '#FFA500'
+                : '#00BF29',
             paddingTop: '5px',
             paddingBottom: '5px',
             paddingLeft: '10px',
@@ -183,7 +227,11 @@ export default function ModelList() {
             color: 'white',
           }}
         >
-          {row.status === 0 ? 'In Progress' : 'Completed'}
+          {row.status === 0
+            ? 'In Progress'
+            : row.status === 2
+            ? 'Transfered'
+            : 'Completed'}
         </span>
       ),
     },
@@ -232,6 +280,16 @@ export default function ModelList() {
       ),
     },
   ]
+  const userOptions = React.useMemo(() => {
+    return (
+      usersData?.pages.flatMap((page: any) =>
+        page.users.map((user) => ({
+          label: user.name?.en,
+          value: user._id,
+        })),
+      ) || []
+    )
+  }, [usersData])
 
   return (
     <div>
@@ -287,38 +345,51 @@ export default function ModelList() {
           <Box
             flexDirection="row"
             display="flex"
-            justifyContent="flex-end"
+            justifyContent={{xs: 'center', md: 'flex-end'}}
             gap="20px"
             alignItems="center"
+            flexWrap={{xs: 'wrap', md: 'nowrap'}}
           >
-            <DesktopDatePicker
-              label="From"
-              value={filter.start_date}
-              onChange={(value) => setFilter({...filter, start_date: value})}
-              renderInput={(props) => <TextField {...props} />}
-            />
-            <DesktopDatePicker
-              label="To"
-              value={filter.end_date}
-              onChange={(value) => setFilter({...filter, end_date: value})}
-              renderInput={(props) => <TextField {...props} />}
-            />
-            <CustomSelect
-              id="bootstrap"
-              options={usersData?.users?.map((user) => ({
-                label: user?.name?.en,
-                value: user._id,
-              }))}
-              hasEmpty
-              label="User"
-              placeholder="User Name"
-              className="w-full"
-              value={filter.user}
-              onChange={({target: {name, value}}) =>
-                setFilter({...filter, user: value})
-              }
-              padding={2}
-            />
+            <Box
+              flexDirection="row"
+              display="flex"
+              justifyContent={{xs: 'center', md: 'flex-end'}}
+              gap="20px"
+              alignItems="center"
+            >
+              <DesktopDatePicker
+                label="From"
+                value={filter.start_date}
+                onChange={(value) => setFilter({...filter, start_date: value})}
+                renderInput={(props) => <TextField {...props} />}
+              />
+              <DesktopDatePicker
+                label="To"
+                value={filter.end_date}
+                onChange={(value) => setFilter({...filter, end_date: value})}
+                renderInput={(props) => <TextField {...props} />}
+              />
+            </Box>
+            {user?.role === 0 && (
+              <CustomSelect
+                id="user-select"
+                options={userOptions}
+                hasEmpty
+                label="User"
+                placeholder="User Name"
+                className="w-full"
+                value={filter.user}
+                onChange={({target: {name, value}}) =>
+                  setFilter({...filter, user: value})
+                }
+                padding={2}
+                multiple={false}
+                fetchNextPage={fetchNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                hasNextPage={hasNextPage}
+                isLoading={isLoadingUsers}
+              />
+            )}
             {user?.role === 0 && (
               <CustomSelect
                 id="bootstrap"
@@ -350,10 +421,9 @@ export default function ModelList() {
                 hasEmpty
                 label="Branch"
                 placeholder="Branch"
-                className="w-full"
-                value={filter.branch}
+                value={filter.branches}
                 onChange={({target: {name, value}}) =>
-                  setFilter({...filter, branch: value})
+                  setFilter({...filter, branches: value})
                 }
                 padding={2}
               />

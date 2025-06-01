@@ -6,6 +6,8 @@ import {AnimatePresence, motion} from 'framer-motion'
 import React, {useState} from 'react'
 import {RiArrowLeftRightLine} from 'react-icons/ri'
 import {FaCodeBranch} from 'react-icons/fa'
+import {IoIosNotifications} from 'react-icons/io'
+
 import {IoTicketOutline} from 'react-icons/io5'
 import {FaQuestion} from 'react-icons/fa'
 import {MdChecklist} from 'react-icons/md'
@@ -79,6 +81,12 @@ export default function SideBar() {
       href: '/questions',
       icon: <FaQuestion size="1.7rem" />,
     },
+    {
+      title: 'Send Notifications',
+      tooltip: 'Send Notifications',
+      href: '/send-notifications',
+      icon: <IoIosNotifications size="1.7rem" />,
+    },
   ]
 
   const [open, setOpen] = useState(false)
@@ -89,7 +97,7 @@ export default function SideBar() {
   return (
     <motion.div
       style={{
-        zIndex: 1500,
+        zIndex: 1000,
         width: '7rem',
       }}
       animate={{

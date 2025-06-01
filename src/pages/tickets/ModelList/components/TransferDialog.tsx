@@ -32,7 +32,7 @@ const TransferDialog = ({
   const onSubmit = async () => {
     try {
       setLoading(true)
-      await ticketsApi.edit(id.toString(), {
+      await ticketsApi.update(id.toString(), {
         ...values,
         transfer_to_department: true,
       })
@@ -63,9 +63,14 @@ const TransferDialog = ({
       }}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
+      PaperProps={{
+        sx: {
+          zIndex: 1600,
+        },
+      }}
     >
       <DialogTitle id="alert-dialog-title">{'Transfer Ticket'}</DialogTitle>
-      <DialogContent sx={{width: '400px'}}>
+      <DialogContent sx={{width: {xs: '300px', md: '400px'}}}>
         <CustomSelect
           id="bootstrap"
           options={departments?.departments?.map((department) => ({

@@ -30,7 +30,7 @@ const CompleteDialog = ({
   const onSubmit = async () => {
     try {
       setLoading(true)
-      await ticketsApi.edit(id.toString(), {
+      await ticketsApi.update(id.toString(), {
         ...values,
         resolve: true,
       })
@@ -62,7 +62,7 @@ const CompleteDialog = ({
       aria-describedby="alert-dialog-description"
     >
       <DialogTitle id="alert-dialog-title">{'Complete Ticket'}</DialogTitle>
-      <DialogContent sx={{width: '400px'}}>
+      <DialogContent sx={{width: {xs: '300px', md: '400px'}}}>
         <TextInput
           label="Progress Note"
           className="w-full"

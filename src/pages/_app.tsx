@@ -115,7 +115,7 @@ function MyApp({Component, pageProps}) {
     const getUserInfo = async () => {
       try {
         const userData = await rehydrateUser()
-        if (userData?.role === 1) {
+        if (token && userData?.role === 1) {
           router.push('/tickets')
         }
       } catch (error) {

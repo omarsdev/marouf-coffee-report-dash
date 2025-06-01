@@ -48,6 +48,7 @@ export default function ModelList() {
         isSearchingRef.current
           ? toSearchQuery({
               ...filterOptionsRef.current,
+              branch: (filterOptionsRef.current as any)?.branch ?? null,
               pageNumber: pagination.pageNumber + 1,
               pageSize: pagination.pageSize,
             })
@@ -92,7 +93,7 @@ export default function ModelList() {
         0,
       )
       return totalFetched < (lastPage?.count || 0)
-        ? allPages.length + 1
+        ? allPages?.length + 1
         : undefined
     },
   })
@@ -229,11 +230,13 @@ export default function ModelList() {
       sortComparator: (v1, v2, row1, row2) => {
         return (v1 || 0) - (v2 || 0)
       },
-      renderCell: ({row}) => (
-        <div>
-          {calculateYesPercentage(row?.submission?.answers ?? undefined)} %
-        </div>
-      ),
+      renderCell: ({row}) => {
+        return (
+          <div>
+            {calculateYesPercentage(row?.submission?.answers ?? undefined)} %
+          </div>
+        )
+      },
     },
     {
       ...defaultRowConfig,
@@ -332,9 +335,9 @@ export default function ModelList() {
               placeholder="Branch"
               className="w-full"
               value={filter.branch}
-              onChange={({target: {value}}) =>
+              onChange={({target: {value}}) => {
                 setFilter((old) => ({...old, branch: value}))
-              }
+              }}
               padding={2}
             />
             <CustomSelect

@@ -18,6 +18,7 @@ import {ticketsApi} from 'lib/api/tickets'
 import CustomImage from 'components/CustomImage'
 import {Box} from '@mui/material'
 import * as Yup from 'yup'
+import clsx from 'clsx'
 
 export default function TicketsForm({setLoading}) {
   const {
@@ -130,7 +131,7 @@ export default function TicketsForm({setLoading}) {
         style={{
           overflow: 'hidden',
         }}
-        className="overflow-hidden mb-14"
+        className={clsx('overflow-hidden mb-14 width-[82%] sm:w-full')}
         radius="medium"
         type="secondary"
         padding={3}
@@ -138,15 +139,24 @@ export default function TicketsForm({setLoading}) {
         {isEditting &&
           data?.ticket &&
           data?.ticket?.ticket_images?.length > 0 && (
-            <a href={data?.ticket?.ticket_images[0]} target="_blank">
-              <Box
-                sx={{
-                  mb: 2,
-                }}
-              >
-                <CustomImage src={data?.ticket?.ticket_images[0]} />
-              </Box>
-            </a>
+            <Box
+              sx={{
+                mb: 2,
+                display: 'flex',
+                gap: '10px',
+                alignItems: 'center',
+                justifyContent:
+                  data?.ticket?.ticket_images?.length > 2 ? 'center' : 'start',
+                paddingBottom: '1rem',
+                overflow: 'auto',
+              }}
+            >
+              {data?.ticket?.ticket_images?.map((image) => (
+                <a href={image} target="_blank">
+                  <CustomImage src={image} />
+                </a>
+              ))}
+            </Box>
           )}
 
         <TextInput
@@ -179,7 +189,7 @@ export default function TicketsForm({setLoading}) {
             },
             {
               label: 'High',
-              value: '3',
+              value: '2',
             },
           ]}
           inputProps={{
@@ -216,6 +226,10 @@ export default function TicketsForm({setLoading}) {
             {
               label: 'Completed',
               value: '1',
+            },
+            {
+              label: 'Transfered',
+              value: '2',
             },
           ]}
           inputProps={{
